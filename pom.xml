@@ -11,9 +11,10 @@
 
     <parent>
         <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter</artifactId>
+        <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.2.2</version>
     </parent>
+
     <modules>
         <module>wf</module>
         <module>wf-dingtalk</module>
