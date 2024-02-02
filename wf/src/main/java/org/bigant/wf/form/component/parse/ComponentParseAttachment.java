@@ -3,10 +3,8 @@ package org.bigant.wf.form.component.parse;
 import com.alibaba.fastjson2.JSONArray;
 import org.bigant.wf.form.component.ComponentParse;
 import org.bigant.wf.form.component.ComponentType;
-import org.bigant.wf.form.component.bean.Attachment;
+import org.bigant.wf.form.component.bean.AttachmentComponent;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -15,21 +13,21 @@ import java.util.List;
  * @author galen
  * @date 2024/1/3116:30
  */
-public class ComponentParseAttachment implements ComponentParse<List<Attachment>> {
+public class ComponentParseAttachment implements ComponentParse<List<AttachmentComponent>> {
 
 
     @Override
-    public List<Attachment> toJava(String str) {
-        return JSONArray.parse(str).toJavaList(Attachment.class);
+    public List<AttachmentComponent> toJava(String str) {
+        return JSONArray.parse(str).toJavaList(AttachmentComponent.class);
     }
 
     @Override
-    public String toStr(List<Attachment> data) {
+    public String toStr(List<AttachmentComponent> data) {
         return JSONArray.toJSONString(data);
     }
 
     @Override
-    public void verify(List<Attachment> data) {
+    public void verify(List<AttachmentComponent> data) {
 
     }
 

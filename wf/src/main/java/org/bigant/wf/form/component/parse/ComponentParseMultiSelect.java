@@ -4,8 +4,7 @@ import com.alibaba.fastjson2.JSONArray;
 import org.bigant.wf.form.component.ComponentParse;
 import org.bigant.wf.form.component.ComponentType;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 /**
  * 组建工具
@@ -13,21 +12,21 @@ import java.util.Set;
  * @author galen
  * @date 2024/1/3116:30
  */
-public class ComponentParseMultiSelect implements ComponentParse<Set<String>> {
+public class ComponentParseMultiSelect implements ComponentParse<List<String>> {
 
 
     @Override
-    public Set<String> toJava(String str) {
-        return new HashSet<>(JSONArray.parseArray(str, String.class));
+    public List<String> toJava(String str) {
+        return JSONArray.parseArray(str, String.class);
     }
 
     @Override
-    public String toStr(Set<String> data) {
+    public String toStr(List<String> data) {
         return JSONArray.toJSONString(data);
     }
 
     @Override
-    public void verify(Set<String> data) {
+    public void verify(List<String> data) {
 
     }
 

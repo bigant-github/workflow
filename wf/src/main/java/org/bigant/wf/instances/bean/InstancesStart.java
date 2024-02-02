@@ -5,12 +5,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
 import org.bigant.wf.form.bean.FormComponent;
-import org.bigant.wf.form.component.ComponentType;
-import org.bigant.wf.form.component.bean.Attachment;
-import org.bigant.wf.form.component.bean.DateRange;
-
-import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 
 /**

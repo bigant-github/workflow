@@ -1,9 +1,10 @@
 package org.bigant.wf.form.component.parse;
 
+import com.alibaba.fastjson2.JSONObject;
 import org.bigant.wf.form.component.ComponentParse;
 import org.bigant.wf.form.component.ComponentType;
+import org.bigant.wf.form.component.bean.DateRangeComponent;
 
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -12,23 +13,23 @@ import java.time.format.DateTimeFormatter;
  * @author galen
  * @date 2024/1/3116:30
  */
-public class ComponentParseDateRange implements ComponentParse<LocalDate> {
+public class ComponentParseDateRange implements ComponentParse<DateRangeComponent> {
 
     public static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
 
     @Override
-    public LocalDate toJava(String str) {
-        return DATE_FORMAT.parse(str, LocalDate::from);
+    public DateRangeComponent toJava(String str) {
+        return JSONObject.parseObject(str, DateRangeComponent.class);
     }
 
     @Override
-    public String toStr(LocalDate data) {
-        return DATE_FORMAT.format(data);
+    public String toStr(DateRangeComponent data) {
+        return JSONObject.toJSONString(data);
     }
 
     @Override
-    public void verify(LocalDate data) {
+    public void verify(DateRangeComponent data) {
         
     }
 

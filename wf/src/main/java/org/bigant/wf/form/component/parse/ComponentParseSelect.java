@@ -1,12 +1,7 @@
 package org.bigant.wf.form.component.parse;
 
-import com.alibaba.fastjson2.JSONArray;
-import com.alibaba.fastjson2.JSONObject;
 import org.bigant.wf.form.component.ComponentParse;
 import org.bigant.wf.form.component.ComponentType;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * 组建工具

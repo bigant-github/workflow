@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.bigant.wf.form.component.ComponentDateFormat;
 
 import java.time.LocalDateTime;
 
@@ -21,13 +22,18 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class DateRange {
+public class DateComponent {
+
+    @ApiModelProperty("时间格式")
+    private ComponentDateFormat dateFormat;
 
     @ApiModelProperty("开始时间")
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime begin;
+    private LocalDateTime date;
 
-    @ApiModelProperty("结束时间")
-    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime end;
+
+    public String toDateStr() {
+        return dateFormat.getParse().format(date);
+    }
+
 }

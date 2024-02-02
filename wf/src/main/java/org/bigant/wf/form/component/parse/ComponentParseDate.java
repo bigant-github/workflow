@@ -1,11 +1,9 @@
 package org.bigant.wf.form.component.parse;
 
+import com.alibaba.fastjson2.JSONObject;
 import org.bigant.wf.form.component.ComponentParse;
 import org.bigant.wf.form.component.ComponentType;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import org.bigant.wf.form.component.bean.DateComponent;
 
 /**
  * 组建工具
@@ -13,24 +11,21 @@ import java.time.format.DateTimeFormatter;
  * @author galen
  * @date 2024/1/3116:30
  */
-public class ComponentParseDate implements ComponentParse<LocalDateTime> {
-
-    public static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+public class ComponentParseDate implements ComponentParse<DateComponent> {
 
 
     @Override
-    public LocalDateTime toJava(String str) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(str);
-        return LocalDateTime.parse(str, formatter);
+    public DateComponent toJava(String str) {
+        return JSONObject.parseObject(str, DateComponent.class);
     }
 
     @Override
-    public String toStr(LocalDateTime data) {
-        return DATE_FORMAT.format(data);
+    public String toStr(DateComponent data) {
+        return JSONObject.toJSONString(data);
     }
 
     @Override
-    public void verify(LocalDateTime data) {
+    public void verify(DateComponent data) {
 
     }
 

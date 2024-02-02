@@ -14,14 +14,14 @@ import org.bigant.wf.form.component.parse.*;
 @AllArgsConstructor
 public enum ComponentType {
 
-    TEXT("单行输入框", new ComponentParseText()),
-    TEXTAREA("多行输入框", new ComponentParseTextarea()),
-    NUMBER("数字输入框", new ComponentParseNumber()),
-    SELECT("单选框", new ComponentParseSelect()),
-    MULTI_SELECT("多选框", new ComponentParseMultiSelect()),
-    DATE("日期控件", new ComponentParseDate()),
-    DATE_RANGE("时间区间控件", new ComponentParseDateRange()),
-    ATTACHMENT("附件", new ComponentParseAttachment());
+    TEXT("单行输入框", ComponentParseAll.COMPONENT_PARSE_TEXT),
+    TEXTAREA("多行输入框", ComponentParseAll.COMPONENT_PARSE_TEXTAREA),
+    NUMBER("数字输入框", ComponentParseAll.COMPONENT_PARSE_NUMBER),
+    SELECT("单选框", ComponentParseAll.COMPONENT_PARSE_SELECT),
+    MULTI_SELECT("多选框", ComponentParseAll.COMPONENT_PARSE_MULTI_SELECT),
+    DATE("日期控件", ComponentParseAll.COMPONENT_PARSE_DATE),
+    DATE_RANGE("时间区间控件", ComponentParseAll.COMPONENT_PARSE_DATE_RANGE),
+    ATTACHMENT("附件", ComponentParseAll.COMPONENT_PARSE_ATTACHMENT);
     /*TEXT_NOTE("文字说明控件（审批模版上设置好的场景，不支持发起审批实例时修改）"),
     PHONE("电话控件"),
     PHOTO("图片控件"),

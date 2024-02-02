@@ -1,11 +1,14 @@
 package org.bigant.wf.form.bean;
 
+import com.alibaba.fastjson2.JSONArray;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.bigant.wf.form.component.ComponentDateFormat;
 import org.bigant.wf.form.component.ComponentType;
-import org.bigant.wf.form.component.bean.Attachment;
-import org.bigant.wf.form.component.bean.DateRange;
+import org.bigant.wf.form.component.bean.AttachmentComponent;
+import org.bigant.wf.form.component.bean.DateComponent;
+import org.bigant.wf.form.component.bean.DateRangeComponent;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -25,68 +28,68 @@ public class FormComponent {
     private ComponentType componentType;
 
 
-    public FormComponent setName(String name) {
+    public FormComponent setValue(String name, String value) {
+        this.setValue(name, value, ComponentType.TEXT);
+        return this;
+    }
+
+
+    public FormComponent setTextareaValue(String name, String value) {
+        this.setValue(name, value, ComponentType.TEXTAREA);
+        return this;
+    }
+
+
+    public FormComponent setNumberValue(String name, Number value) {
+        this.setValue(name, value, ComponentType.NUMBER);
+        return this;
+    }
+
+
+    public FormComponent setSelectValue(String name, String value) {
+        this.setValue(name, value, ComponentType.SELECT);
+        return this;
+    }
+
+    public FormComponent setMultiSelectValue(String name, Collection<String> value) {
+        this.setValue(name, value, ComponentType.MULTI_SELECT);
+        return this;
+    }
+
+
+    public FormComponent setMultiSelectValue(String name, String... values) {
+        this.setValue(name, Arrays.asList(values), ComponentType.MULTI_SELECT);
+        return this;
+    }
+
+    public FormComponent setAttachmentValue(String name, Collection<AttachmentComponent> value) {
+        this.setValue(name, value, ComponentType.ATTACHMENT);
+        return this;
+    }
+
+
+    public FormComponent setDateValue(String name, LocalDateTime value, ComponentDateFormat dateFormat) {
+        this.setValue(name, new DateComponent(dateFormat, value), ComponentType.DATE);
+        return this;
+    }
+
+    public FormComponent setDateRangeValue(String beginName, String endName, DateRangeComponent value) {
+        this.setValue(JSONArray.of(beginName, endName).toJSONString(), value, ComponentType.DATE_RANGE);
+        return this;
+    }
+
+    public FormComponent setDateRangeValue(String beginName,
+                                           LocalDateTime beginDate,
+                                           String endName,
+                                           LocalDateTime end,
+                                           ComponentDateFormat dateFormat) {
+
+        return this.setDateRangeValue(beginName, endName, new DateRangeComponent(dateFormat, beginDate, end));
+    }
+
+
+    private void setValue(String name, Object value, ComponentType componentType) {
         this.name = name;
-        return this;
-    }
-
-    public FormComponent setValue(String value) {
-        this.setValue(value, ComponentType.TEXT);
-        return this;
-    }
-
-
-    public FormComponent setTextareaValue(String value) {
-        this.setValue(value, ComponentType.TEXTAREA);
-        return this;
-    }
-
-
-    public FormComponent setNumberValue(Number value) {
-        this.setValue(value, ComponentType.NUMBER);
-        return this;
-    }
-
-
-    public FormComponent setSelectValue(String value) {
-        this.setValue(value, ComponentType.SELECT);
-        return this;
-    }
-
-    public FormComponent setMultiSelectValue(Collection<String> value) {
-        this.setValue(value, ComponentType.MULTI_SELECT);
-        return this;
-    }
-
-
-    public FormComponent setMultiSelectValue(String... values) {
-        this.setValue(Arrays.asList(values), ComponentType.MULTI_SELECT);
-        return this;
-    }
-
-    public FormComponent setAttachmentValue(Collection<Attachment> value) {
-        this.setValue(value, ComponentType.ATTACHMENT);
-        return this;
-    }
-
-
-    public FormComponent setDateValue(LocalDateTime value) {
-        this.setValue(value, ComponentType.DATE);
-        return this;
-    }
-
-    public FormComponent setDateRangeValue(DateRange value) {
-        this.setValue(value, ComponentType.DATE_RANGE);
-        return this;
-    }
-
-    public FormComponent setDateRangeValue(LocalDateTime start, LocalDateTime end) {
-        this.setValue(new DateRange(start, end), ComponentType.DATE_RANGE);
-        return this;
-    }
-
-
-    private void setValue(Object value, ComponentType componentType) {
         this.componentType = componentType;
         this.value = componentType
                 .getParse()
