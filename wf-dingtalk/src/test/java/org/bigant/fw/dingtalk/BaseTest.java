@@ -16,6 +16,8 @@ public class BaseTest {
 
     @Before
     public void setup() {
+
+        String dingTalkAgentId = System.getenv("dingTalkAgentId");
         String dingTalkAppKey = System.getenv("dingTalkAppKey");
         String dingTalkAppSecret = System.getenv("dingTalkAppSecret");
         String dingTalkManagerUserId = System.getenv("dingTalkManagerUserId");
@@ -24,7 +26,8 @@ public class BaseTest {
 
         dingTalkConfig = new DingTalkConfig(dingTalkAppKey,
                 dingTalkAppSecret,
-                dingTalkManagerUserId);
+                dingTalkManagerUserId,
+                Long.parseLong(dingTalkAgentId));
 
         userService = new UserService() {
 

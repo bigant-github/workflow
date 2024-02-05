@@ -1,11 +1,14 @@
 package org.bigant.fw.dingtalk.instances;
 
 
-import com.aliyun.dingtalkworkflow_1_0.models.ProcessForecastHeaders;
-import com.aliyun.dingtalkworkflow_1_0.models.ProcessForecastRequest;
-import com.aliyun.dingtalkworkflow_1_0.models.ProcessForecastResponseBody;
-import com.aliyun.dingtalkworkflow_1_0.models.StartProcessInstanceRequest;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
+import com.aliyun.dingtalkdrive_1_0.models.AddFileHeaders;
+import com.aliyun.dingtalkdrive_1_0.models.AddFileRequest;
+import com.aliyun.dingtalkdrive_1_0.models.AddFileResponse;
+import com.aliyun.dingtalkworkflow_1_0.models.*;
 import com.aliyun.tea.TeaException;
+import com.aliyun.teaopenapi.models.Config;
 import com.aliyun.teautil.models.RuntimeOptions;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,7 +17,7 @@ import org.bigant.fw.dingtalk.DingTalkConfig;
 import org.bigant.fw.dingtalk.DingTalkConstant;
 import org.bigant.wf.form.bean.FormComponent;
 import org.bigant.wf.form.component.ComponentParseAll;
-import org.bigant.wf.form.component.bean.DateComponent;
+import org.bigant.wf.form.component.bean.DateRangeComponent;
 import org.bigant.wf.instances.InstancesService;
 import org.bigant.wf.instances.bean.InstancesPreview;
 import org.bigant.wf.instances.bean.InstancesPreviewResult;
@@ -58,7 +61,7 @@ public class DingTalkInstancesService implements InstancesService {
         ArrayList<StartProcessInstanceRequest.StartProcessInstanceRequestFormComponentValues> valuesDetailsDetails
                 = new ArrayList<>();
 
-        HashMap<String, String> map = this.parseFormValue(instancesStart.getFormComponents());
+        HashMap<String, String> map = this.parseFormValue(instancesStart.getFormComponents(), instancesStart.getUserId());
 
         for (Map.Entry<String, String> formComponent : map.entrySet()) {
             StartProcessInstanceRequest.StartProcessInstanceRequestFormComponentValues value =
@@ -232,7 +235,7 @@ public class DingTalkInstancesService implements InstancesService {
 
         ProcessForecastHeaders processForecastHeaders = new ProcessForecastHeaders();
 
-        HashMap<String, String> map = this.parseFormValue(formComponents);
+        HashMap<String, String> map = this.parseFormValue(formComponents, userId);
 
         ArrayList<ProcessForecastRequest.ProcessForecastRequestFormComponentValues> values =
                 new ArrayList<>();
@@ -317,9 +320,10 @@ public class DingTalkInstancesService implements InstancesService {
      * 解析表单值,主要是解决个平台数据格式不一样的问题
      *
      * @param formComponents
+     * @param userId
      * @return
      */
-    private HashMap<String, String> parseFormValue(List<FormComponent> formComponents) {
+    private HashMap<String, String> parseFormValue(List<FormComponent> formComponents, String userId) {
         HashMap<String, String> formMap = new HashMap<>(formComponents.size());
 
         for (FormComponent formComponent : formComponents) {
@@ -329,24 +333,16 @@ public class DingTalkInstancesService implements InstancesService {
                     formMap.put(formComponent.getName(), ComponentParseAll.COMPONENT_PARSE_DATE.toJava(formComponent.getValue()).toDateStr());
                     break;
                 case DATE_RANGE:
-                    formMap.put(formComponent.getName(), formComponent.getValue());
-                    break;
-                case NUMBER:
-                    formMap.put(formComponent.getName(), formComponent.getValue());
-                    break;
-                case TEXT:
-                    formMap.put(formComponent.getName(), formComponent.getValue());
-                    break;
-                case TEXTAREA:
-                    formMap.put(formComponent.getName(), formComponent.getValue());
-                    break;
-                case SELECT:
-                    formMap.put(formComponent.getName(), formComponent.getValue());
-                    break;
-                case MULTI_SELECT:
-                    formMap.put(formComponent.getName(), formComponent.getValue());
+                    DateRangeComponent rangeComponent = ComponentParseAll.COMPONENT_PARSE_DATE_RANGE.toJava(formComponent.getValue());
+                    String begin = rangeComponent.getDateFormat().getParse().format(rangeComponent.getBegin());
+                    String end = rangeComponent.getDateFormat().getParse().format(rangeComponent.getEnd());
+                    formMap.put(formComponent.getName(), JSONArray.toJSONString(new String[]{begin, end}));
                     break;
                 case ATTACHMENT:
+                    Long processInstancesSpaces = this.getProcessInstancesSpaces(userId);
+
+
+
                     formMap.put(formComponent.getName(), formComponent.getValue());
                     break;
                 default:
@@ -359,6 +355,41 @@ public class DingTalkInstancesService implements InstancesService {
         return formMap;
 
     }
+
+
+    /**
+     * 获取流程实例的空间
+     *
+     * @param userId
+     * @return
+     */
+    private Long getProcessInstancesSpaces(String userId) {
+
+        com.aliyun.dingtalkworkflow_1_0.models.GetAttachmentSpaceHeaders getAttachmentSpaceHeaders = new com.aliyun.dingtalkworkflow_1_0.models.GetAttachmentSpaceHeaders();
+
+        com.aliyun.dingtalkworkflow_1_0.models.GetAttachmentSpaceRequest getAttachmentSpaceRequest = new com.aliyun.dingtalkworkflow_1_0.models.GetAttachmentSpaceRequest()
+                .setUserId(userService.getThirdPartyId(userId, getType()))
+                .setAgentId(dingTalkConfig.getAgentId());
+
+        try {
+            com.aliyun.dingtalkworkflow_1_0.Client client = createClient();
+            getAttachmentSpaceHeaders.xAcsDingtalkAccessToken = dingTalkConfig.getAccessToken();
+            GetAttachmentSpaceResponse attachmentSpaceWithOptions = client.getAttachmentSpaceWithOptions(getAttachmentSpaceRequest, getAttachmentSpaceHeaders, new RuntimeOptions());
+            Long spaceId = attachmentSpaceWithOptions.getBody().getResult().getSpaceId();
+
+            log.debug(" 获取钉钉审批空间详情成功，userId:{},spaceId:{}", userId, spaceId);
+
+            return spaceId;
+
+        } catch (TeaException err) {
+
+            log.error(" 获取钉钉审批空间详情失败，userId{},code:{},message:{}", userId, err.getCode(), err.getMessage());
+            throw err;
+        } catch (Exception _err) {
+            throw new TeaException(_err.getMessage(), _err);
+        }
+    }
+
 
     private static com.aliyun.dingtalkworkflow_1_0.Client createClient() throws Exception {
         com.aliyun.teaopenapi.models.Config config = new com.aliyun.teaopenapi.models.Config();
