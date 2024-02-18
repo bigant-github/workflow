@@ -1,6 +1,7 @@
 package org.bigant.wf.form.bean;
 
 import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -13,6 +14,8 @@ import org.bigant.wf.form.component.bean.DateRangeComponent;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 @ApiModel("表单字段")
 @Data
@@ -28,72 +31,79 @@ public class FormComponent {
     private ComponentType componentType;
 
 
-    public FormComponent setValue(String name, String value) {
-        this.setValue(name, value, ComponentType.TEXT);
-        return this;
+    public static FormComponent text(String name, String value) {
+        FormComponent formComponent = new FormComponent();
+        return formComponent.setValue(name, value, ComponentType.TEXT);
     }
 
 
-    public FormComponent setTextareaValue(String name, String value) {
-        this.setValue(name, value, ComponentType.TEXTAREA);
-        return this;
+    public static FormComponent textarea(String name, String value) {
+        FormComponent formComponent = new FormComponent();
+        return formComponent.setValue(name, value, ComponentType.TEXTAREA);
     }
 
 
-    public FormComponent setNumberValue(String name, Number value) {
-        this.setValue(name, value, ComponentType.NUMBER);
-        return this;
+    public static FormComponent number(String name, Number value) {
+        FormComponent formComponent = new FormComponent();
+        return formComponent.setValue(name, value, ComponentType.NUMBER);
     }
 
 
-    public FormComponent setSelectValue(String name, String value) {
-        this.setValue(name, value, ComponentType.SELECT);
-        return this;
+    public static FormComponent select(String name, String value) {
+        FormComponent formComponent = new FormComponent();
+        return formComponent.setValue(name, value, ComponentType.SELECT);
     }
 
-    public FormComponent setMultiSelectValue(String name, Collection<String> value) {
-        this.setValue(name, value, ComponentType.MULTI_SELECT);
-        return this;
-    }
-
-
-    public FormComponent setMultiSelectValue(String name, String... values) {
-        this.setValue(name, Arrays.asList(values), ComponentType.MULTI_SELECT);
-        return this;
-    }
-
-    public FormComponent setAttachmentValue(String name, Collection<AttachmentComponent> value) {
-        this.setValue(name, value, ComponentType.ATTACHMENT);
-        return this;
+    public static FormComponent multiSelect(String name, Collection<String> value) {
+        FormComponent formComponent = new FormComponent();
+        return formComponent.setValue(name, value, ComponentType.MULTI_SELECT);
     }
 
 
-    public FormComponent setDateValue(String name, LocalDateTime value, ComponentDateFormat dateFormat) {
-        this.setValue(name, new DateComponent(dateFormat, value), ComponentType.DATE);
-        return this;
+    public static FormComponent multiSelect(String name, String... values) {
+        FormComponent formComponent = new FormComponent();
+        return formComponent.setValue(name, Arrays.asList(values), ComponentType.MULTI_SELECT);
     }
 
-    public FormComponent setDateRangeValue(String beginName, String endName, DateRangeComponent value) {
-        this.setValue(JSONArray.of(beginName, endName).toJSONString(), value, ComponentType.DATE_RANGE);
-        return this;
-    }
-
-    public FormComponent setDateRangeValue(String beginName,
-                                           LocalDateTime beginDate,
-                                           String endName,
-                                           LocalDateTime end,
-                                           ComponentDateFormat dateFormat) {
-
-        return this.setDateRangeValue(beginName, endName, new DateRangeComponent(dateFormat, beginDate, end));
+    public static FormComponent attachment(String name, Collection<AttachmentComponent> value) {
+        FormComponent formComponent = new FormComponent();
+        return formComponent.setValue(name, value, ComponentType.ATTACHMENT);
     }
 
 
-    private void setValue(String name, Object value, ComponentType componentType) {
+    public static FormComponent date(String name, LocalDateTime value, ComponentDateFormat dateFormat) {
+        FormComponent formComponent = new FormComponent();
+        return formComponent.setValue(name, new DateComponent(dateFormat, value), ComponentType.DATE);
+    }
+
+    public static FormComponent dateRange(String beginName, String endName, DateRangeComponent value) {
+        FormComponent formComponent = new FormComponent();
+        return formComponent.setValue(JSONArray.of(beginName, endName).toJSONString(), value, ComponentType.DATE_RANGE);
+    }
+
+    public static FormComponent dateRange(String beginName,
+                                          LocalDateTime beginDate,
+                                          String endName,
+                                          LocalDateTime end,
+                                          ComponentDateFormat dateFormat) {
+        return dateRange(beginName, endName, new DateRangeComponent(dateFormat, beginDate, end));
+    }
+
+
+    public static FormComponent table(String name, Collection<Collection<FormComponent>> table) {
+        FormComponent formComponent = new FormComponent();
+        return formComponent.setValue(name, table, ComponentType.TABLE);
+    }
+
+
+    private FormComponent setValue(String name, Object value, ComponentType componentType) {
         this.name = name;
         this.componentType = componentType;
         this.value = componentType
                 .getParse()
                 .toStr(value);
+
+        return this;
     }
 
 

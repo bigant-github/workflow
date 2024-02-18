@@ -21,7 +21,8 @@ public enum ComponentType {
     MULTI_SELECT("多选框", ComponentParseAll.COMPONENT_PARSE_MULTI_SELECT),
     DATE("日期控件", ComponentParseAll.COMPONENT_PARSE_DATE),
     DATE_RANGE("时间区间控件", ComponentParseAll.COMPONENT_PARSE_DATE_RANGE),
-    ATTACHMENT("附件", ComponentParseAll.COMPONENT_PARSE_ATTACHMENT);
+    ATTACHMENT("附件", ComponentParseAll.COMPONENT_PARSE_ATTACHMENT),
+    TABLE("表格", ComponentParseAll.COMPONENT_PARSE_TABLE);
     /*TEXT_NOTE("文字说明控件（审批模版上设置好的场景，不支持发起审批实例时修改）"),
     PHONE("电话控件"),
     PHOTO("图片控件"),

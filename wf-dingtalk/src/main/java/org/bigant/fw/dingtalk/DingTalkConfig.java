@@ -32,6 +32,17 @@ public class DingTalkConfig {
     private Long agentId;
 
 
+    private String accessToken;
+    private long accessTokenExpiresIn = 0;
+    private long accessTokenTimeOut = 7100 * 1000;
+
+    public DingTalkConfig(String appKey, String appSecret, String managerUserId, Long agentId) {
+        this.appKey = appKey;
+        this.appSecret = appSecret;
+        this.managerUserId = managerUserId;
+        this.agentId = agentId;
+    }
+
     /**
      * 使用 Token 初始化账号Client
      *
@@ -56,12 +67,20 @@ public class DingTalkConfig {
      * @throws Exception 异常信息
      */
     public String getAccessToken() {
+        long t = System.currentTimeMillis();
+
+        if (t < accessTokenExpiresIn) {
+            return accessToken;
+        }
+
         Client client = createClient();
         GetAccessTokenRequest getAccessTokenRequest = new GetAccessTokenRequest()
                 .setAppKey(appKey)
                 .setAppSecret(appSecret);
         try {
-            return client.getAccessToken(getAccessTokenRequest).getBody().getAccessToken();
+            this.accessToken = client.getAccessToken(getAccessTokenRequest).getBody().getAccessToken();
+            this.accessTokenExpiresIn = t + accessTokenTimeOut;
+            return this.accessToken;
         } catch (TeaException err) {
             throw err;
         } catch (Exception _err) {

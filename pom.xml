@@ -17,6 +17,7 @@
     <modules>
         <module>wf</module>
         <module>wf-dingtalk</module>
+        <module>wf-lark</module>
     </modules>
 
     <packaging>pom</packaging>

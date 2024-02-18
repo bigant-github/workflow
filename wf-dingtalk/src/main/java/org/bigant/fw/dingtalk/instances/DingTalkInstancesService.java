@@ -3,20 +3,22 @@ package org.bigant.fw.dingtalk.instances;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import com.aliyun.dingtalkdrive_1_0.models.AddFileHeaders;
-import com.aliyun.dingtalkdrive_1_0.models.AddFileRequest;
-import com.aliyun.dingtalkdrive_1_0.models.AddFileResponse;
+import com.aliyun.dingtalkstorage_1_0.models.CommitFileResponseBody;
+import com.aliyun.dingtalkworkflow_1_0.Client;
 import com.aliyun.dingtalkworkflow_1_0.models.*;
 import com.aliyun.tea.TeaException;
-import com.aliyun.teaopenapi.models.Config;
 import com.aliyun.teautil.models.RuntimeOptions;
+import com.google.gson.JsonArray;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.bigant.fw.dingtalk.DingTalkConfig;
 import org.bigant.fw.dingtalk.DingTalkConstant;
+import org.bigant.fw.dingtalk.DingTalkFile;
+import org.bigant.fw.dingtalk.DingTalkUser;
 import org.bigant.wf.form.bean.FormComponent;
 import org.bigant.wf.form.component.ComponentParseAll;
+import org.bigant.wf.form.component.bean.AttachmentComponent;
 import org.bigant.wf.form.component.bean.DateRangeComponent;
 import org.bigant.wf.instances.InstancesService;
 import org.bigant.wf.instances.bean.InstancesPreview;
@@ -25,10 +27,7 @@ import org.bigant.wf.instances.bean.InstancesStart;
 import org.bigant.wf.instances.bean.InstancesStartResult;
 import org.bigant.wf.user.UserService;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -55,15 +54,20 @@ public class DingTalkInstancesService implements InstancesService {
     @Override
     public InstancesStartResult start(InstancesStart instancesStart) {
 
-        com.aliyun.dingtalkworkflow_1_0.models.StartProcessInstanceHeaders startProcessInstanceHeaders = new
-                com.aliyun.dingtalkworkflow_1_0.models.StartProcessInstanceHeaders();
+        log.debug("发起审批实例：{}", JSONObject.toJSONString(instancesStart));
+
+        String dingTalkUserId = userService.getThirdPartyId(instancesStart.getUserId(), this.getType());
+
+        StartProcessInstanceHeaders startProcessInstanceHeaders = new
+                StartProcessInstanceHeaders();
 
         ArrayList<StartProcessInstanceRequest.StartProcessInstanceRequestFormComponentValues> valuesDetailsDetails
                 = new ArrayList<>();
 
-        HashMap<String, String> map = this.parseFormValue(instancesStart.getFormComponents(), instancesStart.getUserId());
+        //转换表单值
+        HashMap<String, String> formComponents = this.parseFormValue(instancesStart.getFormComponents(), dingTalkUserId);
 
-        for (Map.Entry<String, String> formComponent : map.entrySet()) {
+        for (Map.Entry<String, String> formComponent : formComponents.entrySet()) {
             StartProcessInstanceRequest.StartProcessInstanceRequestFormComponentValues value =
                     new StartProcessInstanceRequest.StartProcessInstanceRequestFormComponentValues()
                             .setName(formComponent.getKey())
@@ -72,18 +76,18 @@ public class DingTalkInstancesService implements InstancesService {
         }
 
 
-        //匹配自选节点
+        //匹配自选审批节点
         List<StartProcessInstanceRequest.StartProcessInstanceRequestTargetSelectActioners> selectActioners = null;
         if (instancesStart.getTargetSelectUsers() != null && instancesStart.getTargetSelectUsers().size() > 0) {
             selectActioners = this.parseTargetSelectUsers(instancesStart);
         } else if (instancesStart.getTargetSelectUsersAuthMatch() != null && instancesStart.getTargetSelectUsersAuthMatch().size() > 0) {
             //自选节点自动匹配
-            selectActioners = this.parseTargetSelectUsersAuthMatch(instancesStart);
+            selectActioners = this.parseTargetSelectUsersAuthMatch(instancesStart, formComponents);
         }
 
 
-        com.aliyun.dingtalkworkflow_1_0.models.StartProcessInstanceRequest startProcessInstanceRequest = new com.aliyun.dingtalkworkflow_1_0.models.StartProcessInstanceRequest()
-                .setOriginatorUserId(userService.getThirdPartyId(instancesStart.getUserId(), this.getType()))
+        StartProcessInstanceRequest startProcessInstanceRequest = new StartProcessInstanceRequest()
+                .setOriginatorUserId(dingTalkUserId)
                 .setProcessCode(instancesStart.getCode())
                 .setDeptId(instancesStart.getDeptId() != null && instancesStart.getDeptId().length() > 0 ?
                         Long.parseLong(userService.getThirdDeptId(instancesStart.getDeptId(), this.getType()))
@@ -96,15 +100,24 @@ public class DingTalkInstancesService implements InstancesService {
                 .setFormComponentValues(valuesDetailsDetails);
 
         try {
-            com.aliyun.dingtalkworkflow_1_0.Client client = createClient();
+            Client client = createClient();
             startProcessInstanceHeaders.xAcsDingtalkAccessToken = dingTalkConfig.getAccessToken();
-            client.startProcessInstanceWithOptions(startProcessInstanceRequest, startProcessInstanceHeaders, new com.aliyun.teautil.models.RuntimeOptions());
+            StartProcessInstanceResponse processInstanceResponse = client.startProcessInstanceWithOptions(startProcessInstanceRequest,
+                    startProcessInstanceHeaders,
+                    new RuntimeOptions());
+
+            String instanceId = processInstanceResponse.getBody().getInstanceId();
+            log.debug("发起审批实例成功：code:{}，instanceId:{}", instancesStart.getCode(), instanceId);
+
+            return InstancesStartResult.builder()
+                    .code(instancesStart.getCode())
+                    .instanceId(instanceId)
+                    .build();
         } catch (TeaException err) {
             throw err;
         } catch (Exception _err) {
             throw new TeaException(_err.getMessage(), _err);
         }
-        return null;
     }
 
     @Override
@@ -116,9 +129,10 @@ public class DingTalkInstancesService implements InstancesService {
      * 解析自选节点用户自动匹配
      *
      * @param instancesStart
+     * @param formComponents
      * @return
      */
-    private List<StartProcessInstanceRequest.StartProcessInstanceRequestTargetSelectActioners> parseTargetSelectUsersAuthMatch(InstancesStart instancesStart) {
+    private List<StartProcessInstanceRequest.StartProcessInstanceRequestTargetSelectActioners> parseTargetSelectUsersAuthMatch(InstancesStart instancesStart, HashMap<String, String> formComponents) {
         List<InstancesStart.TargetSelectUserAuthMatch> targetSelectUsersAuthMatch = instancesStart.getTargetSelectUsersAuthMatch();
         log.debug(" 发起审批实例：code:{}，共{}个节点，使用自选节点自动匹配。", instancesStart.getCode(), targetSelectUsersAuthMatch.size());
 
@@ -128,7 +142,7 @@ public class DingTalkInstancesService implements InstancesService {
         ProcessForecastResponseBody.ProcessForecastResponseBodyResult forecast = this.forecast(instancesStart.getCode(),
                 instancesStart.getUserId(),
                 instancesStart.getDeptId(),
-                instancesStart.getFormComponents());
+                formComponents);
 
         //获取需要输入的审批节点
         List<ProcessForecastResponseBody.ProcessForecastResponseBodyResultWorkflowActivityRulesWorkflowActor> approverListByForecast
@@ -225,8 +239,7 @@ public class DingTalkInstancesService implements InstancesService {
      * @return
      * @throws Exception
      */
-    private ProcessForecastResponseBody.ProcessForecastResponseBodyResult forecast(String code, String userId, String deptId, List<FormComponent> formComponents) {
-
+    private ProcessForecastResponseBody.ProcessForecastResponseBodyResult forecast(String code, String userId, String deptId, Map<String, String> formComponents) {
         log.debug(" 预测是否有自定义审批节点：code:{}，userId:{}，deptId:{}，formComponents:{}。",
                 code,
                 userId,
@@ -235,12 +248,10 @@ public class DingTalkInstancesService implements InstancesService {
 
         ProcessForecastHeaders processForecastHeaders = new ProcessForecastHeaders();
 
-        HashMap<String, String> map = this.parseFormValue(formComponents, userId);
-
         ArrayList<ProcessForecastRequest.ProcessForecastRequestFormComponentValues> values =
                 new ArrayList<>();
 
-        for (Map.Entry<String, String> formComponent : map.entrySet()) {
+        for (Map.Entry<String, String> formComponent : formComponents.entrySet()) {
 
             ProcessForecastRequest.ProcessForecastRequestFormComponentValues value =
                     new ProcessForecastRequest.ProcessForecastRequestFormComponentValues()
@@ -271,9 +282,9 @@ public class DingTalkInstancesService implements InstancesService {
                         userId,
                         deptId,
                         formComponents,
-                        result);
+                        JSONObject.toJSONString(result));
 
-                getApproverListByForecast(result)
+                this.getApproverListByForecast(result)
                         .forEach(x -> log.debug(" 预测是否有自定义审批节点结果需要自选的节点：code:{}，key:{}",
                                 code,
                                 x.getActorKey()));
@@ -295,6 +306,26 @@ public class DingTalkInstancesService implements InstancesService {
             log.error(" 预测是否有自定义审批节点：{}，userId:{}，deptId:{}，formComponents:{}，err:{}", code, userId, deptId, formComponents, _err);
             throw new TeaException(_err.getMessage(), _err);
         }
+    }
+
+
+    /**
+     * 预测是否有自定义审批节点
+     *
+     * @param formComponents
+     * @return
+     * @throws Exception
+     */
+    private ProcessForecastResponseBody.ProcessForecastResponseBodyResult forecast(String code, String userId, String deptId, List<FormComponent> formComponents) {
+
+        log.debug(" 预测是否有自定义审批节点：code:{}，userId:{}，deptId:{}，formComponents:{}。",
+                code,
+                userId,
+                deptId,
+                formComponents);
+
+        return this.forecast(code, userId, deptId, this.parseFormValue(formComponents, userId));
+
     }
 
 
@@ -326,34 +357,89 @@ public class DingTalkInstancesService implements InstancesService {
     private HashMap<String, String> parseFormValue(List<FormComponent> formComponents, String userId) {
         HashMap<String, String> formMap = new HashMap<>(formComponents.size());
 
+
         for (FormComponent formComponent : formComponents) {
-
-            switch (formComponent.getComponentType()) {
-                case DATE:
-                    formMap.put(formComponent.getName(), ComponentParseAll.COMPONENT_PARSE_DATE.toJava(formComponent.getValue()).toDateStr());
-                    break;
-                case DATE_RANGE:
-                    DateRangeComponent rangeComponent = ComponentParseAll.COMPONENT_PARSE_DATE_RANGE.toJava(formComponent.getValue());
-                    String begin = rangeComponent.getDateFormat().getParse().format(rangeComponent.getBegin());
-                    String end = rangeComponent.getDateFormat().getParse().format(rangeComponent.getEnd());
-                    formMap.put(formComponent.getName(), JSONArray.toJSONString(new String[]{begin, end}));
-                    break;
-                case ATTACHMENT:
-                    Long processInstancesSpaces = this.getProcessInstancesSpaces(userId);
-
-
-
-                    formMap.put(formComponent.getName(), formComponent.getValue());
-                    break;
-                default:
-                    formMap.put(formComponent.getName(), formComponent.getValue());
-                    break;
-            }
-
+            formMap.putAll(this.parseFormValue(formComponent, userId));
         }
 
         return formMap;
 
+    }
+
+    private HashMap<String, String> parseFormValue(FormComponent formComponent, String userId) {
+        HashMap<String, String> formMap = new HashMap<>(1);
+
+        switch (formComponent.getComponentType()) {
+            case DATE:
+                formMap.put(formComponent.getName(), ComponentParseAll.COMPONENT_PARSE_DATE.toJava(formComponent.getValue()).toDateStr());
+                break;
+            case DATE_RANGE:
+                DateRangeComponent rangeComponent = ComponentParseAll.COMPONENT_PARSE_DATE_RANGE.toJava(formComponent.getValue());
+                String begin = rangeComponent.getDateFormat().getParse().format(rangeComponent.getBegin());
+                String end = rangeComponent.getDateFormat().getParse().format(rangeComponent.getEnd());
+                formMap.put(formComponent.getName(), JSONArray.toJSONString(new String[]{begin, end}));
+                break;
+            case ATTACHMENT:
+
+                String spaceId = null;
+                String unionId = null;
+                spaceId = this.getProcessInstancesSpaces(userId).toString();
+
+                unionId = DingTalkUser.getUserInfo(userId, dingTalkConfig).getUnionid();
+
+                List<AttachmentComponent> attachmentComponents =
+                        ComponentParseAll.COMPONENT_PARSE_ATTACHMENT.toJava(formComponent.getValue());
+                JSONArray array = new JSONArray();
+                for (AttachmentComponent attachmentComponent : attachmentComponents) {
+
+                    CommitFileResponseBody fileBody = DingTalkFile.uploadFile(unionId,
+                            spaceId,
+                            attachmentComponent.getName(),
+                            attachmentComponent.getSize(),
+                            attachmentComponent.getUrl(),
+                            dingTalkConfig);
+
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("spaceId", fileBody.getDentry().getSpaceId());
+                    jsonObject.put("fileName", fileBody.getDentry().getName());
+                    jsonObject.put("fileSize", fileBody.getDentry().getSize());
+                    jsonObject.put("fileType", fileBody.getDentry().getType());
+                    jsonObject.put("fileId", fileBody.getDentry().getId());
+                    array.add(jsonObject);
+                }
+                formMap.put(formComponent.getName(), array.toJSONString());
+                break;
+            case TABLE:
+
+                Collection<Collection<FormComponent>> tableValue =
+                        ComponentParseAll.COMPONENT_PARSE_TABLE.toJava(formComponent.getValue());
+
+                JSONArray table = new JSONArray();
+                for (Collection<FormComponent> componentList : tableValue) {
+
+                    JSONArray row = new JSONArray();
+                    for (FormComponent component : componentList) {
+                        HashMap<String, String> value = this.parseFormValue(component, userId);
+
+                        for (Map.Entry<String, String> entry : value.entrySet()) {
+                            JSONObject json = new JSONObject();
+                            json.put("name", entry.getKey());
+                            json.put("value", entry.getValue());
+                            row.add(json);
+                        }
+
+                    }
+
+                    table.add(row);
+                }
+                formMap.put(formComponent.getName(), table.toJSONString());
+                break;
+            default:
+                formMap.put(formComponent.getName(), formComponent.getValue());
+                break;
+        }
+
+        return formMap;
     }
 
 
@@ -365,6 +451,8 @@ public class DingTalkInstancesService implements InstancesService {
      */
     private Long getProcessInstancesSpaces(String userId) {
 
+        log.debug(" 获取流程实例的空间：userId:{}。",
+                userId);
         com.aliyun.dingtalkworkflow_1_0.models.GetAttachmentSpaceHeaders getAttachmentSpaceHeaders = new com.aliyun.dingtalkworkflow_1_0.models.GetAttachmentSpaceHeaders();
 
         com.aliyun.dingtalkworkflow_1_0.models.GetAttachmentSpaceRequest getAttachmentSpaceRequest = new com.aliyun.dingtalkworkflow_1_0.models.GetAttachmentSpaceRequest()

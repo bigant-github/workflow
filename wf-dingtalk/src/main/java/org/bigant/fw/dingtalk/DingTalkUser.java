@@ -1,5 +1,6 @@
 package org.bigant.fw.dingtalk;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.dingtalk.api.DefaultDingTalkClient;
 import com.dingtalk.api.DingTalkClient;
 import com.dingtalk.api.request.OapiV2UserGetRequest;
@@ -38,11 +39,13 @@ public class DingTalkUser {
         OapiV2UserGetResponse rsp = null;
         try {
             rsp = client.execute(req, dingTalkConfig.getAccessToken());
+
             if (!rsp.isSuccess()) {
                 log.error("获取钉钉用户详情失败,userid:{}，errcode:{} errmsg:{}", dingTalkUserId, rsp.getErrcode(), rsp.getErrmsg());
                 throw new WfException("获取钉钉用户详情失败,errcode:" + rsp.getErrcode() + ",errmsg:" + rsp.getErrmsg());
             }
 
+            log.debug("获取钉钉用户详情成功,userid:{},data:{}", dingTalkUserId, JSONObject.toJSONString(rsp.getResult()));
             return rsp.getResult();
         } catch (ApiException e) {
             log.error("获取钉钉用户详情失败，userId:{}", dingTalkUserId, e);

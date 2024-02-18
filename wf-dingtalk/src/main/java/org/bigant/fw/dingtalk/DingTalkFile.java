@@ -1,16 +1,19 @@
 package org.bigant.fw.dingtalk;
 
-import com.aliyun.dingtalkdrive_1_0.models.*;
+import com.alibaba.fastjson2.JSONObject;
 import com.aliyun.dingtalkstorage_1_0.Client;
+import com.aliyun.dingtalkstorage_1_0.models.CommitFileResponseBody;
 import com.aliyun.dingtalkstorage_1_0.models.GetFileUploadInfoResponse;
+import com.aliyun.dingtalkstorage_1_0.models.GetFileUploadInfoResponseBody;
 import com.aliyun.tea.TeaException;
-import com.aliyun.teaopenapi.models.Config;
 import com.aliyun.teautil.models.RuntimeOptions;
 import lombok.extern.slf4j.Slf4j;
+import org.bigant.wf.exception.WfException;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Map;
 
 /**
  * 钉钉云盘文件上传
@@ -28,13 +31,27 @@ public class DingTalkFile {
      * @param unionId
      * @param fileName
      * @param size
-     * @param md5
      * @param spaceId
      * @param dingTalkConfig
+     * @return
      */
-    public static void uploadFile(String unionId, String fileName, Long size, String md5, String spaceId, String filePath, DingTalkConfig dingTalkConfig) throws IOException {
-        log.debug("上传文件，unionId:{}，fileName:{}，size:{}，md5:{}，spaceId:{}，filePath:{}", unionId, fileName, size, md5, size, filePath);
-        uploadFile(unionId, fileName, size, md5, spaceId, new URL(filePath).openStream(), dingTalkConfig);
+    public static CommitFileResponseBody uploadFile(String unionId,
+                                                    String spaceId,
+                                                    String fileName,
+                                                    Long size,
+                                                    String filePath,
+                                                    DingTalkConfig dingTalkConfig) {
+        log.debug("根据上传文件，unionId:{}，spaceId:{}，fileName:{}，size:{}，filePath:{}", unionId, fileName, size, size, filePath);
+        try {
+            return uploadFile(unionId, spaceId, fileName, size, new URL(filePath).openStream(), dingTalkConfig);
+        } catch (IOException e) {
+
+            String errMsg = String.format("上传文件，unionId:%s，spaceId:%s，fileName:%s，size:%s，filePath:%s", unionId, fileName, size, size, filePath);
+
+            log.error(errMsg, e);
+
+            throw new WfException(errMsg, e);
+        }
 
     }
 
@@ -44,42 +61,118 @@ public class DingTalkFile {
      * @param unionId
      * @param fileName
      * @param size
-     * @param md5
      * @param spaceId
      * @param dingTalkConfig
+     * @return
      */
-    public static void uploadFile(String unionId, String fileName, Long size, String md5, String spaceId, InputStream is, DingTalkConfig dingTalkConfig) {
-        log.debug("上传文件，unionId:{}，fileName:{}，size:{}，md5:{}，spaceId:{}", unionId, fileName, size, md5, size);
-        GetUploadInfoResponseBody uploadInfo = getUploadInfo(unionId, fileName, size, md5, spaceId, dingTalkConfig);
+    public static CommitFileResponseBody uploadFile(String unionId, String spaceId, String fileName, Long size, InputStream is, DingTalkConfig dingTalkConfig) {
+        log.debug("根据流上传文件，unionId:{}，fileName:{}，size:{}，spaceId:{}", unionId, fileName, size, size);
+        GetFileUploadInfoResponseBody uploadInfo = getUploadInfo(unionId, spaceId, fileName, size, dingTalkConfig);
+        GetFileUploadInfoResponseBody.GetFileUploadInfoResponseBodyHeaderSignatureInfo headerSignatureInfo = uploadInfo.getHeaderSignatureInfo();
 
-        // 阿里云账号的临时accessKeyId。
-        String accessKeyId = "<accessKeyId>";
-        // 阿里云账号的临时accessKeySecret。
-        String accessKeySecret = "<accessKeySecret>";
-        // 临时访问密钥。
-        String securityToken = "<accessToken>";
-        // OSS访问域名。
-        String endpoint = "<endpoint>";
-        // OSS存储空间。
-        String bucket = "<bucket>";
-        // 对应OSS Object Key，可用于刷新token以及调用添加文件（夹）接口添加文件记录。
-        String ossKey = "<mediaId>";
-        GetUploadInfoResponseBody.GetUploadInfoResponseBodyStsUploadInfo stsUploadInfo = uploadInfo.getStsUploadInfo();
+        try {
 
-        CredentialsProvider credentialsProvider = new DefaultCredentialProvider(stsUploadInfo.getAccessKeyId(),
-                stsUploadInfo.getAccessKeySecret(),
-                stsUploadInfo.getAccessToken());
+            // 从接口返回信息中拿到resourceUrls
+            String resourceUrl = headerSignatureInfo.getResourceUrls().get(0);
+            // 从接口返回信息中拿到headers
+            Map<String, String> headers = headerSignatureInfo.getHeaders();
+            URL url = new URL(resourceUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            if (headers != null) {
+                for (Map.Entry<String, String> entry : headers.entrySet()) {
+                    connection.setRequestProperty(entry.getKey(), entry.getValue());
+                }
+            }
+            connection.setDoOutput(true);
+            connection.setRequestMethod("PUT");
+            connection.setUseCaches(false);
+            connection.setReadTimeout(10000);
+            connection.setConnectTimeout(10000);
+            connection.connect();
+            OutputStream out = connection.getOutputStream();
+            byte[] b = new byte[1024];
+            int temp;
+            while ((temp = is.read(b)) != -1) {
+                out.write(b, 0, temp);
+            }
+            out.flush();
+            out.close();
+            int responseCode = connection.getResponseCode();
+            connection.disconnect();
 
-        ClientConfiguration clientConfiguration = new ClientConfiguration();
-        clientConfiguration.setProtocol(Protocol.HTTPS); // 注意, 需要是HTTPS
-        OSSClient ossClient = new OSSClient(endpoint, credentialsProvider, clientConfiguration);
-        PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, ossKey, new File("<path_to_file>"));
 
-        ossClient.putObject(putObjectRequest);
-        // 关闭OSSClient。
-        ossClient.shutdown();
+            if (responseCode == 200) {
+                log.debug("上传文件成功，unionId:{}，spaceId:{}，fileName:{}，size:{}", unionId, spaceId, fileName, size);
+                return commitFile(unionId, spaceId, fileName, size, dingTalkConfig, uploadInfo);
+            } else {
 
+                String errMsg = String.format("上传文件失败，unionId:%s，fileName:%s，size:%s，spaceId:%s，responseCode:%s",
+                        unionId,
+                        fileName,
+                        size,
+                        size,
+                        responseCode);
+                log.error(errMsg);
+                throw new TeaException(errMsg, new RuntimeException(errMsg));
+
+            }
+        } catch (Exception e) {
+            String errMsg = String.format("上传文件失败，unionId:%s，fileName:%s，size:%s，spaceId:%s，responseCode:%s，err",
+                    unionId,
+                    fileName,
+                    size,
+                    size,
+                    e.getMessage());
+
+            log.error(errMsg);
+            throw new WfException(errMsg, e);
+        }
     }
+
+    /**
+     * 提交文件
+     *
+     * @param unionId
+     * @param fileName
+     * @param size
+     * @param spaceId
+     * @param dingTalkConfig
+     * @param uploadInfo
+     * @return
+     * @throws Exception
+     */
+    private static CommitFileResponseBody commitFile(String unionId, String spaceId, String fileName, Long size, DingTalkConfig dingTalkConfig, GetFileUploadInfoResponseBody uploadInfo) throws Exception {
+        log.debug("提交文件，unionId:{}，spaceId:{}，fileName:{}，size:{}", unionId, fileName, size, spaceId);
+        Client client = createClient();
+        com.aliyun.dingtalkstorage_1_0.models.CommitFileHeaders commitFileHeaders = new com.aliyun.dingtalkstorage_1_0.models.CommitFileHeaders();
+        commitFileHeaders.xAcsDingtalkAccessToken = dingTalkConfig.getAccessToken();
+
+        com.aliyun.dingtalkstorage_1_0.models.CommitFileRequest.CommitFileRequestOption option = new com.aliyun.dingtalkstorage_1_0.models.CommitFileRequest.CommitFileRequestOption()
+                .setSize(size)
+                .setConflictStrategy("AUTO_RENAME");
+
+        com.aliyun.dingtalkstorage_1_0.models.CommitFileRequest commitFileRequest = new com.aliyun.dingtalkstorage_1_0.models.CommitFileRequest()
+                .setUnionId(unionId)
+                .setUploadKey(uploadInfo.getUploadKey())
+                .setName(fileName)
+                .setParentId("0")
+                .setOption(option);
+        try {
+            CommitFileResponseBody body = client.commitFileWithOptions(spaceId, commitFileRequest, commitFileHeaders, new RuntimeOptions()).getBody();
+            log.debug("提交文件成功，unionId:{}，fileName:{}，size:{}，spaceId:{}，body:{}", unionId, fileName, size, spaceId, JSONObject.toJSONString(body));
+            return body;
+        } catch (TeaException err) {
+            log.error("提交文件失败，unionId:{}，fileName:{}，size:{}，spaceId:{}，errMsg:{}", unionId, fileName, size, spaceId, err.message);
+            throw err;
+        } catch (Exception _err) {
+            log.error("提交文件失败，unionId:{}，fileName:{}，size:{}，spaceId:{}，errMsg:{}", unionId, fileName, size, spaceId, _err.getMessage());
+
+            TeaException err = new TeaException(_err.getMessage(), _err);
+            throw err;
+
+        }
+    }
+
 
     /**
      * 获取文件上传信息
@@ -87,128 +180,46 @@ public class DingTalkFile {
      * @param unionId
      * @param fileName
      * @param size
-     * @param md5
      * @param spaceId
      * @param dingTalkConfig
      * @return
      */
-    public static GetUploadInfoResponseBody getUploadInfo(String unionId, String fileName, Long size, String md5, String spaceId, DingTalkConfig dingTalkConfig) {
+    public static GetFileUploadInfoResponseBody getUploadInfo(String unionId, String spaceId, String fileName, Long size, DingTalkConfig dingTalkConfig) {
 
-        log.debug("获取文件上传信息，unionId:{}，fileName:{}，size:{}，md5:{}，spaceId:{}", unionId, fileName, size, md5, size);
+        log.debug("获取文件上传信息，unionId:{}，fileName:{}，size:{}，spaceId:{}", unionId, fileName, size, size);
 
         com.aliyun.dingtalkstorage_1_0.models.GetFileUploadInfoHeaders getFileUploadInfoHeaders = new com.aliyun.dingtalkstorage_1_0.models.GetFileUploadInfoHeaders();
-        getFileUploadInfoHeaders.xAcsDingtalkAccessToken = "<your access token>";
+        getFileUploadInfoHeaders.xAcsDingtalkAccessToken = dingTalkConfig.getAccessToken();
+
         com.aliyun.dingtalkstorage_1_0.models.GetFileUploadInfoRequest.GetFileUploadInfoRequestOptionPreCheckParam optionPreCheckParam = new com.aliyun.dingtalkstorage_1_0.models.GetFileUploadInfoRequest.GetFileUploadInfoRequestOptionPreCheckParam()
                 .setMd5("md5")
-                .setSize(512L)
+                .setSize(size)
                 .setParentId("0")
-                .setName("dentry_name");
+                .setName(fileName);
         com.aliyun.dingtalkstorage_1_0.models.GetFileUploadInfoRequest.GetFileUploadInfoRequestOption option = new com.aliyun.dingtalkstorage_1_0.models.GetFileUploadInfoRequest.GetFileUploadInfoRequestOption()
                 .setStorageDriver("DINGTALK")
                 .setPreCheckParam(optionPreCheckParam)
                 .setPreferRegion("ZHANGJIAKOU")
                 .setPreferIntranet(true);
         com.aliyun.dingtalkstorage_1_0.models.GetFileUploadInfoRequest getFileUploadInfoRequest = new com.aliyun.dingtalkstorage_1_0.models.GetFileUploadInfoRequest()
-                .setUnionId("cHtUxxxxx")
+                .setUnionId(unionId)
                 .setProtocol("HEADER_SIGNATURE")
                 .setMultipart(false)
                 .setOption(option);
-        try {
 
+        try {
             com.aliyun.dingtalkstorage_1_0.Client client = createClient();
             GetFileUploadInfoResponse fileUploadInfoWithOptions = client.getFileUploadInfoWithOptions(spaceId, getFileUploadInfoRequest, getFileUploadInfoHeaders, new RuntimeOptions());
-            fileUploadInfoWithOptions.getBody().getHeaderSignatureInfo();
+            log.debug("获取文件上传信息成功，unionId:{}，fileName:{}，size:{}，spaceId:{}，body:{}", unionId, fileName, size, size, JSONObject.toJSONString(fileUploadInfoWithOptions.getBody()));
+            return fileUploadInfoWithOptions.getBody();
         } catch (TeaException err) {
-            if (!com.aliyun.teautil.Common.empty(err.code) && !com.aliyun.teautil.Common.empty(err.message)) {
-                // err 中含有 code 和 message 属性，可帮助开发定位问题
-            }
-
-        } catch (Exception _err) {
-            TeaException err = new TeaException(_err.getMessage(), _err);
-            if (!com.aliyun.teautil.Common.empty(err.code) && !com.aliyun.teautil.Common.empty(err.message)) {
-                // err 中含有 code 和 message 属性，可帮助开发定位问题
-            }
-
-        }
-        /*log.debug("获取文件上传信息，unionId:{}，fileName:{}，size:{}，md5:{}，spaceId:{}", unionId, fileName, size, md5, size);
-
-
-        GetUploadInfoHeaders getUploadInfoHeaders = new GetUploadInfoHeaders();
-
-        GetUploadInfoRequest getUploadInfoRequest = new GetUploadInfoRequest()
-                .setUnionId(unionId)
-                .setFileName(fileName)
-                .setFileSize(size)
-                .setMd5(md5)
-                .setAddConflictPolicy("autoRename")
-                .setCallerRegion("BEIJING");
-        try {
-
-            Config config = new Config();
-            config.protocol = "https";
-            config.regionId = "central";
-            com.aliyun.dingtalkdrive_1_0.Client client = new com.aliyun.dingtalkdrive_1_0.Client(config);
-
-            getUploadInfoHeaders.xAcsDingtalkAccessToken = dingTalkConfig.getAccessToken();
-
-            GetUploadInfoResponse uploadInfoWithOptions = client.getUploadInfoWithOptions(spaceId,
-                    "0",
-                    getUploadInfoRequest,
-                    getUploadInfoHeaders,
-                    new RuntimeOptions());
-
-            return uploadInfoWithOptions.getBody();
-        } catch (TeaException err) {
-            log.error("获取文件上传信息异常", err);
+            log.error("获取文件上传信息失败，unionId:{}，fileName:{}，size:{}，spaceId:{}，err:{}", unionId, fileName, size, size, err);
             throw err;
         } catch (Exception _err) {
-            TeaException err = new TeaException(_err.getMessage(), _err);
-            log.error("获取文件上传信息异常", err);
-            throw err;
-        }*/
-    }
-
-    /**
-     * 上传文件
-     *
-     * @param fileName
-     * @param mediaId
-     * @param unionId
-     * @param spaceId
-     * @return
-     */
-    public static AddFileResponse addFileWithOptions(String fileName, String mediaId, String unionId, String spaceId, DingTalkConfig dingTalkConfig) {
-        Config config = new Config();
-        config.protocol = "https";
-        config.regionId = "central";
-        com.aliyun.dingtalkdrive_1_0.Client client = null;
-        try {
-            client = new com.aliyun.dingtalkdrive_1_0.Client(config);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        try {
-            AddFileHeaders addFileHeaders = new AddFileHeaders();
-            addFileHeaders.xAcsDingtalkAccessToken = dingTalkConfig.getAccessToken();
-            AddFileRequest addFileRequest = new AddFileRequest()
-                    .setFileType("file")
-                    .setFileName(fileName)
-                    .setMediaId(mediaId)
-                    .setAddConflictPolicy("autoRename")
-                    .setUnionId(unionId);
-
-            assert client != null;
-            return client.addFileWithOptions(spaceId,
-                    addFileRequest,
-                    addFileHeaders,
-                    new RuntimeOptions());
-
-        } catch (TeaException err) {
-            throw err;
-        } catch (Exception _err) {
+            log.error("获取文件上传信息失败，unionId:{}，fileName:{}，size:{}，spaceId:{}，err:{}", unionId, fileName, size, size, _err);
             throw new TeaException(_err.getMessage(), _err);
         }
+
     }
 
 

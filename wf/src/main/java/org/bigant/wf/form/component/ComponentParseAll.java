@@ -19,4 +19,7 @@ public interface ComponentParseAll {
     ComponentParseDateRange COMPONENT_PARSE_DATE_RANGE = new ComponentParseDateRange();
     ComponentParseAttachment COMPONENT_PARSE_ATTACHMENT = new ComponentParseAttachment();
 
+    ComponentParseTable COMPONENT_PARSE_TABLE = new ComponentParseTable();
+
+
 }

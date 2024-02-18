@@ -37,25 +37,33 @@ public class DingTalkInstancesServiceTest extends BaseTest {
                         ))
                 .formComponents(
                         Arrays.asList(
-                                new FormComponent()
-                                        .setValue("单行输入框", "测试"),
-                                new FormComponent()
-                                        .setValue("多行输入框", "测试"),
-                                new FormComponent()
-                                        .setNumberValue("数字输入框", 1),
-                                new FormComponent()
-                                        .setSelectValue("单选框", "选项1"),
-                                new FormComponent()
-                                        .setMultiSelectValue("多选框", "选项1", "选项2"),
-                                new FormComponent()
-                                        .setDateValue("日期", LocalDateTime.now(), ComponentDateFormat.YYYY_MM_DD),
-                                new FormComponent()
-                                        .setDateRangeValue("开始时间", LocalDateTime.now(), "结束时间", LocalDateTime.now(), ComponentDateFormat.YYYY_MM_DD),
-                                new FormComponent()
-                                        .setAttachmentValue("附件", Arrays.asList(AttachmentComponent.builder().name("测试.gif").size(100L).url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
-                                                AttachmentComponent.builder().name("测试测试.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
-                                                AttachmentComponent.builder().name("测试测试.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build()))
-                        ))
+                                FormComponent.text("单行输入框", "测试"),
+                                FormComponent.text("多行输入框", "测试"),
+                                FormComponent.number("数字输入框", 1),
+                                FormComponent.select("单选框", "选项1"),
+                                FormComponent.multiSelect("多选框", "选项1", "选项2"),
+                                FormComponent.date("日期", LocalDateTime.now(), ComponentDateFormat.YYYY_MM_DD),
+                                FormComponent.dateRange("开始时间", LocalDateTime.now(), "结束时间", LocalDateTime.now(), ComponentDateFormat.YYYY_MM_DD),
+                                FormComponent.attachment("附件", Arrays.asList(
+                                        AttachmentComponent.builder().name("测试1.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
+                                        AttachmentComponent.builder().name("测试2.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
+                                        AttachmentComponent.builder().name("测试3.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build())),
+                                FormComponent.table("表格",
+                                        Arrays.asList(
+                                                Arrays.asList(
+                                                        FormComponent.text("单行输入框", "表格单行输入框1"),
+                                                        FormComponent.date("日期", LocalDateTime.now(), ComponentDateFormat.YYYY_MM_DD_HH_MM),
+                                                        FormComponent.attachment("附件", Arrays.asList(
+                                                                AttachmentComponent.builder().name("测试1.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
+                                                                AttachmentComponent.builder().name("测试2.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build()))
+                                                ),
+                                                Arrays.asList(
+                                                        FormComponent.text("单行输入框", "表格单行输入框2"),
+                                                        FormComponent.date("日期", LocalDateTime.now(), ComponentDateFormat.YYYY_MM_DD_HH_MM),
+                                                        FormComponent.attachment("附件", Arrays.asList(
+                                                                AttachmentComponent.builder().name("测试1.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
+                                                                AttachmentComponent.builder().name("测试2.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build()))
+                                                )))))
                 .build();
 
         DingTalkInstancesService dingTalkInstancesService = this.getDingTalkInstancesService();
