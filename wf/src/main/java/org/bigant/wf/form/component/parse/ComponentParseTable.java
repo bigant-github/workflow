@@ -3,15 +3,13 @@ package org.bigant.wf.form.component.parse;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.TypeReference;
+import org.bigant.wf.form.component.ComponentType;
 import org.bigant.wf.form.bean.FormComponent;
 import org.bigant.wf.form.component.ComponentParse;
-import org.bigant.wf.form.component.ComponentType;
-import org.bigant.wf.form.component.bean.AttachmentComponent;
 
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 组建工具

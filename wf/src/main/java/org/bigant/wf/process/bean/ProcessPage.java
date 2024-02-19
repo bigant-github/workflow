@@ -1,4 +1,4 @@
-package org.bigant.wf.form.bean;
+package org.bigant.wf.process.bean;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @ApiModel("表单列表")
 @Data
 @Builder
-public class FormPage {
+public class ProcessPage {
 
     @ApiModelProperty("图标url")
     public String iconUrl;

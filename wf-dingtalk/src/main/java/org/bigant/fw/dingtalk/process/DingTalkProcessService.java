@@ -1,4 +1,4 @@
-package org.bigant.fw.dingtalk.form;
+package org.bigant.fw.dingtalk.process;
 
 import com.aliyun.dingtalkworkflow_1_0.models.GetManageProcessByStaffIdResponse;
 import com.aliyun.tea.TeaException;
@@ -7,9 +7,9 @@ import com.aliyun.teautil.models.RuntimeOptions;
 import lombok.AllArgsConstructor;
 import org.bigant.fw.dingtalk.DingTalkConfig;
 import org.bigant.fw.dingtalk.DingTalkConstant;
-import org.bigant.wf.form.IFormService;
-import org.bigant.wf.form.bean.FormPage;
-import org.bigant.wf.form.bean.FormPageQuery;
+import org.bigant.wf.process.IProcessService;
+import org.bigant.wf.process.bean.ProcessPage;
+import org.bigant.wf.process.bean.ProcessPageQuery;
 import org.bigant.wf.user.UserService;
 
 import java.time.LocalDateTime;
@@ -24,13 +24,13 @@ import java.util.stream.Collectors;
  * @date 2024/1/30 15:33
  */
 @AllArgsConstructor
-public class DingTalkFormService implements IFormService {
+public class DingTalkProcessService implements IProcessService {
 
     private DingTalkConfig dingTalkConfig;
     private UserService userService;
 
     @Override
-    public List<FormPage> page(FormPage formPage, String userId) {
+    public List<ProcessPage> page(ProcessPageQuery processPageQuery, String userId) {
 
         try {
             com.aliyun.dingtalkworkflow_1_0.Client client = createClient();
@@ -47,7 +47,7 @@ public class DingTalkFormService implements IFormService {
                     .getResult()
                     .getProcessList()
                     .stream()
-                    .map(x -> FormPage.builder()
+                    .map(x -> ProcessPage.builder()
                             .code(x.getProcessCode())
                             .title(x.getName())
                             .iconUrl(x.getIconUrl())
@@ -61,7 +61,7 @@ public class DingTalkFormService implements IFormService {
     }
 
     @Override
-    public List<FormPage> allPage(FormPageQuery query) {
+    public List<ProcessPage> allPage(ProcessPageQuery query) {
         try {
 
             com.aliyun.dingtalkworkflow_1_0.Client client = createClient();
@@ -80,7 +80,7 @@ public class DingTalkFormService implements IFormService {
                             , new RuntimeOptions());
 
             return manageProcessByStaffIdWithOptions.getBody().getResult()
-                    .stream().map(x -> FormPage.builder()
+                    .stream().map(x -> ProcessPage.builder()
                             .code(x.getProcessCode())
                             .title(x.getFlowTitle())
                             .iconUrl(x.getIconUrl())

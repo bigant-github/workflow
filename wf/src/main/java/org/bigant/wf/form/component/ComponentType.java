@@ -2,7 +2,6 @@ package org.bigant.wf.form.component;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.bigant.wf.form.component.parse.*;
 
 /**
  * 控件类型

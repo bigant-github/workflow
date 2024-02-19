@@ -1,4 +1,4 @@
-package org.bigant.wf.form.bean;
+package org.bigant.wf.process.bean;
 
 import io.swagger.annotations.ApiModel;
 
@@ -9,6 +9,6 @@ import io.swagger.annotations.ApiModel;
  * @date 2024/1/3015:44
  */
 @ApiModel(description = "表单列表查询")
-public class FormPageQuery {
+public class ProcessPageQuery {
 
 }

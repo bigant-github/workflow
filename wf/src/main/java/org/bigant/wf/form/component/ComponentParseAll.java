@@ -1,6 +1,7 @@
 package org.bigant.wf.form.component;
 
 import org.bigant.wf.form.component.parse.*;
+import org.bigant.wf.process.component.parse.*;
 
 /**
  * 组建工具

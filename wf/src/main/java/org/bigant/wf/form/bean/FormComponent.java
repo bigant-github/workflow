@@ -1,7 +1,6 @@
 package org.bigant.wf.form.bean;
 
 import com.alibaba.fastjson2.JSONArray;
-import com.alibaba.fastjson2.JSONObject;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -14,8 +13,6 @@ import org.bigant.wf.form.component.bean.DateRangeComponent;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
 @ApiModel("表单字段")
 @Data
