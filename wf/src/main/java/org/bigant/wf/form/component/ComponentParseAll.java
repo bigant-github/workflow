@@ -1,7 +1,6 @@
 package org.bigant.wf.form.component;
 
 import org.bigant.wf.form.component.parse.*;
-import org.bigant.wf.process.component.parse.*;
 
 /**
  * 组建工具
@@ -22,5 +21,5 @@ public interface ComponentParseAll {
 
     ComponentParseTable COMPONENT_PARSE_TABLE = new ComponentParseTable();
 
-
+    ComponentParseUnknown COMPONENT_PARSE_UNKNOWN = new ComponentParseUnknown();
 }

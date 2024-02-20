@@ -21,7 +21,8 @@ public enum ComponentType {
     DATE("日期控件", ComponentParseAll.COMPONENT_PARSE_DATE),
     DATE_RANGE("时间区间控件", ComponentParseAll.COMPONENT_PARSE_DATE_RANGE),
     ATTACHMENT("附件", ComponentParseAll.COMPONENT_PARSE_ATTACHMENT),
-    TABLE("表格", ComponentParseAll.COMPONENT_PARSE_TABLE);
+    TABLE("表格", ComponentParseAll.COMPONENT_PARSE_TABLE),
+    UNKNOWN("未知", ComponentParseAll.COMPONENT_PARSE_UNKNOWN);
     /*TEXT_NOTE("文字说明控件（审批模版上设置好的场景，不支持发起审批实例时修改）"),
     PHONE("电话控件"),
     PHOTO("图片控件"),
