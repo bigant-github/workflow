@@ -20,9 +20,9 @@ public class BaseTest {
         String dingTalkAgentId = System.getenv("dingTalkAgentId");
         String dingTalkAppKey = System.getenv("dingTalkAppKey");
         String dingTalkAppSecret = System.getenv("dingTalkAppSecret");
+        String dingTalkUserId = System.getenv("dingTalkUserId");
+        String dingTalkDeptId = System.getenv("dingTalkDeptId");
         String dingTalkManagerUserId = System.getenv("dingTalkManagerUserId");
-        String dingTalkManagerDeptId = System.getenv("dingTalkManagerDeptId");
-
 
         dingTalkConfig = new DingTalkConfig(dingTalkAppKey,
                 dingTalkAppSecret,
@@ -38,12 +38,12 @@ public class BaseTest {
 
             @Override
             public String getThirdPartyId(String id, String thirdPartyType) {
-                return dingTalkManagerUserId;
+                return dingTalkUserId;
             }
 
             @Override
             public String getThirdDeptId(String deptId, String thirdPartyType) {
-                return dingTalkManagerDeptId;
+                return dingTalkDeptId;
             }
         };
 

@@ -1,5 +1,6 @@
 package org.bigant.wf.process;
 
+import org.bigant.wf.process.bean.ProcessDetail;
 import org.bigant.wf.process.bean.ProcessPage;
 import org.bigant.wf.process.bean.ProcessPageQuery;
 
@@ -16,7 +17,6 @@ public interface IProcessService {
     /**
      * 根据当前登录人查看表单
      *
-     * @param processPage
      * @return
      */
     List<ProcessPage> page(ProcessPageQuery processPageQuery, String userId);
@@ -28,6 +28,8 @@ public interface IProcessService {
      * @return
      */
     List<ProcessPage> allPage(ProcessPageQuery query);
+
+    ProcessDetail detail(String code);
 
     String getType();
 }

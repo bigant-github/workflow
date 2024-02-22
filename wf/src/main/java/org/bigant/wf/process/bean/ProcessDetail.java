@@ -38,6 +38,9 @@ public class ProcessDetail {
         @ApiModelProperty("字段类型")
         private ComponentType type;
 
+        @ApiModelProperty("子集")
+        private List<FormItem> children;
+
     }
 
 

@@ -15,6 +15,7 @@ import java.util.List;
 @Data
 @ApiModel("发起审批实例")
 public class InstancesPreviewResult {
+
     @ApiModelProperty("审批实例code")
     private String code;
 
@@ -23,12 +24,6 @@ public class InstancesPreviewResult {
 
     @ApiModelProperty("发起人id")
     private String deptId;
-
-    @ApiModelProperty("自选节点用户（与 targetSelectUsersAuthMatch 只能二选一）")
-    private List<TargetSelectUser> targetSelectUsers;
-
-    @ApiModelProperty("自选节点用户自动匹配 （与 targetSelectUsers 只能二选一）")
-    private List<TargetSelectUserAuthMatch> targetSelectUsersAuthMatch;
 
 
     @ApiModel("自选节点用户")

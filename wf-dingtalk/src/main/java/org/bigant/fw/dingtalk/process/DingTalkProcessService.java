@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import org.bigant.fw.dingtalk.DingTalkConfig;
 import org.bigant.fw.dingtalk.DingTalkConstant;
 import org.bigant.wf.process.IProcessService;
+import org.bigant.wf.process.bean.ProcessDetail;
 import org.bigant.wf.process.bean.ProcessPage;
 import org.bigant.wf.process.bean.ProcessPageQuery;
 import org.bigant.wf.user.UserService;
@@ -93,6 +94,11 @@ public class DingTalkProcessService implements IProcessService {
         } catch (Exception _err) {
             throw new TeaException(_err.getMessage(), _err);
         }
+    }
+
+    @Override
+    public ProcessDetail detail(String code) {
+        return null;
     }
 
 

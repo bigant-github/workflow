@@ -16,8 +16,22 @@
         <maven.compiler.target>8</maven.compiler.target>
         <java.version>8</java.version>
         <jdk.version>8</jdk.version>
+        <lark.version>2.1.5</lark.version>
     </properties>
 
 
+    <dependencies>
+        <dependency>
+            <groupId>org.bigant.workflow</groupId>
+            <artifactId>wf</artifactId>
+            <version>${parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.larksuite.oapi</groupId>
+            <artifactId>oapi-sdk</artifactId>
+            <version>${lark.version}</version>
+        </dependency>
+
+    </dependencies>
 
 </project>

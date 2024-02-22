@@ -3,6 +3,8 @@ package org.bigant.wf.instances.bean;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.bigant.wf.form.bean.FormComponent;
+
 import java.util.List;
 
 /**
@@ -29,7 +31,8 @@ public class InstancesPreview {
     @ApiModelProperty("自选节点用户自动匹配 （与 targetSelectUsers 只能二选一）")
     private List<TargetSelectUserAuthMatch> targetSelectUsersAuthMatch;
 
-
+    @ApiModelProperty("表单字段集合")
+    private List<FormComponent> formComponents;
     @ApiModel("自选节点用户")
     @Data
     public static class TargetSelectUser {
