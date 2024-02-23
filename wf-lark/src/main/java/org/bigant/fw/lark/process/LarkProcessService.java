@@ -12,6 +12,8 @@ import org.bigant.fw.lark.LarkConfig;
 import org.bigant.fw.lark.LarkConstant;
 import org.bigant.wf.exception.WfException;
 import org.bigant.wf.form.component.ComponentType;
+import org.bigant.wf.form.option.MultiSelectOption;
+import org.bigant.wf.form.option.SelectOption;
 import org.bigant.wf.process.IProcessService;
 import org.bigant.wf.process.bean.ProcessDetail;
 import org.bigant.wf.process.bean.ProcessPage;
@@ -124,6 +126,7 @@ public class LarkProcessService implements IProcessService {
      * 单选	radio/radioV2
      * 多选	checkbox/checkboxV2
      * 表格 fieldList
+     *
      * @param item
      * @return
      */
@@ -161,7 +164,6 @@ public class LarkProcessService implements IProcessService {
                         .type(ComponentType.DATE)
                         .build();
             case "dateInterval":
-
                 Map<String, Object> option = (Map<String, Object>) item.get("option");
                 List<String> names = Arrays.asList(option.get("start").toString(), option.get("end").toString());
                 return ProcessDetail.FormItem.builder()
@@ -185,21 +187,30 @@ public class LarkProcessService implements IProcessService {
                         .build();
             case "radio":
             case "radioV2":
+                List<Map<String, String>> radioOption = (List<Map<String, String>>) item.get("option");
+                List<SelectOption.Option> radioOptions = radioOption.stream()
+                        .map(x -> SelectOption.Option.builder().name(x.get("text")).value(x.get("value")).build())
+                        .collect(Collectors.toList());
                 return ProcessDetail.FormItem.builder()
                         .name(item.get("name").toString())
                         .id(item.get("id").toString())
+                        .option(SelectOption.builder().options(radioOptions).build())
                         .type(ComponentType.SELECT)
                         .build();
             case "checkbox":
             case "checkboxV2":
+                List<Map<String, String>> checkboxOption = (List<Map<String, String>>) item.get("option");
+                List<MultiSelectOption.Option> checkboxOptions = checkboxOption.stream()
+                        .map(x -> MultiSelectOption.Option.builder().name(x.get("text")).value(x.get("value")).build())
+                        .collect(Collectors.toList());
                 return ProcessDetail.FormItem.builder()
                         .name(item.get("name").toString())
                         .id(item.get("id").toString())
+                        .option(MultiSelectOption.builder().options(checkboxOptions).build())
                         .type(ComponentType.MULTI_SELECT)
                         .build();
             case "fieldList":
-
-                List<Map<String,Object>> children = (List<Map<String, Object>>) item.get("children");
+                List<Map<String, Object>> children = (List<Map<String, Object>>) item.get("children");
                 List<ProcessDetail.FormItem> childrenItems =
                         children.stream().map(this::convertFormItem).collect(Collectors.toList());
                 return ProcessDetail.FormItem.builder()

@@ -10,9 +10,11 @@ import org.bigant.wf.form.component.bean.AttachmentComponent;
 import org.bigant.wf.form.component.bean.DateComponent;
 import org.bigant.wf.form.component.bean.DateRangeComponent;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 @ApiModel("表单字段")
 @Data
@@ -46,6 +48,11 @@ public class FormComponent {
     }
 
 
+    public static FormComponent amount(String name, BigDecimal value) {
+        FormComponent formComponent = new FormComponent();
+        return formComponent.setValue(name, value, ComponentType.AMOUNT);
+    }
+
     public static FormComponent select(String name, String value) {
         FormComponent formComponent = new FormComponent();
         return formComponent.setValue(name, value, ComponentType.SELECT);
@@ -67,6 +74,10 @@ public class FormComponent {
         return formComponent.setValue(name, value, ComponentType.ATTACHMENT);
     }
 
+    public static FormComponent image(String name, List<AttachmentComponent> value) {
+        FormComponent formComponent = new FormComponent();
+        return formComponent.setValue(name, value, ComponentType.IMAGE);
+    }
 
     public static FormComponent date(String name, LocalDateTime value, ComponentDateFormat dateFormat) {
         FormComponent formComponent = new FormComponent();
@@ -91,6 +102,8 @@ public class FormComponent {
         FormComponent formComponent = new FormComponent();
         return formComponent.setValue(name, table, ComponentType.TABLE);
     }
+
+
 
 
     private FormComponent setValue(String name, Object value, ComponentType componentType) {

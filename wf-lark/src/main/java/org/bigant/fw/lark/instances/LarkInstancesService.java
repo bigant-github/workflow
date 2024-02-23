@@ -1,10 +1,13 @@
 package org.bigant.fw.lark.instances;
 
+import com.google.gson.annotations.SerializedName;
 import com.lark.oapi.Client;
 import com.lark.oapi.core.request.RequestOptions;
+import com.lark.oapi.core.response.BaseResponse;
 import com.lark.oapi.core.response.RawResponse;
 import com.lark.oapi.core.token.AccessTokenType;
 import com.lark.oapi.core.utils.Jsons;
+import com.lark.oapi.core.utils.UnmarshalRespUtil;
 import com.lark.oapi.service.approval.v4.model.*;
 import com.oracle.tools.packager.IOUtils;
 import io.swagger.annotations.ApiModel;
@@ -24,6 +27,8 @@ import org.bigant.wf.form.component.bean.AttachmentComponent;
 import org.bigant.wf.form.component.bean.DateComponent;
 import org.bigant.wf.form.component.bean.DateRangeComponent;
 import org.bigant.wf.form.component.bean.ImageComponent;
+import org.bigant.wf.form.option.MultiSelectOption;
+import org.bigant.wf.form.option.SelectOption;
 import org.bigant.wf.instances.InstancesService;
 import org.bigant.wf.instances.bean.InstancesPreview;
 import org.bigant.wf.instances.bean.InstancesPreviewResult;
@@ -35,6 +40,7 @@ import org.bigant.wf.user.UserService;
 import java.io.File;
 import java.net.URL;
 import java.time.Duration;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -132,11 +138,8 @@ public class LarkInstancesService implements InstancesService {
                         .key(previewNode.getNodeId())
                         .value(userIds)
                         .build());
-
             }
-
         }
-
 
         // 创建请求对象
         CreateInstanceReq req = CreateInstanceReq.newBuilder()
@@ -153,11 +156,12 @@ public class LarkInstancesService implements InstancesService {
             CreateInstanceResp resp = client.approval().instance().create(req);
             // 处理服务端错误
             if (!resp.success()) {
-                String errMsg = String.format("飞书-发起审批实例失败。data:%s,code:%s,msg:%s,reqId:%s",
-                        Jsons.DEFAULT.toJson(instancesStart),
+                String errMsg = String.format("飞书-发起审批实例失败。code:%s,msg:%s,reqId:%s,data:%s,form:%s",
                         resp.getCode(),
                         resp.getMsg(),
-                        resp.getRequestId());
+                        resp.getRequestId(),
+                        Jsons.DEFAULT.toJson(instancesStart),
+                        form);
                 log.error(errMsg);
                 throw new WfException(errMsg);
             }
@@ -168,8 +172,14 @@ public class LarkInstancesService implements InstancesService {
                     .code(instancesStart.getCode())
                     .build();
 
+        } catch (WfException e) {
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            String errMsg = String.format("飞书-发起审批实例失败。data:%s,form:%s",
+                    Jsons.DEFAULT.toJson(instancesStart),
+                    form);
+            log.error(errMsg);
+            throw new WfException(errMsg, e);
         }
 
     }
@@ -211,20 +221,21 @@ public class LarkInstancesService implements InstancesService {
                             .departmentId(larkDeptId)
                             .form(form)
                             .build())
+                    .userIdType("user_id")
                     .build();
             // 发起请求
             PreviewInstanceResp resp = larkConfig.getClient().approval().instance().preview(req);
 
             // 处理服务端错误
             if (!resp.success()) {
-                String errMsg = String.format("飞书-预览审批实例失败。approvalCode:%s,larkUserId:%s,larkDeptId:%s,form:%s,code:%s,msg:%s,reqId:%s",
+                String errMsg = String.format("飞书-预览审批实例失败。code:%s,msg:%s,reqId:%s,approvalCode:%s,larkUserId:%s,larkDeptId:%s,form:%s",
+                        resp.getCode(),
+                        resp.getMsg(),
+                        resp.getRequestId(),
                         approvalCode,
                         larkUserId,
                         larkDeptId,
-                        form,
-                        resp.getCode(),
-                        resp.getMsg(),
-                        resp.getRequestId());
+                        form);
                 throw new WfException(errMsg);
             }
 
@@ -247,7 +258,7 @@ public class LarkInstancesService implements InstancesService {
 
     public String parseFormValues(List<FormComponent> formComponents, Map<String, ProcessDetail.FormItem> formItemMap) {
 
-        ArrayList<Map<String, String>> maps = new ArrayList<>();
+        ArrayList<Map<String, Object>> maps = new ArrayList<>();
         for (FormComponent formComponent : formComponents) {
             maps.add(this.parseFormValues(formComponent, formItemMap.get(formComponent.getName())));
         }
@@ -256,7 +267,7 @@ public class LarkInstancesService implements InstancesService {
     }
 
 
-    public Map<String, String> parseFormValues(FormComponent formComponents, ProcessDetail.FormItem formItem) {
+    public Map<String, Object> parseFormValues(FormComponent formComponents, ProcessDetail.FormItem formItem) {
 
         return formConvert.convert(formComponents.getComponentType(), new FormItemConvert(formComponents, formItem));
     }
@@ -270,13 +281,13 @@ public class LarkInstancesService implements InstancesService {
 
     @Slf4j
     @AllArgsConstructor
-    public static class FormConvert extends ComponentConvert<FormItemConvert, Map<String, String>> {
+    public static class FormConvert extends ComponentConvert<FormItemConvert, Map<String, Object>> {
 
         private LarkConfig larkConfig;
 
         @Override
-        public Map<String, String> convert(ComponentType type, FormItemConvert component) {
-            if (component.getFormComponents().getComponentType().equals(component.getFormItem().getType())) {
+        public Map<String, Object> convert(ComponentType type, FormItemConvert component) {
+            if (!type.equals(component.getFormItem().getType())) {
                 String errMsg = String.format("飞书-转换表单内容失败，传入表单类型与飞书平台配置类型不匹配或飞书平台设置类型系统不支持。name:%s,系统类型:%s,飞书类型:%s",
                         component.getFormItem().getName(),
                         component.getFormComponents().getComponentType(),
@@ -287,83 +298,101 @@ public class LarkInstancesService implements InstancesService {
             return super.convert(type, component);
         }
 
-        public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ");
-
         @Override
-        protected Map<String, String> text(FormItemConvert component) {
+        protected Map<String, Object> text(FormItemConvert component) {
             return this.base(component, "input", component.getFormComponents().getValue());
         }
 
         @Override
-        protected Map<String, String> textarea(FormItemConvert component) {
+        protected Map<String, Object> textarea(FormItemConvert component) {
             return this.base(component, "textarea", component.getFormComponents().getValue());
         }
 
         @Override
-        protected Map<String, String> select(FormItemConvert component) {
-            return this.base(component, "radioV2", component.getFormComponents().getValue());
+        protected Map<String, Object> select(FormItemConvert component) {
+
+            SelectOption option = (SelectOption) component.getFormItem().getOption();
+
+            Map<String, String> optionMap = option.optionsToMap();
+
+
+            return this.base(component, "radioV2", optionMap.get(component.getFormComponents().getValue()));
         }
 
         @Override
-        protected Map<String, String> multiSelect(FormItemConvert component) {
-            return this.base(component, "checkboxV2", component.getFormComponents().getValue());
+        protected Map<String, Object> multiSelect(FormItemConvert component) {
+
+            List<String> list = ComponentParseAll
+                    .COMPONENT_PARSE_MULTI_SELECT
+                    .toJava(component.getFormComponents().getValue());
+
+
+            MultiSelectOption option = (MultiSelectOption) component.getFormItem().getOption();
+
+            Map<String, String> optionMap = option.optionsToMap();
+
+            return this.base(component, "checkboxV2", list.stream()
+                    .map(optionMap::get)
+                    .collect(Collectors.toList()));
         }
 
         @Override
-        protected Map<String, String> date(FormItemConvert component) {
+        protected Map<String, Object> date(FormItemConvert component) {
 
             DateComponent dateComponent = ComponentParseAll
                     .COMPONENT_PARSE_DATE
                     .toJava(component.getFormComponents().getValue());
 
-            return this.base(component, "date", DATE_TIME_FORMATTER.format(dateComponent.getDate()));
+            return this.base(component, "date", dateComponent.getDate().atOffset(ZoneOffset.ofHours(8))
+                    .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
         }
 
         @Override
-        protected Map<String, String> dateRange(FormItemConvert component) {
+        protected Map<String, Object> dateRange(FormItemConvert component) {
             DateRangeComponent dateRange = ComponentParseAll
                     .COMPONENT_PARSE_DATE_RANGE
                     .toJava(component.getFormComponents().getValue());
+            String begin = dateRange.getBegin().atOffset(ZoneOffset.ofHours(8))
+                    .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+            String end = dateRange.getEnd().atOffset(ZoneOffset.ofHours(8))
+                    .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
 
-            String begin = DATE_TIME_FORMATTER.format(dateRange.getBegin());
-            String end = DATE_TIME_FORMATTER.format(dateRange.getBegin());
-            HashMap<String, String> map = new HashMap<String, String>() {{
-                put("begin", begin);
-                put("end", end);
-            }};
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("start", begin);
+            map.put("end", end);
 
             switch (dateRange.getDateFormat()) {
                 case YYYY_MM_DD:
-                    map.put("interval", String.valueOf(
+                    map.put("interval",
                             Duration.between(dateRange.getBegin().toLocalDate()
-                                    , dateRange.getEnd().toLocalDate()).toDays() + 1));
+                                    , dateRange.getEnd().toLocalDate()).toDays());
 
                 case YYYY_MM_DD_HH_MM:
 
-                    map.put("interval", String.valueOf(
+                    map.put("interval",
                             Duration.between(
                                     dateRange.getBegin().withSecond(0),
-                                    dateRange.getEnd().withSecond(0)).toHours() + 1));
+                                    dateRange.getEnd().withSecond(0)).toHours());
             }
 
-            return this.base(component, "dateInterval", Jsons.DEFAULT.toJson(map));
+            return this.base(component, "dateInterval", map);
 
         }
 
         @Override
-        protected Map<String, String> number(FormItemConvert component) {
+        protected Map<String, Object> number(FormItemConvert component) {
             return this.base(component, "number", component.getFormComponents().getValue());
         }
 
         @Override
-        protected Map<String, String> amount(FormItemConvert component) {
-            Map<String, String> map = this.base(component, "amount", component.getFormComponents().getValue());
+        protected Map<String, Object> amount(FormItemConvert component) {
+            Map<String, Object> map = this.base(component, "amount", component.getFormComponents().getValue());
             map.put("currency", "CNY");
-            return this.base(component, "amount", component.getFormComponents().getValue());
+            return map;
         }
 
         @Override
-        protected Map<String, String> image(FormItemConvert component) {
+        protected Map<String, Object> image(FormItemConvert component) {
 
             List<ImageComponent> imageComponents = ComponentParseAll
                     .COMPONENT_PARSE_IMAGE
@@ -380,12 +409,12 @@ public class LarkInstancesService implements InstancesService {
 
             }
 
-            return this.base(component, "image", Jsons.DEFAULT.toJson(list));
+            return this.base(component, "image", list);
         }
 
 
         @Override
-        protected Map<String, String> attachment(FormItemConvert component) {
+        protected Map<String, Object> attachment(FormItemConvert component) {
             List<AttachmentComponent> attachmentComponents = ComponentParseAll
                     .COMPONENT_PARSE_ATTACHMENT
                     .toJava(component.getFormComponents().getValue());
@@ -399,11 +428,11 @@ public class LarkInstancesService implements InstancesService {
                 list.add(code);
             }
 
-            return this.base(component, "attachmentV2", Jsons.DEFAULT.toJson(list));
+            return this.base(component, "attachmentV2", list);
         }
 
         @Override
-        protected Map<String, String> unknown(FormItemConvert component) {
+        protected Map<String, Object> unknown(FormItemConvert component) {
             String errMsg = String.format("飞书-转换表单内容失败，无法识别的类型。name:%s,id:%s,value:%s",
                     component.getFormItem().getName(),
                     component.getFormItem().getId(),
@@ -413,7 +442,7 @@ public class LarkInstancesService implements InstancesService {
         }
 
         @Override
-        protected Map<String, String> table(FormItemConvert component) {
+        protected Map<String, Object> table(FormItemConvert component) {
 
             Collection<Collection<FormComponent>> table = ComponentParseAll
                     .COMPONENT_PARSE_TABLE
@@ -423,75 +452,75 @@ public class LarkInstancesService implements InstancesService {
             Map<String, ProcessDetail.FormItem> childrenMap = children.stream()
                     .collect(Collectors.toMap(ProcessDetail.FormItem::getName, x -> x));
 
-            List<List<Map<String, String>>> value = table.stream()
+            List<List<Map<String, Object>>> value = table.stream()
                     .map(row -> row.stream()
-                            .map(x -> this.convert(component.getFormComponents().getComponentType()
+                            .map(x -> this.convert(x.getComponentType()
                                     , new FormItemConvert(x, childrenMap.get(x.getName()))))
                             .collect(Collectors.toList()))
                     .collect(Collectors.toList());
 
 
-            return this.base(component, "fieldList", Jsons.DEFAULT.toJson(value));
+            return this.base(component, "fieldList", value);
         }
 
-        private Map<String, String> base(FormItemConvert component, String type, String value) {
-            HashMap<String, String> map = new HashMap<>(3);
+        private Map<String, Object> base(FormItemConvert component, String type, Object value) {
+            HashMap<String, Object> map = new HashMap<>(3);
             map.put("id", component.getFormItem().getId());
             map.put("type", type);
             map.put("value", value);
             return map;
         }
 
-        private String uploadFile(String type, String fileName, String fileUrl, long fileSize) {
+        private String uploadFile(String type, String fileName, String fileUrl, Long fileSize) {
             File dir = null;
             File file = null;
 
+            String tempDir = System.getProperty("java.io.tmpdir");
+            String uuid = UUID.randomUUID().toString();
+            String tempDirPath = tempDir + "/" + uuid;
+            dir = new File(tempDirPath);
+            boolean mkdirs = dir.mkdirs();
+
+            if (!mkdirs) {
+                String errMsg = String.format("飞书-上传审批文件创建临时文件夹失败 path:%s", tempDirPath);
+                log.error(errMsg);
+                throw new WfException(errMsg);
+            }
+
+            file = new File(tempDirPath + "/" + fileName);
+
+
             try {
-                String tempDir = System.getProperty("java.io.tmpdir");
-                String uuid = UUID.randomUUID().toString();
-                String tempDirPath = tempDir + "/" + uuid;
-                dir = new File(tempDirPath);
-                boolean mkdirs = dir.mkdirs();
-
-                if (!mkdirs) {
-                    String errMsg = String.format("飞书-上传审批文件创建临时文件夹失败 path:%s", tempDirPath);
-                    log.error(errMsg);
-                    throw new WfException(errMsg);
-                }
-
-                file = new File(tempDirPath + "/" + fileName);
                 IOUtils.copyFromURL(new URL(fileUrl), file);
 
                 RequestOptions reqOptions = new RequestOptions();
                 reqOptions.setSupportUpload(true);
 
-                PutFileBody fileBody = PutFileBody.builder()
+                UploadFileBody fileBody = UploadFileBody.builder()
                         .content(file)
                         .name(fileName)
                         .type(type)
                         .build();
 
-                RawResponse post = larkConfig.getClient().post("/approval/openapi/v2/file/upload"
+                RawResponse rsp = larkConfig.getClient().post("/approval/openapi/v2/file/upload"
                         , fileBody
                         , AccessTokenType.Tenant, reqOptions);
 
-                Map<String, Object> map = Jsons.DEFAULT.fromJson(new String(post.getBody()), Map.class);
+                // 反序列化
+                UploadFileRsp resp = UnmarshalRespUtil.unmarshalResp(rsp, UploadFileRsp.class);
                 //上传失败
-                if (!map.get("code").toString().equals("1")) {
+                if (!resp.success()) {
                     String errMsg = String.format("飞书-上传审批文件失败 name:%s,filesize:%s,filepath:%s,code:%s,msg:%s",
                             fileName,
                             fileSize,
                             fileUrl,
-                            map.get("code").toString(),
-                            map.get("msg").toString());
+                            resp.getCode(),
+                            resp.getMsg());
                     log.error(errMsg);
                     throw new WfException(errMsg);
                 }
 
-
-                Map data = (Map<String, Object>) map.get("map");
-                return data.get("code").toString();
-
+                return resp.getData().get("code");
             } catch (WfException wfe) {
                 throw wfe;
             } catch (Exception e) {
@@ -519,11 +548,22 @@ public class LarkInstancesService implements InstancesService {
         @ApiModel("飞书-上传审批文件参数")
         @Data
         @Builder
-        public static class PutFileBody {
+        public static class UploadFileBody {
+            @SerializedName("name")
             private String name;
+            @SerializedName("type")
             private String type;
+            @SerializedName("content")
             private File content;
         }
+
+        @ApiModel("飞书-上传文件返回")
+        @Data
+        @Builder
+        public static class UploadFileRsp extends BaseResponse<Map<String, String>> {
+
+        }
+
 
     }
 
