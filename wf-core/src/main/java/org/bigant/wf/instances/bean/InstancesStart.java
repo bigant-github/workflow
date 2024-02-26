@@ -2,8 +2,10 @@ package org.bigant.wf.instances.bean;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bigant.wf.form.bean.FormComponent;
 import java.util.List;
 
@@ -16,6 +18,8 @@ import java.util.List;
 @Data
 @ApiModel("发起审批实例")
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class InstancesStart {
     @ApiModelProperty("审批实例code")
     private String code;

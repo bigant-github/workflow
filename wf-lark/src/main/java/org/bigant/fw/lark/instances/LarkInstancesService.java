@@ -9,12 +9,12 @@ import com.lark.oapi.core.token.AccessTokenType;
 import com.lark.oapi.core.utils.Jsons;
 import com.lark.oapi.core.utils.UnmarshalRespUtil;
 import com.lark.oapi.service.approval.v4.model.*;
-import com.oracle.tools.packager.IOUtils;
 import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.bigant.fw.lark.IOUtils;
 import org.bigant.fw.lark.LarkConfig;
 import org.bigant.fw.lark.LarkConstant;
 import org.bigant.fw.lark.process.LarkProcessService;
@@ -493,7 +493,7 @@ public class LarkInstancesService implements InstancesService {
 
 
             try {
-                IOUtils.copyFromURL(new URL(fileUrl), file);
+                IOUtils.copyFile(new URL(fileUrl), file);
 
                 RequestOptions reqOptions = new RequestOptions();
                 reqOptions.setSupportUpload(true);

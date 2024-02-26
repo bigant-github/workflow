@@ -1,6 +1,5 @@
 package org.bigant.wf.user;
 
-import io.swagger.annotations.ApiModelProperty;
 import org.bigant.wf.user.vo.User;
 
 /**
@@ -26,7 +25,7 @@ public interface UserService {
      * @param thirdPartyType
      * @return
      */
-    String getThirdPartyId(String userId, String thirdPartyType);
+    String getUserId(String userId, String thirdPartyType);
 
 
     /**
@@ -36,6 +35,6 @@ public interface UserService {
      * @param thirdPartyType
      * @return
      */
-    String getThirdDeptId(String deptId, String thirdPartyType);
+    String getDeptId(String deptId, String thirdPartyType);
 
 }

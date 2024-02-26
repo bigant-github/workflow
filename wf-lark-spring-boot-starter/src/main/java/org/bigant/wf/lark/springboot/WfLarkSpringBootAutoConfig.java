@@ -5,7 +5,6 @@ import org.bigant.fw.lark.instances.LarkInstancesService;
 import org.bigant.fw.lark.process.LarkProcessService;
 import org.bigant.wf.user.UserService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

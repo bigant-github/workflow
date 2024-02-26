@@ -9,7 +9,7 @@
     <version>1.0-SNAPSHOT</version>
 
     <modules>
-        <module>wf</module>
+        <module>wf-core</module>
         <module>wf-dingtalk</module>
         <module>wf-lark</module>
         <module>wf-dingtalk-spring-boot-starter</module>
