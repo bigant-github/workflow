@@ -36,7 +36,7 @@ public class DingTalkProcessService implements IProcessService {
         try {
             com.aliyun.dingtalkworkflow_1_0.Client client = createClient();
             com.aliyun.dingtalkworkflow_1_0.models.ListUserVisibleBpmsProcessesHeaders listUserVisibleBpmsProcessesHeaders = new com.aliyun.dingtalkworkflow_1_0.models.ListUserVisibleBpmsProcessesHeaders();
-            listUserVisibleBpmsProcessesHeaders.xAcsDingtalkAccessToken = dingTalkConfig.getAccessToken();
+            listUserVisibleBpmsProcessesHeaders.xAcsDingtalkAccessToken = dingTalkConfig.accessToken();
             com.aliyun.dingtalkworkflow_1_0.models.ListUserVisibleBpmsProcessesRequest listUserVisibleBpmsProcessesRequest = new com.aliyun.dingtalkworkflow_1_0.models.ListUserVisibleBpmsProcessesRequest()
                     .setUserId(userService.getThirdPartyId(userId, this.getType()))
                     .setMaxResults(100L)
@@ -69,7 +69,7 @@ public class DingTalkProcessService implements IProcessService {
             com.aliyun.dingtalkworkflow_1_0.models.GetManageProcessByStaffIdHeaders getManageProcessByStaffIdHeaders =
                     new com.aliyun.dingtalkworkflow_1_0.models.GetManageProcessByStaffIdHeaders();
 
-            getManageProcessByStaffIdHeaders.xAcsDingtalkAccessToken = dingTalkConfig.getAccessToken();
+            getManageProcessByStaffIdHeaders.xAcsDingtalkAccessToken = dingTalkConfig.accessToken();
 
             com.aliyun.dingtalkworkflow_1_0.models.GetManageProcessByStaffIdRequest getManageProcessByStaffIdRequest =
                     new com.aliyun.dingtalkworkflow_1_0.models.GetManageProcessByStaffIdRequest()

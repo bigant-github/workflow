@@ -66,7 +66,7 @@ public class DingTalkConfig {
      *
      * @throws Exception 异常信息
      */
-    public String getAccessToken() {
+    public String accessToken() {
         long t = System.currentTimeMillis();
 
         if (t < accessTokenExpiresIn) {

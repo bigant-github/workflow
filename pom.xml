@@ -8,17 +8,12 @@
     <artifactId>parent</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.2</version>
-    </parent>
-
     <modules>
         <module>wf</module>
         <module>wf-dingtalk</module>
         <module>wf-lark</module>
-        <module>wf-dingtalk-spring</module>
+        <module>wf-dingtalk-spring-boot-starter</module>
+        <module>wf-lark-spring-boot-starter</module>
     </modules>
 
     <packaging>pom</packaging>
@@ -29,11 +24,13 @@
         <java.version>8</java.version>
         <jdk.version>8</jdk.version>
         <mybatis-plus.version>3.4.1</mybatis-plus.version>
-        <swagger.version>1.5.3</swagger.version>
+        <swagger.version>1.6.12</swagger.version>
         <fastjson2.version>2.0.46</fastjson2.version>
         <logback.version>1.2.3</logback.version>
         <slf4j.version>1.7.30</slf4j.version>
         <springboot.version>2.2.13.RELEASE</springboot.version>
+        <lombok.version>1.18.30</lombok.version>
+        <junit.version>4.13.2</junit.version>
     </properties>
 
 
@@ -61,6 +58,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

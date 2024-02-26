@@ -145,7 +145,7 @@ public class DingTalkFile {
         log.debug("提交文件，unionId:{}，spaceId:{}，fileName:{}，size:{}", unionId, fileName, size, spaceId);
         Client client = createClient();
         com.aliyun.dingtalkstorage_1_0.models.CommitFileHeaders commitFileHeaders = new com.aliyun.dingtalkstorage_1_0.models.CommitFileHeaders();
-        commitFileHeaders.xAcsDingtalkAccessToken = dingTalkConfig.getAccessToken();
+        commitFileHeaders.xAcsDingtalkAccessToken = dingTalkConfig.accessToken();
 
         com.aliyun.dingtalkstorage_1_0.models.CommitFileRequest.CommitFileRequestOption option = new com.aliyun.dingtalkstorage_1_0.models.CommitFileRequest.CommitFileRequestOption()
                 .setSize(size)
@@ -189,7 +189,7 @@ public class DingTalkFile {
         log.debug("获取文件上传信息，unionId:{}，fileName:{}，size:{}，spaceId:{}", unionId, fileName, size, size);
 
         com.aliyun.dingtalkstorage_1_0.models.GetFileUploadInfoHeaders getFileUploadInfoHeaders = new com.aliyun.dingtalkstorage_1_0.models.GetFileUploadInfoHeaders();
-        getFileUploadInfoHeaders.xAcsDingtalkAccessToken = dingTalkConfig.getAccessToken();
+        getFileUploadInfoHeaders.xAcsDingtalkAccessToken = dingTalkConfig.accessToken();
 
         com.aliyun.dingtalkstorage_1_0.models.GetFileUploadInfoRequest.GetFileUploadInfoRequestOptionPreCheckParam optionPreCheckParam = new com.aliyun.dingtalkstorage_1_0.models.GetFileUploadInfoRequest.GetFileUploadInfoRequestOptionPreCheckParam()
                 .setMd5("md5")

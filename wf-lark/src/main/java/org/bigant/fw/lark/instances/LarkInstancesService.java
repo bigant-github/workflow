@@ -56,12 +56,14 @@ import java.util.stream.Collectors;
 public class LarkInstancesService implements InstancesService {
 
     private LarkConfig larkConfig;
-    private UserService userService;
+
     private LarkProcessService larkProcessService;
+
+    private UserService userService;
 
     private FormConvert formConvert;
 
-    public LarkInstancesService(LarkConfig larkConfig, UserService userService, LarkProcessService larkProcessService) {
+    public LarkInstancesService(LarkConfig larkConfig, LarkProcessService larkProcessService, UserService userService) {
         this.larkConfig = larkConfig;
         this.userService = userService;
         this.larkProcessService = larkProcessService;

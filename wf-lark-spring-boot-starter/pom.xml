@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>wf</artifactId>
+    <artifactId>wf-lark-spring-boot-starter</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -20,19 +20,17 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.swagger</groupId>
-            <artifactId>swagger-annotations</artifactId>
-            <version>${swagger.version}</version>
+            <groupId>org.bigant.workflow</groupId>
+            <artifactId>wf-lark</artifactId>
+            <version>${project.version}</version>
         </dependency>
+
+        <!--spring-->
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/com.alibaba.fastjson2/fastjson2 -->
-        <dependency>
-            <groupId>com.alibaba.fastjson2</groupId>
-            <artifactId>fastjson2</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>${springboot.version}</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

@@ -85,8 +85,8 @@ public class LarkInstancesServiceTest extends BaseTest {
         LarkProcessService processService = new LarkProcessService(larkConfig);
 
         return new LarkInstancesService(larkConfig,
-                userService,
-                processService);
+                processService,
+                userService);
 
     }
 

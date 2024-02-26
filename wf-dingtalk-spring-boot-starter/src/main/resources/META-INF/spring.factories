@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  org.bigant.wf.dingtalk.springboot.WfDingTalkSpringBootAutoConfig

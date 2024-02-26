@@ -38,7 +38,7 @@ public class DingTalkUser {
 
         OapiV2UserGetResponse rsp = null;
         try {
-            rsp = client.execute(req, dingTalkConfig.getAccessToken());
+            rsp = client.execute(req, dingTalkConfig.accessToken());
 
             if (!rsp.isSuccess()) {
                 log.error("获取钉钉用户详情失败,userid:{}，errcode:{} errmsg:{}", dingTalkUserId, rsp.getErrcode(), rsp.getErrmsg());

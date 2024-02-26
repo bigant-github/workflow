@@ -100,7 +100,7 @@ public class DingTalkInstancesService implements InstancesService {
 
         try {
             Client client = createClient();
-            startProcessInstanceHeaders.xAcsDingtalkAccessToken = dingTalkConfig.getAccessToken();
+            startProcessInstanceHeaders.xAcsDingtalkAccessToken = dingTalkConfig.accessToken();
             StartProcessInstanceResponse processInstanceResponse = client.startProcessInstanceWithOptions(startProcessInstanceRequest,
                     startProcessInstanceHeaders,
                     new RuntimeOptions());
@@ -268,7 +268,7 @@ public class DingTalkInstancesService implements InstancesService {
 
         try {
             com.aliyun.dingtalkworkflow_1_0.Client client = createClient();
-            processForecastHeaders.xAcsDingtalkAccessToken = dingTalkConfig.getAccessToken();
+            processForecastHeaders.xAcsDingtalkAccessToken = dingTalkConfig.accessToken();
 
             ProcessForecastResponseBody.ProcessForecastResponseBodyResult result =
                     client.processForecastWithOptions(processForecastRequest, processForecastHeaders, new RuntimeOptions())
@@ -460,7 +460,7 @@ public class DingTalkInstancesService implements InstancesService {
 
         try {
             com.aliyun.dingtalkworkflow_1_0.Client client = createClient();
-            getAttachmentSpaceHeaders.xAcsDingtalkAccessToken = dingTalkConfig.getAccessToken();
+            getAttachmentSpaceHeaders.xAcsDingtalkAccessToken = dingTalkConfig.accessToken();
             GetAttachmentSpaceResponse attachmentSpaceWithOptions = client.getAttachmentSpaceWithOptions(getAttachmentSpaceRequest, getAttachmentSpaceHeaders, new RuntimeOptions());
             Long spaceId = attachmentSpaceWithOptions.getBody().getResult().getSpaceId();
 
