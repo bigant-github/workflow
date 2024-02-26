@@ -22,19 +22,19 @@ public interface UserService {
      * 获取第三方id
      *
      * @param userId
-     * @param thirdPartyType
+     * @param type
      * @return
      */
-    String getUserId(String userId, String thirdPartyType);
+    String getUserId(String userId, String type);
 
 
     /**
      * 获取第三方部门id
      *
      * @param deptId
-     * @param thirdPartyType
+     * @param type
      * @return
      */
-    String getDeptId(String deptId, String thirdPartyType);
+    String getDeptId(String deptId, String type);
 
 }

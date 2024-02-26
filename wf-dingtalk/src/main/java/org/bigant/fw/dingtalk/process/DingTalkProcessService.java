@@ -7,7 +7,7 @@ import com.aliyun.teautil.models.RuntimeOptions;
 import lombok.AllArgsConstructor;
 import org.bigant.fw.dingtalk.DingTalkConfig;
 import org.bigant.fw.dingtalk.DingTalkConstant;
-import org.bigant.wf.process.IProcessService;
+import org.bigant.wf.process.ProcessService;
 import org.bigant.wf.process.bean.ProcessDetail;
 import org.bigant.wf.process.bean.ProcessPage;
 import org.bigant.wf.process.bean.ProcessPageQuery;
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  * @date 2024/1/30 15:33
  */
 @AllArgsConstructor
-public class DingTalkProcessService implements IProcessService {
+public class DingTalkProcessService implements ProcessService {
 
     private DingTalkConfig dingTalkConfig;
     private UserService userService;
@@ -38,7 +38,7 @@ public class DingTalkProcessService implements IProcessService {
             com.aliyun.dingtalkworkflow_1_0.models.ListUserVisibleBpmsProcessesHeaders listUserVisibleBpmsProcessesHeaders = new com.aliyun.dingtalkworkflow_1_0.models.ListUserVisibleBpmsProcessesHeaders();
             listUserVisibleBpmsProcessesHeaders.xAcsDingtalkAccessToken = dingTalkConfig.accessToken();
             com.aliyun.dingtalkworkflow_1_0.models.ListUserVisibleBpmsProcessesRequest listUserVisibleBpmsProcessesRequest = new com.aliyun.dingtalkworkflow_1_0.models.ListUserVisibleBpmsProcessesRequest()
-                    .setUserId(userService.getThirdPartyId(userId, this.getType()))
+                    .setUserId(userService.getUserId(userId, this.getType()))
                     .setMaxResults(100L)
                     .setNextToken(0L);
             return client.listUserVisibleBpmsProcessesWithOptions(listUserVisibleBpmsProcessesRequest,
@@ -109,7 +109,7 @@ public class DingTalkProcessService implements IProcessService {
      * @return
      */
     private String getDingTalkUserId(String userId) {
-        return userService.getThirdPartyId(userId, getType());
+        return userService.getUserId(userId, getType());
     }
 
     @Override

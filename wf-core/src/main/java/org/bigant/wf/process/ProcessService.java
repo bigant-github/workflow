@@ -12,7 +12,7 @@ import java.util.List;
  * @author galen
  * @date 2024/1/3014:19
  */
-public interface IProcessService {
+public interface ProcessService {
 
     /**
      * 根据当前登录人查看表单

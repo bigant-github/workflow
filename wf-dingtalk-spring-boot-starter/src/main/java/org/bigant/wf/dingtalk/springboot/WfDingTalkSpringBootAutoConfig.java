@@ -3,6 +3,7 @@ package org.bigant.wf.dingtalk.springboot;
 import org.bigant.fw.dingtalk.DingTalkConfig;
 import org.bigant.fw.dingtalk.instances.DingTalkInstancesService;
 import org.bigant.fw.dingtalk.process.DingTalkProcessService;
+import org.bigant.wf.Factory;
 import org.bigant.wf.user.UserService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -28,12 +29,16 @@ public class WfDingTalkSpringBootAutoConfig {
     @Bean
     @ConditionalOnMissingBean
     public DingTalkInstancesService dingTalkInstancesService(DingTalkConfig dingTalkConfig, UserService userService) {
-        return new DingTalkInstancesService(dingTalkConfig, userService);
+        DingTalkInstancesService dingTalkInstancesService = new DingTalkInstancesService(dingTalkConfig, userService);
+        Factory.registerInstancesService(dingTalkInstancesService.getType(), dingTalkInstancesService);
+        return dingTalkInstancesService;
     }
 
     @Bean
     @ConditionalOnMissingBean
     public DingTalkProcessService dingTalkProcessService(DingTalkConfig dingTalkConfig, UserService userService) {
+        DingTalkProcessService dingTalkProcessService = new DingTalkProcessService(dingTalkConfig, userService);
+        Factory.registerProcessService(dingTalkProcessService.getType(), dingTalkProcessService);
         return new DingTalkProcessService(dingTalkConfig, userService);
     }
 

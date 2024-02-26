@@ -14,7 +14,7 @@ import org.bigant.wf.exception.WfException;
 import org.bigant.wf.form.component.ComponentType;
 import org.bigant.wf.form.option.MultiSelectOption;
 import org.bigant.wf.form.option.SelectOption;
-import org.bigant.wf.process.IProcessService;
+import org.bigant.wf.process.ProcessService;
 import org.bigant.wf.process.bean.ProcessDetail;
 import org.bigant.wf.process.bean.ProcessPage;
 import org.bigant.wf.process.bean.ProcessPageQuery;
@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @AllArgsConstructor
-public class LarkProcessService implements IProcessService {
+public class LarkProcessService implements ProcessService {
 
     LarkConfig config;
 

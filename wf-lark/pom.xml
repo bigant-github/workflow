@@ -23,7 +23,7 @@
     <dependencies>
         <dependency>
             <groupId>org.bigant.workflow</groupId>
-            <artifactId>wf</artifactId>
+            <artifactId>wf-core</artifactId>
             <version>${parent.version}</version>
         </dependency>
         <dependency>

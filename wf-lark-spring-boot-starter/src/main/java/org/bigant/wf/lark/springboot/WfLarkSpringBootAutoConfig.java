@@ -3,6 +3,7 @@ package org.bigant.wf.lark.springboot;
 import org.bigant.fw.lark.LarkConfig;
 import org.bigant.fw.lark.instances.LarkInstancesService;
 import org.bigant.fw.lark.process.LarkProcessService;
+import org.bigant.wf.Factory;
 import org.bigant.wf.user.UserService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -29,13 +30,17 @@ public class WfLarkSpringBootAutoConfig {
     @Bean
     @ConditionalOnMissingBean
     public LarkProcessService larkProcessService(LarkConfig larkConfig) {
-        return new LarkProcessService(larkConfig);
+        LarkProcessService larkProcessService = new LarkProcessService(larkConfig);
+        Factory.registerProcessService(larkProcessService.getType(), larkProcessService);
+        return larkProcessService;
     }
 
     @Bean
     @ConditionalOnMissingBean
     public LarkInstancesService larkInstancesService(LarkConfig larkConfig, LarkProcessService larkProcessService, UserService userService) {
-        return new LarkInstancesService(larkConfig, larkProcessService, userService);
+        LarkInstancesService larkInstancesService = new LarkInstancesService(larkConfig, larkProcessService, userService);
+        Factory.registerInstancesService(larkInstancesService.getType(), larkInstancesService);
+        return larkInstancesService;
     }
 
 
