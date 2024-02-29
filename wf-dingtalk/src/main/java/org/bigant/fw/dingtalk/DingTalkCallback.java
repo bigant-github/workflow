@@ -84,32 +84,35 @@ public class DingTalkCallback {
 
 
         InstancesAction.InstancesCallback instancesCallback = InstancesAction.InstancesCallback.builder()
-                .instanceCode(event.getString("instance_code"))
+                .instanceCode(event.getString("processInstanceId"))
+                .processCode(event.getString("processCode"))
                 .operateTime(operateTime)
                 .build();
 
         switch (event.getString("type")) {
             case "start":
-                this.action.start(instancesCallback);
+                instancesCallback.setAction(InstancesAction.InstancesActionEnum.START);
                 break;
             case "finish":
                 switch (event.getString("result")) {
                     case "agree":
-                        this.action.agree(instancesCallback);
+                        instancesCallback.setAction(InstancesAction.InstancesActionEnum.AGREE);
                         break;
                     case "reject":
-                        this.action.refuse(instancesCallback);
+                        instancesCallback.setAction(InstancesAction.InstancesActionEnum.REFUSE);
                         break;
                     default:
                         throw new WfException("钉钉-无法识别的实例状态:" + event.getString("result"));
                 }
                 break;
             case "terminate":
+                instancesCallback.setAction(InstancesAction.InstancesActionEnum.CANCEL);
                 this.action.cancel(instancesCallback);
                 break;
             default:
                 throw new WfException("钉钉-无法识别的实例状态:" + event.getString("type"));
         }
+        this.action.action(instancesCallback);
 
     }
 

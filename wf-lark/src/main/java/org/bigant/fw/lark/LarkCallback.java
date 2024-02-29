@@ -68,31 +68,34 @@ public class LarkCallback {
 
         InstancesAction.InstancesCallback instancesCallback = InstancesAction.InstancesCallback.builder()
                 .instanceCode(event.getString("instance_code"))
+                .processCode(event.getString("approval_code"))
                 .operateTime(operateTime)
                 .build();
 
         switch (event.getString("status")) {
             case "PENDING":
             case "OVERTIME_RECOVER":
-                this.action.start(instancesCallback);
+                instancesCallback.setAction(InstancesAction.InstancesActionEnum.START);
                 break;
             case "APPROVED":
-                this.action.agree(instancesCallback);
+                instancesCallback.setAction(InstancesAction.InstancesActionEnum.AGREE);
                 break;
             case "REJECTED":
-                this.action.refuse(instancesCallback);
+                instancesCallback.setAction(InstancesAction.InstancesActionEnum.REFUSE);
                 break;
             case "CANCELED":
             case "REVERTED":
             case "DELETED":
-                this.action.cancel(instancesCallback);
+                instancesCallback.setAction(InstancesAction.InstancesActionEnum.CANCEL);
                 break;
             case "OVERTIME_CLOSE":
-                this.action.close(instancesCallback);
+                instancesCallback.setAction(InstancesAction.InstancesActionEnum.CLOSE);
                 break;
             default:
                 throw new WfException("飞书-无法识别的实例状态:" + event.getString("status"));
         }
+
+        action.action(instancesCallback);
 
     }
 

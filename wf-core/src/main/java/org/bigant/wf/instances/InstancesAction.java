@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.bigant.wf.exception.WfException;
 
 import java.time.LocalDateTime;
 
@@ -14,6 +15,28 @@ import java.time.LocalDateTime;
  * @date 2024/2/2811:29
  */
 public interface InstancesAction {
+
+    default public void action(InstancesCallback callback) {
+        switch (callback.getAction()) {
+            case START:
+                start(callback);
+                break;
+            case AGREE:
+                agree(callback);
+                break;
+            case REFUSE:
+                refuse(callback);
+                break;
+            case CANCEL:
+                cancel(callback);
+                break;
+            case CLOSE:
+                close(callback);
+                break;
+            default:
+                throw new WfException("无法识别的审批实例：" + callback.getAction());
+        }
+    }
 
     void start(InstancesCallback callback);
 
