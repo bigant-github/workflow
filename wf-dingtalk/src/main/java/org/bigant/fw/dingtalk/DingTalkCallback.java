@@ -2,7 +2,6 @@ package org.bigant.fw.dingtalk;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-import com.dingtalk.oapi.lib.aes.DingTalkEncryptException;
 import com.dingtalk.oapi.lib.aes.DingTalkEncryptor;
 import com.dingtalk.oapi.lib.aes.Utils;
 import lombok.AllArgsConstructor;
@@ -10,8 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.bigant.wf.exception.WfException;
 import org.bigant.wf.instances.InstancesAction;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -98,17 +95,17 @@ public class DingTalkCallback {
             case "finish":
                 switch (event.getString("result")) {
                     case "agree":
-                        this.action.approved(instancesCallback);
+                        this.action.agree(instancesCallback);
                         break;
                     case "reject":
-                        this.action.rejected(instancesCallback);
+                        this.action.refuse(instancesCallback);
                         break;
                     default:
                         throw new WfException("钉钉-无法识别的实例状态:" + event.getString("result"));
                 }
                 break;
             case "terminate":
-                this.action.canceled(instancesCallback);
+                this.action.cancel(instancesCallback);
                 break;
             default:
                 throw new WfException("钉钉-无法识别的实例状态:" + event.getString("type"));

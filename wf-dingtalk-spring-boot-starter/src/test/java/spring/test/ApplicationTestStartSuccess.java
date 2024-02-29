@@ -69,17 +69,17 @@ public class ApplicationTestStartSuccess {
             }
 
             @Override
-            public void approved(InstancesCallback callback) {
+            public void agree(InstancesCallback callback) {
 
             }
 
             @Override
-            public void rejected(InstancesCallback callback) {
+            public void refuse(InstancesCallback callback) {
 
             }
 
             @Override
-            public void canceled(InstancesCallback callback) {
+            public void cancel(InstancesCallback callback) {
 
             }
 

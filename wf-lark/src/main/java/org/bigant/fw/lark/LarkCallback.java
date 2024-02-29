@@ -10,7 +10,6 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 
 /**
  * 飞书回调
@@ -78,15 +77,15 @@ public class LarkCallback {
                 this.action.start(instancesCallback);
                 break;
             case "APPROVED":
-                this.action.approved(instancesCallback);
+                this.action.agree(instancesCallback);
                 break;
             case "REJECTED":
-                this.action.rejected(instancesCallback);
+                this.action.refuse(instancesCallback);
                 break;
             case "CANCELED":
             case "REVERTED":
             case "DELETED":
-                this.action.canceled(instancesCallback);
+                this.action.cancel(instancesCallback);
                 break;
             case "OVERTIME_CLOSE":
                 this.action.close(instancesCallback);

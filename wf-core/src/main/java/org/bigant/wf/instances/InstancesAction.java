@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -18,11 +17,11 @@ public interface InstancesAction {
 
     void start(InstancesCallback callback);
 
-    void approved(InstancesCallback callback);
+    void agree(InstancesCallback callback);
 
-    void rejected(InstancesCallback callback);
+    void refuse(InstancesCallback callback);
 
-    void canceled(InstancesCallback callback);
+    void cancel(InstancesCallback callback);
 
     void close(InstancesCallback callback);
 
@@ -30,10 +29,33 @@ public interface InstancesAction {
     @AllArgsConstructor
     @NoArgsConstructor
     @Builder
-    public static class InstancesCallback{
+    public static class InstancesCallback {
+
+        private String processCode;
+
         private String instanceCode;
 
         private LocalDateTime operateTime;
+
+        private InstancesActionEnum action;
+    }
+
+
+    public static enum InstancesActionEnum {
+        START("start"),
+        AGREE("agree"),
+        REFUSE("refuse"),
+        CANCEL("cancel"),
+        CLOSE("close");
+        private final String actionName;
+
+        InstancesActionEnum(String actionName) {
+            this.actionName = actionName;
+        }
+
+        public String getActionName() {
+            return actionName;
+        }
     }
 
 }
