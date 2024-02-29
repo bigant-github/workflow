@@ -3,6 +3,7 @@ package spring.test;
 import org.bigant.fw.lark.LarkConfig;
 import org.bigant.fw.lark.instances.LarkInstancesService;
 import org.bigant.fw.lark.process.LarkProcessService;
+import org.bigant.wf.instances.InstancesAction;
 import org.bigant.wf.user.UserService;
 import org.bigant.wf.user.vo.User;
 import org.springframework.boot.SpringApplication;
@@ -31,6 +32,35 @@ public class ApplicationTestStartSuccess {
 
     }
 
+    @Bean
+    public InstancesAction instancesAction() {
+        return new InstancesAction() {
+            @Override
+            public void start(InstancesCallback callback) {
+
+            }
+
+            @Override
+            public void approved(InstancesCallback callback) {
+
+            }
+
+            @Override
+            public void rejected(InstancesCallback callback) {
+
+            }
+
+            @Override
+            public void canceled(InstancesCallback callback) {
+
+            }
+
+            @Override
+            public void close(InstancesCallback callback) {
+
+            }
+        };
+    }
 
     @Bean
     public UserService userService() {
@@ -42,14 +72,15 @@ public class ApplicationTestStartSuccess {
             }
 
             @Override
-            public String getThirdPartyId(String userId, String thirdPartyType) {
+            public String getUserId(String userId, String type) {
                 return null;
             }
 
             @Override
-            public String getThirdDeptId(String deptId, String thirdPartyType) {
+            public String getDeptId(String deptId, String type) {
                 return null;
             }
+
         };
     }
 

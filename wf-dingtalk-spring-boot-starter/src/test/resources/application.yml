@@ -1,0 +1,5 @@
+wf:
+  dingtalk:
+    callback:
+      enable: true
+      #path: callback

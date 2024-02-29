@@ -42,6 +42,7 @@ public class DingTalkInstancesService implements InstancesService {
 
     private DingTalkConfig dingTalkConfig;
     private UserService userService;
+    private com.aliyun.dingtalkworkflow_1_0.Client client;
 
     /**
      * 发起审批实例
@@ -55,7 +56,7 @@ public class DingTalkInstancesService implements InstancesService {
 
         log.debug("发起审批实例：{}", JSONObject.toJSONString(instancesStart));
 
-        String dingTalkUserId = userService.getThirdPartyId(instancesStart.getUserId(), this.getType());
+        String dingTalkUserId = userService.getUserId(instancesStart.getUserId(), this.getType());
 
         StartProcessInstanceHeaders startProcessInstanceHeaders = new
                 StartProcessInstanceHeaders();
@@ -89,7 +90,7 @@ public class DingTalkInstancesService implements InstancesService {
                 .setOriginatorUserId(dingTalkUserId)
                 .setProcessCode(instancesStart.getCode())
                 .setDeptId(instancesStart.getDeptId() != null && instancesStart.getDeptId().length() > 0 ?
-                        Long.parseLong(userService.getThirdDeptId(instancesStart.getDeptId(), this.getType()))
+                        Long.parseLong(userService.getDeptId(instancesStart.getDeptId(), this.getType()))
                         : null)
                 /*.setMicroappAgentId(41605932L)*/
                 /*.setApprovers(java.util.Arrays.asList(approvers0))*/
@@ -99,7 +100,7 @@ public class DingTalkInstancesService implements InstancesService {
                 .setFormComponentValues(valuesDetailsDetails);
 
         try {
-            Client client = createClient();
+            Client client = getClient();
             startProcessInstanceHeaders.xAcsDingtalkAccessToken = dingTalkConfig.accessToken();
             StartProcessInstanceResponse processInstanceResponse = client.startProcessInstanceWithOptions(startProcessInstanceRequest,
                     startProcessInstanceHeaders,
@@ -109,8 +110,8 @@ public class DingTalkInstancesService implements InstancesService {
             log.debug("发起审批实例成功：code:{}，instanceId:{}", instancesStart.getCode(), instanceId);
 
             return InstancesStartResult.builder()
-                    .code(instancesStart.getCode())
-                    .instanceId(instanceId)
+                    .processCode(instancesStart.getCode())
+                    .instanceCode(instanceId)
                     .build();
         } catch (TeaException err) {
             throw err;
@@ -159,7 +160,7 @@ public class DingTalkInstancesService implements InstancesService {
 
             List<String> userIds = targetSelectUsersAuthMatch.get(i).getUserIds()
                     .stream()
-                    .map(x -> userService.getThirdPartyId(x, this.getType()))
+                    .map(x -> userService.getUserId(x, this.getType()))
                     .collect(Collectors.toList());
 
             ProcessForecastResponseBody.ProcessForecastResponseBodyResultWorkflowActivityRulesWorkflowActor actor
@@ -205,7 +206,7 @@ public class DingTalkInstancesService implements InstancesService {
 
             List<String> userIds = targetSelectUser.getUserIds()
                     .stream()
-                    .map(x -> userService.getThirdPartyId(x, this.getType()))
+                    .map(x -> userService.getUserId(x, this.getType()))
                     .collect(Collectors.toList());
 
             log.debug(" 发起审批实例：{}，节点Key：{}，共{}个用户：{}。"
@@ -262,12 +263,12 @@ public class DingTalkInstancesService implements InstancesService {
 
         ProcessForecastRequest processForecastRequest = new ProcessForecastRequest()
                 .setProcessCode(code)
-                .setDeptId(Integer.valueOf(userService.getThirdDeptId(deptId, getType())))
-                .setUserId(userService.getThirdPartyId(userId, getType()))
+                .setDeptId(Integer.valueOf(userService.getDeptId(deptId, getType())))
+                .setUserId(userService.getUserId(userId, getType()))
                 .setFormComponentValues(values);
 
         try {
-            com.aliyun.dingtalkworkflow_1_0.Client client = createClient();
+            com.aliyun.dingtalkworkflow_1_0.Client client = getClient();
             processForecastHeaders.xAcsDingtalkAccessToken = dingTalkConfig.accessToken();
 
             ProcessForecastResponseBody.ProcessForecastResponseBodyResult result =
@@ -455,11 +456,11 @@ public class DingTalkInstancesService implements InstancesService {
         com.aliyun.dingtalkworkflow_1_0.models.GetAttachmentSpaceHeaders getAttachmentSpaceHeaders = new com.aliyun.dingtalkworkflow_1_0.models.GetAttachmentSpaceHeaders();
 
         com.aliyun.dingtalkworkflow_1_0.models.GetAttachmentSpaceRequest getAttachmentSpaceRequest = new com.aliyun.dingtalkworkflow_1_0.models.GetAttachmentSpaceRequest()
-                .setUserId(userService.getThirdPartyId(userId, getType()))
+                .setUserId(userService.getUserId(userId, getType()))
                 .setAgentId(dingTalkConfig.getAgentId());
 
         try {
-            com.aliyun.dingtalkworkflow_1_0.Client client = createClient();
+            com.aliyun.dingtalkworkflow_1_0.Client client = getClient();
             getAttachmentSpaceHeaders.xAcsDingtalkAccessToken = dingTalkConfig.accessToken();
             GetAttachmentSpaceResponse attachmentSpaceWithOptions = client.getAttachmentSpaceWithOptions(getAttachmentSpaceRequest, getAttachmentSpaceHeaders, new RuntimeOptions());
             Long spaceId = attachmentSpaceWithOptions.getBody().getResult().getSpaceId();
@@ -478,12 +479,12 @@ public class DingTalkInstancesService implements InstancesService {
     }
 
 
-    private static com.aliyun.dingtalkworkflow_1_0.Client createClient() throws Exception {
+    /*private static com.aliyun.dingtalkworkflow_1_0.Client getClient() throws Exception {
         com.aliyun.teaopenapi.models.Config config = new com.aliyun.teaopenapi.models.Config();
         config.protocol = "https";
         config.regionId = "central";
         return new com.aliyun.dingtalkworkflow_1_0.Client(config);
-    }
+    }*/
 
 
 }

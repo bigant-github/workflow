@@ -1,5 +1,6 @@
 package org.bigant.fw.dingtalk.instances;
 
+import com.aliyun.dingtalkworkflow_1_0.Client;
 import lombok.extern.slf4j.Slf4j;
 import org.bigant.fw.dingtalk.BaseTest;
 import org.bigant.wf.form.bean.FormComponent;
@@ -72,7 +73,11 @@ public class DingTalkInstancesServiceTest extends BaseTest {
     }
 
     public DingTalkInstancesService getDingTalkInstancesService() {
-        return new DingTalkInstancesService(dingTalkConfig, userService);
+        try {
+            return new DingTalkInstancesService(dingTalkConfig, userService,new Client(getConfig()));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

@@ -25,7 +25,7 @@ public class BaseTest {
         String larkUserId = System.getenv("larkUserId");
         String larkDeptId = System.getenv("larkDeptId");
 
-        larkConfig = new LarkConfig(larkAppId, larkAppSecret);
+        larkConfig = new LarkConfig(larkAppId, larkAppSecret, "");
 
         userService = new UserService() {
 
@@ -35,12 +35,12 @@ public class BaseTest {
             }
 
             @Override
-            public String getThirdPartyId(String id, String thirdPartyType) {
+            public String getUserId(String id, String thirdPartyType) {
                 return larkUserId;
             }
 
             @Override
-            public String getThirdDeptId(String deptId, String thirdPartyType) {
+            public String getDeptId(String deptId, String thirdPartyType) {
                 return larkDeptId;
             }
         };

@@ -2,13 +2,15 @@ package org.bigant.fw.dingtalk;
 
 import com.aliyun.dingtalkoauth2_1_0.Client;
 import com.aliyun.dingtalkoauth2_1_0.models.GetAccessTokenRequest;
-import com.aliyun.tea.TeaException;
-import com.aliyun.teaopenapi.models.Config;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bigant.wf.cache.ICache;
+import org.bigant.wf.exception.WfException;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * 钉钉配置
@@ -30,61 +32,38 @@ public class DingTalkConfig {
     private String managerUserId;
     @ApiModelProperty("应用id")
     private Long agentId;
+    public String token;
+    public String aesKey;
+    private ICache cache;
+
+    private Client client;
+
+    private static final String ACCESS_TOKEN_CACHE_KEY = "WF:DINGTALK:ACCESS_TOKEN:";
 
 
-    private String accessToken;
-    private long accessTokenExpiresIn = 0;
-    private long accessTokenTimeOut = 7100 * 1000;
 
-    public DingTalkConfig(String appKey, String appSecret, String managerUserId, Long agentId) {
-        this.appKey = appKey;
-        this.appSecret = appSecret;
-        this.managerUserId = managerUserId;
-        this.agentId = agentId;
-    }
-
-    /**
-     * 使用 Token 初始化账号Client
-     *
-     * @return Client
-     * @throws Exception
-     */
-    public static Client createClient() {
-        Config config = new Config();
-        config.protocol = "https";
-        config.regionId = "central";
-        try {
-            return new Client(config);
-        } catch (Exception e) {
-            log.error("钉钉创建Client失败", e);
-            throw new RuntimeException(e);
-        }
-    }
 
     /**
      * 获取访问 token
-     *
-     * @throws Exception 异常信息
      */
     public String accessToken() {
-        long t = System.currentTimeMillis();
+        String accessToken = cache.get(ACCESS_TOKEN_CACHE_KEY + appKey);
 
-        if (t < accessTokenExpiresIn) {
+        if (accessToken != null) {
             return accessToken;
         }
 
-        Client client = createClient();
+        Client client = getClient();
         GetAccessTokenRequest getAccessTokenRequest = new GetAccessTokenRequest()
                 .setAppKey(appKey)
                 .setAppSecret(appSecret);
+
         try {
-            this.accessToken = client.getAccessToken(getAccessTokenRequest).getBody().getAccessToken();
-            this.accessTokenExpiresIn = t + accessTokenTimeOut;
-            return this.accessToken;
-        } catch (TeaException err) {
-            throw err;
+            accessToken = client.getAccessToken(getAccessTokenRequest).getBody().getAccessToken();
+            cache.set(ACCESS_TOKEN_CACHE_KEY + appKey, accessToken, 7100, TimeUnit.SECONDS);
+            return accessToken;
         } catch (Exception _err) {
-            throw new TeaException(_err.getMessage(), _err);
+            throw new WfException("钉钉-获取accessToken失败", _err);
         }
     }
 }

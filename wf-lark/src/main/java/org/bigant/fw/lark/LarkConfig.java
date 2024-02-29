@@ -27,6 +27,9 @@ public class LarkConfig {
     @ApiModelProperty("应用密钥")
     private String appSecret;
 
+    @ApiModelProperty("应用密钥")
+    private String encryptKey;
+
     private boolean logDebug = false;
 
     private BaseUrlEnum openBaseUrl = BaseUrlEnum.FeiShu;
@@ -35,20 +38,11 @@ public class LarkConfig {
 
     private Client client;
 
-    public LarkConfig(String appId, String appSecret) {
+    public LarkConfig(String appId, String appSecret, String encryptKey) {
         this.appId = appId;
         this.appSecret = appSecret;
+        this.encryptKey = encryptKey;
     }
 
-    public synchronized Client getClient() {
-        if (client == null) {
-            this.client = Client.newBuilder(appId, appSecret)
-                    .openBaseUrl(openBaseUrl) // 设置域名，默认为飞书
-                    .requestTimeout(requestTimeout, TimeUnit.SECONDS) // 设置httpclient 超时时间，默认永不超时
-                    .logReqAtDebug(logDebug) // 在 debug 模式下会打印 http 请求和响应的 headers,body 等信息。
-                    .build();
-        }
-        return client;
-    }
 }
 

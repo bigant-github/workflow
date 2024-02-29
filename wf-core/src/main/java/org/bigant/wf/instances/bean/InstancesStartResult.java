@@ -20,8 +20,8 @@ public class InstancesStartResult {
 
 
     @ApiModelProperty("流程code")
-    private String code;
+    private String processCode;
 
-    @ApiModelProperty("实例id")
-    private String instanceId;
+    @ApiModelProperty("实例code")
+    private String instanceCode;
 }

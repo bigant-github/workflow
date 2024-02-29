@@ -1,2 +1,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  org.bigant.wf.lark.springboot.WfLarkSpringBootAutoConfig
+  org.bigant.wf.lark.springboot.WfLarkSpringBootAutoConfig,\
+  org.bigant.wf.lark.springboot.WfLarkCallbackController

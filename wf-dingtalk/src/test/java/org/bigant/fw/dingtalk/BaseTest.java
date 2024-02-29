@@ -1,5 +1,7 @@
 package org.bigant.fw.dingtalk;
 
+import com.aliyun.dingtalkoauth2_1_0.Client;
+import com.aliyun.teaopenapi.models.Config;
 import org.bigant.wf.user.UserService;
 import org.bigant.wf.user.vo.User;
 import org.junit.Before;
@@ -15,7 +17,7 @@ public class BaseTest {
     protected UserService userService;
 
     @Before
-    public void setup() {
+    public void setup() throws Exception {
 
         String dingTalkAgentId = System.getenv("dingTalkAgentId");
         String dingTalkAppKey = System.getenv("dingTalkAppKey");
@@ -27,7 +29,8 @@ public class BaseTest {
         dingTalkConfig = new DingTalkConfig(dingTalkAppKey,
                 dingTalkAppSecret,
                 dingTalkManagerUserId,
-                Long.parseLong(dingTalkAgentId));
+                Long.parseLong(dingTalkAgentId),
+                null, null, null, new Client(getConfig()));
 
         userService = new UserService() {
 
@@ -37,17 +40,25 @@ public class BaseTest {
             }
 
             @Override
-            public String getThirdPartyId(String id, String thirdPartyType) {
-                return dingTalkUserId;
+            public String getUserId(String userId, String type) {
+                return null;
             }
 
             @Override
-            public String getThirdDeptId(String deptId, String thirdPartyType) {
-                return dingTalkDeptId;
+            public String getDeptId(String deptId, String type) {
+                return null;
             }
+
+
         };
 
     }
 
+    public Config getConfig() {
+        Config config = new Config();
+        config.protocol = "https";
+        config.regionId = "central";
+        return config;
+    }
 
 }

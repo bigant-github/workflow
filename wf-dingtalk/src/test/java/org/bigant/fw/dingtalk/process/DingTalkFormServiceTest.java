@@ -1,6 +1,7 @@
 package org.bigant.fw.dingtalk.process;
 
 
+import com.aliyun.dingtalkworkflow_1_0.Client;
 import lombok.extern.slf4j.Slf4j;
 import org.bigant.fw.dingtalk.BaseTest;
 import org.bigant.wf.process.bean.ProcessPage;
@@ -29,6 +30,10 @@ public class DingTalkFormServiceTest extends BaseTest {
     }
 
     DingTalkProcessService getFormService() {
-        return new DingTalkProcessService(dingTalkConfig, userService);
+        try {
+            return new DingTalkProcessService(dingTalkConfig, userService, new Client(getConfig()));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

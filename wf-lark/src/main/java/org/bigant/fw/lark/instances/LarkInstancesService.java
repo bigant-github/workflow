@@ -82,7 +82,7 @@ public class LarkInstancesService implements InstancesService {
         // 构建client
         Client client = larkConfig.getClient();
 
-        String userId = userService.getThirdPartyId(instancesStart.getUserId(), LarkConstant.NAME);
+        String userId = userService.getUserId(instancesStart.getUserId(), LarkConstant.NAME);
 
         ProcessDetail processDetail = larkProcessService.detail(instancesStart.getCode());
 
@@ -101,7 +101,7 @@ public class LarkInstancesService implements InstancesService {
             targetSelectUsers.forEach(targetSelectUser -> {
 
                 String[] userIds = targetSelectUser.getUserIds().stream()
-                        .map(x -> userService.getThirdPartyId(x, LarkConstant.NAME))
+                        .map(x -> userService.getUserId(x, LarkConstant.NAME))
                         .collect(Collectors.toList())
                         .toArray(new String[]{});
 
@@ -132,7 +132,7 @@ public class LarkInstancesService implements InstancesService {
                 InstancesStart.TargetSelectUserAuthMatch targetSelectUser = targetSelectUsersAuthMatch.get(i);
                 PreviewNode previewNode = needApproverNodes.get(i);
                 String[] userIds = targetSelectUser.getUserIds().stream()
-                        .map(x -> userService.getThirdPartyId(x, LarkConstant.NAME))
+                        .map(x -> userService.getUserId(x, LarkConstant.NAME))
                         .collect(Collectors.toList())
                         .toArray(new String[]{});
 
@@ -170,8 +170,8 @@ public class LarkInstancesService implements InstancesService {
 
             CreateInstanceRespBody data = resp.getData();
 
-            return InstancesStartResult.builder().instanceId(data.getInstanceCode())
-                    .code(instancesStart.getCode())
+            return InstancesStartResult.builder().instanceCode(data.getInstanceCode())
+                    .processCode(instancesStart.getCode())
                     .build();
 
         } catch (WfException e) {
@@ -202,8 +202,8 @@ public class LarkInstancesService implements InstancesService {
         String form = this.parseFormValues(formComponents, formItemMap);
 
         this.preview(instancesPreview.getCode(),
-                userService.getThirdPartyId(instancesPreview.getUserId(), LarkConstant.NAME),
-                userService.getThirdPartyId(instancesPreview.getDeptId(), LarkConstant.NAME),
+                userService.getUserId(instancesPreview.getUserId(), LarkConstant.NAME),
+                userService.getDeptId(instancesPreview.getDeptId(), LarkConstant.NAME),
                 form);
 
         return null;

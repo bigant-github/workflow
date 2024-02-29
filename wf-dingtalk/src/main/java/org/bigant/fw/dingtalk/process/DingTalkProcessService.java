@@ -1,5 +1,6 @@
 package org.bigant.fw.dingtalk.process;
 
+import com.aliyun.dingtalkworkflow_1_0.Client;
 import com.aliyun.dingtalkworkflow_1_0.models.GetManageProcessByStaffIdResponse;
 import com.aliyun.tea.TeaException;
 import com.aliyun.teaopenapi.models.Config;
@@ -29,12 +30,12 @@ public class DingTalkProcessService implements ProcessService {
 
     private DingTalkConfig dingTalkConfig;
     private UserService userService;
-
+    private com.aliyun.dingtalkworkflow_1_0.Client client;
     @Override
     public List<ProcessPage> page(ProcessPageQuery processPageQuery, String userId) {
 
         try {
-            com.aliyun.dingtalkworkflow_1_0.Client client = createClient();
+            com.aliyun.dingtalkworkflow_1_0.Client client = getClient();
             com.aliyun.dingtalkworkflow_1_0.models.ListUserVisibleBpmsProcessesHeaders listUserVisibleBpmsProcessesHeaders = new com.aliyun.dingtalkworkflow_1_0.models.ListUserVisibleBpmsProcessesHeaders();
             listUserVisibleBpmsProcessesHeaders.xAcsDingtalkAccessToken = dingTalkConfig.accessToken();
             com.aliyun.dingtalkworkflow_1_0.models.ListUserVisibleBpmsProcessesRequest listUserVisibleBpmsProcessesRequest = new com.aliyun.dingtalkworkflow_1_0.models.ListUserVisibleBpmsProcessesRequest()
@@ -65,7 +66,7 @@ public class DingTalkProcessService implements ProcessService {
     public List<ProcessPage> allPage(ProcessPageQuery query) {
         try {
 
-            com.aliyun.dingtalkworkflow_1_0.Client client = createClient();
+            com.aliyun.dingtalkworkflow_1_0.Client client = getClient();
             com.aliyun.dingtalkworkflow_1_0.models.GetManageProcessByStaffIdHeaders getManageProcessByStaffIdHeaders =
                     new com.aliyun.dingtalkworkflow_1_0.models.GetManageProcessByStaffIdHeaders();
 
@@ -124,10 +125,14 @@ public class DingTalkProcessService implements ProcessService {
      * @return Client
      * @throws Exception
      */
-    public static com.aliyun.dingtalkworkflow_1_0.Client createClient() throws Exception {
+    /*public static com.aliyun.dingtalkworkflow_1_0.Client getClient() throws Exception {
         Config config = new Config();
         config.protocol = "https";
         config.regionId = "central";
         return new com.aliyun.dingtalkworkflow_1_0.Client(config);
+    }*/
+
+    public Client getClient() {
+        return client;
     }
 }
