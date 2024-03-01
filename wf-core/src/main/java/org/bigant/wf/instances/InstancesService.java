@@ -1,9 +1,6 @@
 package org.bigant.wf.instances;
 
-import org.bigant.wf.instances.bean.InstancesPreview;
-import org.bigant.wf.instances.bean.InstancesPreviewResult;
-import org.bigant.wf.instances.bean.InstancesStart;
-import org.bigant.wf.instances.bean.InstancesStartResult;
+import org.bigant.wf.instances.bean.*;
 
 /**
  * 审批实例service
@@ -16,19 +13,28 @@ public interface InstancesService {
     /**
      * 发起实例
      *
-     * @param instancesStart
+     * @param instanceStart
      * @return
      */
-    InstancesStartResult start(InstancesStart instancesStart);
+    InstanceStartResult start(InstanceStart instanceStart);
 
 
     /**
      * 预览实例
      *
-     * @param instancesPreview
+     * @param instancePreview
      * @return
      */
-    InstancesPreviewResult preview(InstancesPreview instancesPreview);
+    InstancePreviewResult preview(InstancePreview instancePreview);
+
+
+    /**
+     * 预览实例
+     *
+     * @param instanceCode
+     * @return
+     */
+    InstanceDetailResult detail(String instanceCode);
 
 
 

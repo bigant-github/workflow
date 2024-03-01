@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bigant.wf.exception.WfException;
 import org.bigant.wf.instances.InstancesAction;
+import org.bigant.wf.instances.InstancesStatus;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -91,23 +92,23 @@ public class DingTalkCallback {
 
         switch (event.getString("type")) {
             case "start":
-                instancesCallback.setAction(InstancesAction.InstancesActionEnum.START);
+                instancesCallback.setAction(InstancesStatus.RUNNING);
                 break;
             case "finish":
                 switch (event.getString("result")) {
                     case "agree":
-                        instancesCallback.setAction(InstancesAction.InstancesActionEnum.AGREE);
+                        instancesCallback.setAction(InstancesStatus.AGREED);
                         break;
                     case "reject":
-                        instancesCallback.setAction(InstancesAction.InstancesActionEnum.REFUSE);
+                        instancesCallback.setAction(InstancesStatus.REFUSED);
                         break;
                     default:
                         throw new WfException("钉钉-无法识别的实例状态:" + event.getString("result"));
                 }
                 break;
             case "terminate":
-                instancesCallback.setAction(InstancesAction.InstancesActionEnum.CANCEL);
-                this.action.cancel(instancesCallback);
+                instancesCallback.setAction(InstancesStatus.CANCELED);
+                this.action.canceled(instancesCallback);
                 break;
             default:
                 throw new WfException("钉钉-无法识别的实例状态:" + event.getString("type"));

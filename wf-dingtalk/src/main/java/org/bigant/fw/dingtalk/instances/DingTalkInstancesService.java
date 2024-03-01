@@ -20,10 +20,7 @@ import org.bigant.wf.form.component.ComponentParseAll;
 import org.bigant.wf.form.component.bean.AttachmentComponent;
 import org.bigant.wf.form.component.bean.DateRangeComponent;
 import org.bigant.wf.instances.InstancesService;
-import org.bigant.wf.instances.bean.InstancesPreview;
-import org.bigant.wf.instances.bean.InstancesPreviewResult;
-import org.bigant.wf.instances.bean.InstancesStart;
-import org.bigant.wf.instances.bean.InstancesStartResult;
+import org.bigant.wf.instances.bean.*;
 import org.bigant.wf.user.UserService;
 
 import java.util.*;
@@ -48,15 +45,15 @@ public class DingTalkInstancesService implements InstancesService {
      * 发起审批实例
      * 对应接口文档地址：https://open.dingtalk.com/document/orgapp/create-an-approval-instance
      *
-     * @param instancesStart
+     * @param instanceStart
      * @return
      */
     @Override
-    public InstancesStartResult start(InstancesStart instancesStart) {
+    public InstanceStartResult start(InstanceStart instanceStart) {
 
-        log.debug("发起审批实例：{}", JSONObject.toJSONString(instancesStart));
+        log.debug("发起审批实例：{}", JSONObject.toJSONString(instanceStart));
 
-        String dingTalkUserId = userService.getUserId(instancesStart.getUserId(), this.getType());
+        String dingTalkUserId = userService.getUserId(instanceStart.getUserId(), this.getType());
 
         StartProcessInstanceHeaders startProcessInstanceHeaders = new
                 StartProcessInstanceHeaders();
@@ -65,7 +62,7 @@ public class DingTalkInstancesService implements InstancesService {
                 = new ArrayList<>();
 
         //转换表单值
-        HashMap<String, String> formComponents = this.parseFormValue(instancesStart.getFormComponents(), dingTalkUserId);
+        HashMap<String, String> formComponents = this.parseFormValue(instanceStart.getFormComponents(), dingTalkUserId);
 
         for (Map.Entry<String, String> formComponent : formComponents.entrySet()) {
             StartProcessInstanceRequest.StartProcessInstanceRequestFormComponentValues value =
@@ -78,19 +75,19 @@ public class DingTalkInstancesService implements InstancesService {
 
         //匹配自选审批节点
         List<StartProcessInstanceRequest.StartProcessInstanceRequestTargetSelectActioners> selectActioners = null;
-        if (instancesStart.getTargetSelectUsers() != null && instancesStart.getTargetSelectUsers().size() > 0) {
-            selectActioners = this.parseTargetSelectUsers(instancesStart);
-        } else if (instancesStart.getTargetSelectUsersAuthMatch() != null && instancesStart.getTargetSelectUsersAuthMatch().size() > 0) {
+        if (instanceStart.getTargetSelectUsers() != null && instanceStart.getTargetSelectUsers().size() > 0) {
+            selectActioners = this.parseTargetSelectUsers(instanceStart);
+        } else if (instanceStart.getTargetSelectUsersAuthMatch() != null && instanceStart.getTargetSelectUsersAuthMatch().size() > 0) {
             //自选节点自动匹配
-            selectActioners = this.parseTargetSelectUsersAuthMatch(instancesStart, formComponents);
+            selectActioners = this.parseTargetSelectUsersAuthMatch(instanceStart, formComponents);
         }
 
 
         StartProcessInstanceRequest startProcessInstanceRequest = new StartProcessInstanceRequest()
                 .setOriginatorUserId(dingTalkUserId)
-                .setProcessCode(instancesStart.getCode())
-                .setDeptId(instancesStart.getDeptId() != null && instancesStart.getDeptId().length() > 0 ?
-                        Long.parseLong(userService.getDeptId(instancesStart.getDeptId(), this.getType()))
+                .setProcessCode(instanceStart.getProcessCode())
+                .setDeptId(instanceStart.getDeptId() != null && instanceStart.getDeptId().length() > 0 ?
+                        Long.parseLong(userService.getDeptId(instanceStart.getDeptId(), this.getType()))
                         : null)
                 /*.setMicroappAgentId(41605932L)*/
                 /*.setApprovers(java.util.Arrays.asList(approvers0))*/
@@ -107,10 +104,10 @@ public class DingTalkInstancesService implements InstancesService {
                     new RuntimeOptions());
 
             String instanceId = processInstanceResponse.getBody().getInstanceId();
-            log.debug("发起审批实例成功：code:{}，instanceId:{}", instancesStart.getCode(), instanceId);
+            log.debug("发起审批实例成功：code:{}，instanceId:{}", instanceStart.getProcessCode(), instanceId);
 
-            return InstancesStartResult.builder()
-                    .processCode(instancesStart.getCode())
+            return InstanceStartResult.builder()
+                    .processCode(instanceStart.getProcessCode())
                     .instanceCode(instanceId)
                     .build();
         } catch (TeaException err) {
@@ -121,27 +118,58 @@ public class DingTalkInstancesService implements InstancesService {
     }
 
     @Override
-    public InstancesPreviewResult preview(InstancesPreview instancesPreview) {
+    public InstancePreviewResult preview(InstancePreview instancePreview) {
+        return null;
+    }
+
+    @Override
+    public InstanceDetailResult detail(String instanceCode) {
+
+        com.aliyun.dingtalkworkflow_1_0.models.GetProcessInstanceHeaders getProcessInstanceHeaders = new com.aliyun.dingtalkworkflow_1_0.models.GetProcessInstanceHeaders();
+        getProcessInstanceHeaders.xAcsDingtalkAccessToken = dingTalkConfig.accessToken();
+
+        com.aliyun.dingtalkworkflow_1_0.models.GetProcessInstanceRequest getProcessInstanceRequest =
+                new com.aliyun.dingtalkworkflow_1_0.models.GetProcessInstanceRequest()
+                        .setProcessInstanceId(instanceCode);
+        try {
+            GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues getProcessInstanceResponseBodyResultFormComponentValues = client.getProcessInstanceWithOptions(getProcessInstanceRequest, getProcessInstanceHeaders
+                            , new RuntimeOptions())
+                    .getBody()
+                    .getResult()
+                    .getFormComponentValues()
+                    .get(0);
+        } catch (TeaException err) {
+            if (!com.aliyun.teautil.Common.empty(err.code) && !com.aliyun.teautil.Common.empty(err.message)) {
+                // err 中含有 code 和 message 属性，可帮助开发定位问题
+            }
+
+        } catch (Exception _err) {
+            TeaException err = new TeaException(_err.getMessage(), _err);
+            if (!com.aliyun.teautil.Common.empty(err.code) && !com.aliyun.teautil.Common.empty(err.message)) {
+                // err 中含有 code 和 message 属性，可帮助开发定位问题
+            }
+
+        }
         return null;
     }
 
     /**
      * 解析自选节点用户自动匹配
      *
-     * @param instancesStart
+     * @param instanceStart
      * @param formComponents
      * @return
      */
-    private List<StartProcessInstanceRequest.StartProcessInstanceRequestTargetSelectActioners> parseTargetSelectUsersAuthMatch(InstancesStart instancesStart, HashMap<String, String> formComponents) {
-        List<InstancesStart.TargetSelectUserAuthMatch> targetSelectUsersAuthMatch = instancesStart.getTargetSelectUsersAuthMatch();
-        log.debug(" 发起审批实例：code:{}，共{}个节点，使用自选节点自动匹配。", instancesStart.getCode(), targetSelectUsersAuthMatch.size());
+    private List<StartProcessInstanceRequest.StartProcessInstanceRequestTargetSelectActioners> parseTargetSelectUsersAuthMatch(InstanceStart instanceStart, HashMap<String, String> formComponents) {
+        List<InstanceStart.TargetSelectUserAuthMatch> targetSelectUsersAuthMatch = instanceStart.getTargetSelectUsersAuthMatch();
+        log.debug(" 发起审批实例：code:{}，共{}个节点，使用自选节点自动匹配。", instanceStart.getProcessCode(), targetSelectUsersAuthMatch.size());
 
         List<StartProcessInstanceRequest.StartProcessInstanceRequestTargetSelectActioners> users
                 = new ArrayList<>(targetSelectUsersAuthMatch.size());
 
-        ProcessForecastResponseBody.ProcessForecastResponseBodyResult forecast = this.forecast(instancesStart.getCode(),
-                instancesStart.getUserId(),
-                instancesStart.getDeptId(),
+        ProcessForecastResponseBody.ProcessForecastResponseBodyResult forecast = this.forecast(instanceStart.getProcessCode(),
+                instanceStart.getUserId(),
+                instanceStart.getDeptId(),
                 formComponents);
 
         //获取需要输入的审批节点
@@ -167,7 +195,7 @@ public class DingTalkInstancesService implements InstancesService {
                     = approverListByForecast.get(i);
 
             log.debug(" 自选节点自动匹配结果：code:{}，节点Key：{}，共{}个用户：{}。",
-                    instancesStart.getCode(),
+                    instanceStart.getProcessCode(),
                     actor.getActorKey(),
                     userIds.size(),
                     userIds);
@@ -189,20 +217,20 @@ public class DingTalkInstancesService implements InstancesService {
     /**
      * 解析自选节点用户
      *
-     * @param instancesStart
+     * @param instanceStart
      * @return
      */
-    private List<StartProcessInstanceRequest.StartProcessInstanceRequestTargetSelectActioners> parseTargetSelectUsers(InstancesStart instancesStart) {
+    private List<StartProcessInstanceRequest.StartProcessInstanceRequestTargetSelectActioners> parseTargetSelectUsers(InstanceStart instanceStart) {
 
-        List<InstancesStart.TargetSelectUser> targetSelectUsers = instancesStart.getTargetSelectUsers();
+        List<InstanceStart.TargetSelectUser> targetSelectUsers = instanceStart.getTargetSelectUsers();
 
-        log.debug(" 发起审批实例：{}，共{}个节点，使用自选节点。", instancesStart.getCode(), targetSelectUsers.size());
+        log.debug(" 发起审批实例：{}，共{}个节点，使用自选节点。", instanceStart.getProcessCode(), targetSelectUsers.size());
 
 
         List<StartProcessInstanceRequest.StartProcessInstanceRequestTargetSelectActioners> users
                 = new ArrayList<>(targetSelectUsers.size());
 
-        for (InstancesStart.TargetSelectUser targetSelectUser : targetSelectUsers) {
+        for (InstanceStart.TargetSelectUser targetSelectUser : targetSelectUsers) {
 
             List<String> userIds = targetSelectUser.getUserIds()
                     .stream()
@@ -210,7 +238,7 @@ public class DingTalkInstancesService implements InstancesService {
                     .collect(Collectors.toList());
 
             log.debug(" 发起审批实例：{}，节点Key：{}，共{}个用户：{}。"
-                    , instancesStart.getCode()
+                    , instanceStart.getProcessCode()
                     , targetSelectUser.getKey()
                     , userIds.size(), userIds);
 

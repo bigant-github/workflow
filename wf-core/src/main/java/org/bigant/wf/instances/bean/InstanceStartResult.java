@@ -16,7 +16,7 @@ import lombok.ToString;
 @Data
 @ToString
 @Builder
-public class InstancesStartResult {
+public class InstanceStartResult {
 
 
     @ApiModelProperty("流程code")

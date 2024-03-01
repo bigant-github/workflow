@@ -20,9 +20,9 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class InstancesStart {
-    @ApiModelProperty("审批实例code")
-    private String code;
+public class InstanceStart {
+    @ApiModelProperty("审批流程code")
+    private String processCode;
 
     @ApiModelProperty("发起人id")
     private String userId;

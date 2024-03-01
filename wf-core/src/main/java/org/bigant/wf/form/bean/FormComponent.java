@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.bigant.wf.form.component.ComponentDateFormat;
 import org.bigant.wf.form.component.ComponentType;
+import org.bigant.wf.form.component.bean.AmountComponent;
 import org.bigant.wf.form.component.bean.AttachmentComponent;
 import org.bigant.wf.form.component.bean.DateComponent;
 import org.bigant.wf.form.component.bean.DateRangeComponent;
@@ -47,10 +48,9 @@ public class FormComponent {
         return formComponent.setValue(name, value, ComponentType.NUMBER);
     }
 
-
-    public static FormComponent amount(String name, BigDecimal value) {
+    public static FormComponent amount(String name, BigDecimal value, AmountComponent.AmountType amountType) {
         FormComponent formComponent = new FormComponent();
-        return formComponent.setValue(name, value, ComponentType.AMOUNT);
+        return formComponent.setValue(name, new AmountComponent(value, amountType), ComponentType.AMOUNT);
     }
 
     public static FormComponent select(String name, String value) {
@@ -62,7 +62,6 @@ public class FormComponent {
         FormComponent formComponent = new FormComponent();
         return formComponent.setValue(name, value, ComponentType.MULTI_SELECT);
     }
-
 
     public static FormComponent multiSelect(String name, String... values) {
         FormComponent formComponent = new FormComponent();
@@ -97,14 +96,10 @@ public class FormComponent {
         return dateRange(beginName, endName, new DateRangeComponent(dateFormat, beginDate, end));
     }
 
-
     public static FormComponent table(String name, Collection<Collection<FormComponent>> table) {
         FormComponent formComponent = new FormComponent();
         return formComponent.setValue(name, table, ComponentType.TABLE);
     }
-
-
-
 
     private FormComponent setValue(String name, Object value, ComponentType componentType) {
         this.name = name;

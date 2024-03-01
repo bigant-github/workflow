@@ -6,8 +6,9 @@ import org.bigant.fw.lark.BaseTest;
 import org.bigant.fw.lark.process.LarkProcessService;
 import org.bigant.wf.form.bean.FormComponent;
 import org.bigant.wf.form.component.ComponentDateFormat;
+import org.bigant.wf.form.component.bean.AmountComponent;
 import org.bigant.wf.form.component.bean.AttachmentComponent;
-import org.bigant.wf.instances.bean.InstancesStart;
+import org.bigant.wf.instances.bean.InstanceStart;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -29,15 +30,15 @@ public class LarkInstancesServiceTest extends BaseTest {
 
         String larkTestProcessCode = System.getenv("larkTestProcessCode");
 
-        InstancesStart.InstancesStartBuilder builder = InstancesStart.builder();
-        InstancesStart instancesStart = builder.code(larkTestProcessCode)
+        InstanceStart.InstanceStartBuilder builder = InstanceStart.builder();
+        InstanceStart instanceStart = builder.processCode(larkTestProcessCode)
                 .userId("123456789")
                 .deptId("123456789")
                 .targetSelectUsersAuthMatch(
-                        Arrays.asList(InstancesStart.TargetSelectUserAuthMatch.builder()
+                        Arrays.asList(InstanceStart.TargetSelectUserAuthMatch.builder()
                                         .userIds(Arrays.asList("1"))
                                         .build()
-                                , InstancesStart.TargetSelectUserAuthMatch.builder()
+                                , InstanceStart.TargetSelectUserAuthMatch.builder()
                                         .userIds(Arrays.asList("1"))
                                         .build()
                         ))
@@ -46,7 +47,7 @@ public class LarkInstancesServiceTest extends BaseTest {
                                 FormComponent.text("单行文本", "测试"),
                                 FormComponent.textarea("多行文本", "测试"),
                                 FormComponent.number("数字", 1),
-                                FormComponent.amount("金额", new BigDecimal("1.22")),
+                                FormComponent.amount("金额", new BigDecimal("1.22"), AmountComponent.AmountType.CNY),
                                 FormComponent.select("单选", "选项 1"),
                                 FormComponent.multiSelect("多选", "选项 1", "选项 2"),
                                 FormComponent.date("日期", LocalDateTime.now(), ComponentDateFormat.YYYY_MM_DD),
@@ -78,7 +79,7 @@ public class LarkInstancesServiceTest extends BaseTest {
                 .build();
 
         LarkInstancesService larkInstancesService = this.getLarkInstancesService();
-        larkInstancesService.start(instancesStart);
+        larkInstancesService.start(instanceStart);
     }
 
     public LarkInstancesService getLarkInstancesService() {

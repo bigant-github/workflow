@@ -9,7 +9,7 @@ import org.bigant.wf.form.component.ComponentType;
  * @author galen
  * @date 2024/2/2115:35
  */
-public abstract class ComponentConvert<T, R> {
+public abstract class ComponentConvertTTT<T, R> {
 
     public R convert(ComponentType type, T component) {
         switch (type) {
@@ -53,14 +53,5 @@ public abstract class ComponentConvert<T, R> {
     protected abstract R attachment(T component);
     protected abstract R unknown(T component);
     protected abstract R table(T component);
-
-
-
-
-
-
-
-
-
 
 }

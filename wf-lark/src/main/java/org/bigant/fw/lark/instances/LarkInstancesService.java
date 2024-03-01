@@ -19,7 +19,7 @@ import org.bigant.fw.lark.LarkConfig;
 import org.bigant.fw.lark.LarkConstant;
 import org.bigant.fw.lark.process.LarkProcessService;
 import org.bigant.wf.exception.WfException;
-import org.bigant.wf.form.ComponentConvert;
+import org.bigant.wf.form.ComponentConvertTTT;
 import org.bigant.wf.form.bean.FormComponent;
 import org.bigant.wf.form.component.ComponentParseAll;
 import org.bigant.wf.form.component.ComponentType;
@@ -30,10 +30,7 @@ import org.bigant.wf.form.component.bean.ImageComponent;
 import org.bigant.wf.form.option.MultiSelectOption;
 import org.bigant.wf.form.option.SelectOption;
 import org.bigant.wf.instances.InstancesService;
-import org.bigant.wf.instances.bean.InstancesPreview;
-import org.bigant.wf.instances.bean.InstancesPreviewResult;
-import org.bigant.wf.instances.bean.InstancesStart;
-import org.bigant.wf.instances.bean.InstancesStartResult;
+import org.bigant.wf.instances.bean.*;
 import org.bigant.wf.process.bean.ProcessDetail;
 import org.bigant.wf.user.UserService;
 
@@ -74,29 +71,29 @@ public class LarkInstancesService implements InstancesService {
      * 发起审批实例
      * 接口地址 https://open.feishu.cn/document/server-docs/approval-v4/instance/create?appId=cli_a52dc3cf4f3b500e
      *
-     * @param instancesStart
+     * @param instanceStart
      * @return
      */
     @Override
-    public InstancesStartResult start(InstancesStart instancesStart) {
+    public InstanceStartResult start(InstanceStart instanceStart) {
         // 构建client
         Client client = larkConfig.getClient();
 
-        String userId = userService.getUserId(instancesStart.getUserId(), LarkConstant.NAME);
+        String userId = userService.getUserId(instanceStart.getUserId(), LarkConstant.NAME);
 
-        ProcessDetail processDetail = larkProcessService.detail(instancesStart.getCode());
+        ProcessDetail processDetail = larkProcessService.detail(instanceStart.getProcessCode());
 
         Map<String, ProcessDetail.FormItem> formItemMap =
                 processDetail.getForm().stream().collect(Collectors.toMap(ProcessDetail.FormItem::getName, x -> x));
 
-        List<FormComponent> formComponents = instancesStart.getFormComponents();
+        List<FormComponent> formComponents = instanceStart.getFormComponents();
 
         String form = this.parseFormValues(formComponents, formItemMap);
 
         ArrayList<NodeApprover> nodeApprovers = new ArrayList<>();
 
-        List<InstancesStart.TargetSelectUser> targetSelectUsers = instancesStart.getTargetSelectUsers();
-        List<InstancesStart.TargetSelectUserAuthMatch> targetSelectUsersAuthMatch = instancesStart.getTargetSelectUsersAuthMatch();
+        List<InstanceStart.TargetSelectUser> targetSelectUsers = instanceStart.getTargetSelectUsers();
+        List<InstanceStart.TargetSelectUserAuthMatch> targetSelectUsersAuthMatch = instanceStart.getTargetSelectUsersAuthMatch();
         if (targetSelectUsers != null && targetSelectUsers.size() > 0) {
             targetSelectUsers.forEach(targetSelectUser -> {
 
@@ -112,9 +109,9 @@ public class LarkInstancesService implements InstancesService {
             });
         } else if (targetSelectUsersAuthMatch != null && targetSelectUsersAuthMatch.size() > 0) {
             // 自选节点自动匹配
-            log.debug("飞书-发起审批实例：code:{}，共{}个节点，使用自选节点自动匹配。", instancesStart.getCode(), targetSelectUsersAuthMatch.size());
+            log.debug("飞书-发起审批实例：code:{}，共{}个节点，使用自选节点自动匹配。", instanceStart.getProcessCode(), targetSelectUsersAuthMatch.size());
 
-            PreviewInstanceRespBody preview = this.preview(instancesStart.getCode(), userId, null, form);
+            PreviewInstanceRespBody preview = this.preview(instanceStart.getProcessCode(), userId, null, form);
 
             List<PreviewNode> needApproverNodes =
                     Arrays.stream(preview.getPreviewNodes())
@@ -129,7 +126,7 @@ public class LarkInstancesService implements InstancesService {
                 throw new WfException(errorMsg);
             }
             for (int i = 0; i < needApproverNodes.size(); i++) {
-                InstancesStart.TargetSelectUserAuthMatch targetSelectUser = targetSelectUsersAuthMatch.get(i);
+                InstanceStart.TargetSelectUserAuthMatch targetSelectUser = targetSelectUsersAuthMatch.get(i);
                 PreviewNode previewNode = needApproverNodes.get(i);
                 String[] userIds = targetSelectUser.getUserIds().stream()
                         .map(x -> userService.getUserId(x, LarkConstant.NAME))
@@ -146,7 +143,7 @@ public class LarkInstancesService implements InstancesService {
         // 创建请求对象
         CreateInstanceReq req = CreateInstanceReq.newBuilder()
                 .instanceCreate(InstanceCreate.newBuilder()
-                        .approvalCode(instancesStart.getCode())
+                        .approvalCode(instanceStart.getProcessCode())
                         .userId(userId)
                         .form(form)
                         .nodeApproverUserIdList(nodeApprovers.toArray(new NodeApprover[]{}))
@@ -162,7 +159,7 @@ public class LarkInstancesService implements InstancesService {
                         resp.getCode(),
                         resp.getMsg(),
                         resp.getRequestId(),
-                        Jsons.DEFAULT.toJson(instancesStart),
+                        Jsons.DEFAULT.toJson(instanceStart),
                         form);
                 log.error(errMsg);
                 throw new WfException(errMsg);
@@ -170,15 +167,15 @@ public class LarkInstancesService implements InstancesService {
 
             CreateInstanceRespBody data = resp.getData();
 
-            return InstancesStartResult.builder().instanceCode(data.getInstanceCode())
-                    .processCode(instancesStart.getCode())
+            return InstanceStartResult.builder().instanceCode(data.getInstanceCode())
+                    .processCode(instanceStart.getProcessCode())
                     .build();
 
         } catch (WfException e) {
             throw e;
         } catch (Exception e) {
             String errMsg = String.format("飞书-发起审批实例失败。data:%s,form:%s",
-                    Jsons.DEFAULT.toJson(instancesStart),
+                    Jsons.DEFAULT.toJson(instanceStart),
                     form);
             log.error(errMsg);
             throw new WfException(errMsg, e);
@@ -187,24 +184,32 @@ public class LarkInstancesService implements InstancesService {
     }
 
     @Override
-    public InstancesPreviewResult preview(InstancesPreview instancesPreview) {
+    public InstancePreviewResult preview(InstancePreview instancePreview) {
 
-        log.debug("飞书-预览审批实例:{}", Jsons.DEFAULT.toJson(instancesPreview));
+        log.debug("飞书-预览审批实例:{}", Jsons.DEFAULT.toJson(instancePreview));
 
 
-        ProcessDetail processDetail = larkProcessService.detail(instancesPreview.getCode());
+        ProcessDetail processDetail = larkProcessService.detail(instancePreview.getInstanceCode());
 
         Map<String, ProcessDetail.FormItem> formItemMap =
                 processDetail.getForm().stream().collect(Collectors.toMap(ProcessDetail.FormItem::getName, x -> x));
 
-        List<FormComponent> formComponents = instancesPreview.getFormComponents();
+        List<FormComponent> formComponents = instancePreview.getFormComponents();
 
         String form = this.parseFormValues(formComponents, formItemMap);
 
-        this.preview(instancesPreview.getCode(),
-                userService.getUserId(instancesPreview.getUserId(), LarkConstant.NAME),
-                userService.getDeptId(instancesPreview.getDeptId(), LarkConstant.NAME),
+        this.preview(instancePreview.getInstanceCode(),
+                userService.getUserId(instancePreview.getUserId(), LarkConstant.NAME),
+                userService.getDeptId(instancePreview.getDeptId(), LarkConstant.NAME),
                 form);
+
+        return null;
+    }
+
+    @Override
+    public InstanceDetailResult detail(String instanceCode) {
+
+
 
         return null;
     }
@@ -283,7 +288,7 @@ public class LarkInstancesService implements InstancesService {
 
     @Slf4j
     @AllArgsConstructor
-    public static class FormConvert extends ComponentConvert<FormItemConvert, Map<String, Object>> {
+    public static class FormConvert extends ComponentConvertTTT<FormItemConvert, Map<String, Object>> {
 
         private LarkConfig larkConfig;
 

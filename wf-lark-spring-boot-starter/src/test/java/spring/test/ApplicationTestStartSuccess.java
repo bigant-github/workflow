@@ -36,27 +36,27 @@ public class ApplicationTestStartSuccess {
     public InstancesAction instancesAction() {
         return new InstancesAction() {
             @Override
-            public void start(InstancesCallback callback) {
+            public void running(InstancesCallback callback) {
 
             }
 
             @Override
-            public void agree(InstancesCallback callback) {
+            public void agreed(InstancesCallback callback) {
 
             }
 
             @Override
-            public void refuse(InstancesCallback callback) {
+            public void refused(InstancesCallback callback) {
 
             }
 
             @Override
-            public void cancel(InstancesCallback callback) {
+            public void canceled(InstancesCallback callback) {
 
             }
 
             @Override
-            public void close(InstancesCallback callback) {
+            public void deleted(InstancesCallback callback) {
 
             }
         };

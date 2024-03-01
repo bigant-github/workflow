@@ -1,7 +1,10 @@
 package org.bigant.wf.form.component.parse;
 
+import com.alibaba.fastjson2.JSONObject;
 import org.bigant.wf.form.component.ComponentParse;
 import org.bigant.wf.form.component.ComponentType;
+import org.bigant.wf.form.component.bean.AmountComponent;
+import org.bigant.wf.form.component.bean.DateComponent;
 
 import java.math.BigDecimal;
 
@@ -11,26 +14,26 @@ import java.math.BigDecimal;
  * @author galen
  * @date 2024/1/3116:30
  */
-public class ComponentParseAmount implements ComponentParse<Number> {
+public class ComponentParseAmount implements ComponentParse<AmountComponent> {
 
 
     @Override
-    public Number toJava(String str) {
-        return new BigDecimal(str);
+    public AmountComponent toJava(String str) {
+        return JSONObject.parseObject(str, AmountComponent.class);
     }
 
     @Override
-    public String toStr(Number data) {
-        return data.toString();
+    public String toStr(AmountComponent data) {
+        return JSONObject.toJSONString(data);
     }
 
     @Override
-    public void verify(Number data) {
+    public void verify(AmountComponent data) {
     }
 
     @Override
     public ComponentType type() {
-        return ComponentType.NUMBER;
+        return ComponentType.AMOUNT;
     }
 
 }

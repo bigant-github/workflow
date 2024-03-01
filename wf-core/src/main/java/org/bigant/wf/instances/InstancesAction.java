@@ -18,35 +18,35 @@ public interface InstancesAction {
 
     default public void action(InstancesCallback callback) {
         switch (callback.getAction()) {
-            case START:
-                start(callback);
+            case RUNNING:
+                running(callback);
                 break;
-            case AGREE:
-                agree(callback);
+            case AGREED:
+                agreed(callback);
                 break;
-            case REFUSE:
-                refuse(callback);
+            case REFUSED:
+                refused(callback);
                 break;
-            case CANCEL:
-                cancel(callback);
+            case CANCELED:
+                canceled(callback);
                 break;
-            case CLOSE:
-                close(callback);
+            case DELETED:
+                deleted(callback);
                 break;
             default:
                 throw new WfException("无法识别的审批实例：" + callback.getAction());
         }
     }
 
-    void start(InstancesCallback callback);
+    void running(InstancesCallback callback);
 
-    void agree(InstancesCallback callback);
+    void agreed(InstancesCallback callback);
 
-    void refuse(InstancesCallback callback);
+    void refused(InstancesCallback callback);
 
-    void cancel(InstancesCallback callback);
+    void canceled(InstancesCallback callback);
 
-    void close(InstancesCallback callback);
+    void deleted(InstancesCallback callback);
 
     @Data
     @AllArgsConstructor
@@ -60,25 +60,8 @@ public interface InstancesAction {
 
         private LocalDateTime operateTime;
 
-        private InstancesActionEnum action;
+        private InstancesStatus action;
     }
 
-
-    public static enum InstancesActionEnum {
-        START("start"),
-        AGREE("agree"),
-        REFUSE("refuse"),
-        CANCEL("cancel"),
-        CLOSE("close");
-        private final String actionName;
-
-        InstancesActionEnum(String actionName) {
-            this.actionName = actionName;
-        }
-
-        public String getActionName() {
-            return actionName;
-        }
-    }
 
 }

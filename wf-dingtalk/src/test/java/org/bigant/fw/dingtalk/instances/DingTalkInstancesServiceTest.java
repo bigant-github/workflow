@@ -6,7 +6,7 @@ import org.bigant.fw.dingtalk.BaseTest;
 import org.bigant.wf.form.bean.FormComponent;
 import org.bigant.wf.form.component.ComponentDateFormat;
 import org.bigant.wf.form.component.bean.AttachmentComponent;
-import org.bigant.wf.instances.bean.InstancesStart;
+import org.bigant.wf.instances.bean.InstanceStart;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
@@ -24,15 +24,15 @@ public class DingTalkInstancesServiceTest extends BaseTest {
     @Test
     public void start() {
         log.info("开始测试");
-        InstancesStart.InstancesStartBuilder builder = InstancesStart.builder();
-        InstancesStart instancesStart = builder.code(dingTalkTestProcessCode)
+        InstanceStart.InstancesStartBuilder builder = InstanceStart.builder();
+        InstanceStart instanceStart = builder.code(dingTalkTestProcessCode)
                 .userId("123456789")
                 .deptId("123456789")
                 .targetSelectUsersAuthMatch(
-                        Arrays.asList(InstancesStart.TargetSelectUserAuthMatch.builder()
+                        Arrays.asList(InstanceStart.TargetSelectUserAuthMatch.builder()
                                         .userIds(Arrays.asList("1"))
                                         .build()
-                                , InstancesStart.TargetSelectUserAuthMatch.builder()
+                                , InstanceStart.TargetSelectUserAuthMatch.builder()
                                         .userIds(Arrays.asList("1"))
                                         .build()
                         ))
@@ -68,7 +68,7 @@ public class DingTalkInstancesServiceTest extends BaseTest {
                 .build();
 
         DingTalkInstancesService dingTalkInstancesService = this.getDingTalkInstancesService();
-        dingTalkInstancesService.start(instancesStart);
+        dingTalkInstancesService.start(instanceStart);
 
     }
 

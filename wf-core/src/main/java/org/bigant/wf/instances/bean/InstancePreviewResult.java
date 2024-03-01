@@ -14,10 +14,10 @@ import java.util.List;
  */
 @Data
 @ApiModel("发起审批实例")
-public class InstancesPreviewResult {
+public class InstancePreviewResult {
 
     @ApiModelProperty("审批实例code")
-    private String code;
+    private String instanceCode;
 
     @ApiModelProperty("发起人id")
     private String userId;

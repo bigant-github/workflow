@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONObject;
 import lombok.AllArgsConstructor;
 import org.bigant.wf.exception.WfException;
 import org.bigant.wf.instances.InstancesAction;
+import org.bigant.wf.instances.InstancesStatus;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -74,23 +75,24 @@ public class LarkCallback {
 
         switch (event.getString("status")) {
             case "PENDING":
-            case "OVERTIME_RECOVER":
-                instancesCallback.setAction(InstancesAction.InstancesActionEnum.START);
+                instancesCallback.setAction(InstancesStatus.RUNNING);
                 break;
             case "APPROVED":
-                instancesCallback.setAction(InstancesAction.InstancesActionEnum.AGREE);
+                instancesCallback.setAction(InstancesStatus.AGREED);
                 break;
             case "REJECTED":
-                instancesCallback.setAction(InstancesAction.InstancesActionEnum.REFUSE);
+                instancesCallback.setAction(InstancesStatus.REFUSED);
                 break;
             case "CANCELED":
             case "REVERTED":
+                instancesCallback.setAction(InstancesStatus.CANCELED);
             case "DELETED":
-                instancesCallback.setAction(InstancesAction.InstancesActionEnum.CANCEL);
+                instancesCallback.setAction(InstancesStatus.DELETED);
                 break;
             case "OVERTIME_CLOSE":
-                instancesCallback.setAction(InstancesAction.InstancesActionEnum.CLOSE);
-                break;
+            case "OVERTIME_RECOVER":
+                //暂时不处理两个关闭状态
+                return;
             default:
                 throw new WfException("飞书-无法识别的实例状态:" + event.getString("status"));
         }

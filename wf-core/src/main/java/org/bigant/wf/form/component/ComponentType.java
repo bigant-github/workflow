@@ -25,17 +25,6 @@ public enum ComponentType {
     IMAGE("图片", ComponentParseAll.COMPONENT_PARSE_IMAGE),
     TABLE("表格", ComponentParseAll.COMPONENT_PARSE_TABLE),
     UNKNOWN("未知", ComponentParseAll.COMPONENT_PARSE_UNKNOWN);
-    /*TEXT_NOTE("文字说明控件（审批模版上设置好的场景，不支持发起审批实例时修改）"),
-    PHONE("电话控件"),
-    PHOTO("图片控件"),
-    MONEY("金额控件"),
-    TABLE("明细控件"),
-    INNER_CONTACT("联系人控件"),
-    RELATE("关联审批单"),
-    ADDRESS("省市区控件"),
-    STAR_RATING("评分控件"),
-    DEPARTMENT("部门控件")*/;
-
 
     String desc;
 
