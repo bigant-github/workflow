@@ -10,5 +10,7 @@ public interface DingTalkConstant {
 
     String NAME = "dingtalk";
 
+    String CACHE_KEY = "wf:dingTalk:";
+
 
 }

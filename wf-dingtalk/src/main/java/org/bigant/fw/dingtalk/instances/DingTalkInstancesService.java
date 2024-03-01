@@ -1,9 +1,7 @@
 package org.bigant.fw.dingtalk.instances;
 
 
-import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import com.aliyun.dingtalkstorage_1_0.models.CommitFileResponseBody;
 import com.aliyun.dingtalkworkflow_1_0.Client;
 import com.aliyun.dingtalkworkflow_1_0.models.*;
 import com.aliyun.tea.TeaException;
@@ -13,17 +11,16 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.bigant.fw.dingtalk.DingTalkConfig;
 import org.bigant.fw.dingtalk.DingTalkConstant;
-import org.bigant.fw.dingtalk.DingTalkFile;
-import org.bigant.fw.dingtalk.DingTalkUser;
+import org.bigant.fw.dingtalk.form.component.DingTalkCCF;
 import org.bigant.wf.form.bean.FormComponent;
-import org.bigant.wf.form.component.ComponentParseAll;
-import org.bigant.wf.form.component.bean.AttachmentComponent;
-import org.bigant.wf.form.component.bean.DateRangeComponent;
 import org.bigant.wf.instances.InstancesService;
 import org.bigant.wf.instances.bean.*;
 import org.bigant.wf.user.UserService;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -38,8 +35,10 @@ import java.util.stream.Collectors;
 public class DingTalkInstancesService implements InstancesService {
 
     private DingTalkConfig dingTalkConfig;
+    private DingTalkCCF ccf;
     private UserService userService;
     private com.aliyun.dingtalkworkflow_1_0.Client client;
+
 
     /**
      * 发起审批实例
@@ -379,22 +378,33 @@ public class DingTalkInstancesService implements InstancesService {
      * 解析表单值,主要是解决个平台数据格式不一样的问题
      *
      * @param formComponents
-     * @param userId
+     * @param dingTalkUserId
      * @return
      */
-    private HashMap<String, String> parseFormValue(List<FormComponent> formComponents, String userId) {
+    private HashMap<String, String> parseFormValue(List<FormComponent> formComponents, String dingTalkUserId) {
         HashMap<String, String> formMap = new HashMap<>(formComponents.size());
 
 
         for (FormComponent formComponent : formComponents) {
-            formMap.putAll(this.parseFormValue(formComponent, userId));
+            formMap.putAll(this.parseFormValue(formComponent, dingTalkUserId));
         }
 
         return formMap;
 
     }
 
-    private HashMap<String, String> parseFormValue(FormComponent formComponent, String userId) {
+
+    /**
+     * 解析将form数据转换为Map
+     *
+     * @param formComponent
+     * @param dingTalkUserId
+     * @return
+     */
+    private Map<String, String> parseFormValue(FormComponent formComponent, String dingTalkUserId) {
+        return ccf.getConvert(formComponent.getComponentType()).toOther(formComponent, dingTalkUserId);
+    }
+/*    private HashMap<String, String> parseFormValue(FormComponent formComponent, String userId) {
         HashMap<String, String> formMap = new HashMap<>(1);
 
         switch (formComponent.getComponentType()) {
@@ -468,7 +478,7 @@ public class DingTalkInstancesService implements InstancesService {
         }
 
         return formMap;
-    }
+    }*/
 
 
     /**

@@ -61,8 +61,8 @@ public interface ComponentConvertFactory<R, P, T extends ComponentConvert<R, P>>
 
     abstract T attachment();
 
-    abstract T unknown();
-
     abstract T table();
+
+    abstract T unknown();
 
 }

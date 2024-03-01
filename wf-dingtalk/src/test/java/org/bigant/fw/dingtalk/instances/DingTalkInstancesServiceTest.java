@@ -24,8 +24,9 @@ public class DingTalkInstancesServiceTest extends BaseTest {
     @Test
     public void start() {
         log.info("开始测试");
-        InstanceStart.InstancesStartBuilder builder = InstanceStart.builder();
-        InstanceStart instanceStart = builder.code(dingTalkTestProcessCode)
+        InstanceStart.InstanceStartBuilder builder = InstanceStart.builder();
+        InstanceStart instanceStart = builder
+                .processCode(dingTalkTestProcessCode)
                 .userId("123456789")
                 .deptId("123456789")
                 .targetSelectUsersAuthMatch(
@@ -74,7 +75,7 @@ public class DingTalkInstancesServiceTest extends BaseTest {
 
     public DingTalkInstancesService getDingTalkInstancesService() {
         try {
-            return new DingTalkInstancesService(dingTalkConfig, userService,new Client(getConfig()));
+            return new DingTalkInstancesService(dingTalkConfig, userService, new Client(getConfig()));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

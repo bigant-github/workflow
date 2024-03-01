@@ -7,9 +7,10 @@ import org.bigant.wf.form.component.ComponentType;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 
 /**
- * 钉钉字符串转换器
+ * 钉钉数字类型转换器
  *
  * @author galen
  * @date 2024/3/115:29
@@ -17,12 +18,13 @@ import java.util.Collections;
 public class DingTalkNumberCC extends DingTalkBaseCC {
 
     @Override
-    public String toOther(FormComponent component) {
-        return component.getValue();
+    public Map<String, String> toOther(FormComponent component, String dingTalkUserId) {
+        return this.toOtherValue(component);
     }
 
     @Override
-    public FormComponent toComponent(GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues component) {
+    public FormComponent toComponent(
+            GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues component) {
         return FormComponent.number(component.getName(), new BigDecimal(component.getValue()));
     }
 

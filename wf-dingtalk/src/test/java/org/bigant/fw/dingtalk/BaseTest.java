@@ -16,6 +16,7 @@ public class BaseTest {
     protected DingTalkConfig dingTalkConfig;
     protected UserService userService;
 
+
     @Before
     public void setup() throws Exception {
 

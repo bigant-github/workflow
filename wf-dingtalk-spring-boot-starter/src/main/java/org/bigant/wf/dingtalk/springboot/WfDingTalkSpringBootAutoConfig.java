@@ -5,12 +5,13 @@ import com.aliyun.teaopenapi.models.Config;
 import lombok.extern.slf4j.Slf4j;
 import org.bigant.fw.dingtalk.DingTalkCallback;
 import org.bigant.fw.dingtalk.DingTalkConfig;
+import org.bigant.fw.dingtalk.DingTalkUser;
+import org.bigant.fw.dingtalk.form.component.DingTalkCCF;
 import org.bigant.fw.dingtalk.instances.DingTalkInstancesService;
 import org.bigant.fw.dingtalk.process.DingTalkProcessService;
 import org.bigant.wf.Factory;
 import org.bigant.wf.cache.ICache;
 import org.bigant.wf.cache.LocalCache;
-import org.bigant.wf.exception.WfException;
 import org.bigant.wf.instances.InstancesAction;
 import org.bigant.wf.user.UserService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -57,10 +58,27 @@ public class WfDingTalkSpringBootAutoConfig {
     public DingTalkCallback larkCallback(InstancesAction instancesAction) {
         return new DingTalkCallback(instancesAction);
     }
+
     @Bean
     @ConditionalOnMissingBean
-    public DingTalkInstancesService dingTalkInstancesService(DingTalkConfig dingTalkConfig, UserService userService) throws Exception {
+    public DingTalkUser dingTalkUser(DingTalkConfig dingTalkConfig, ICache cache) {
+        return new DingTalkUser(dingTalkConfig, cache);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public DingTalkCCF dingTalkCCF(DingTalkConfig dingTalkConfig, DingTalkUser dingTalkUser, ICache cache) throws Exception {
+        return new DingTalkCCF(dingTalkConfig,
+                dingTalkUser,
+                cache,
+                new com.aliyun.dingtalkworkflow_1_0.Client(getConfig()));
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public DingTalkInstancesService dingTalkInstancesService(DingTalkConfig dingTalkConfig, DingTalkCCF dingTalkCCF, UserService userService) throws Exception {
         DingTalkInstancesService dingTalkInstancesService = new DingTalkInstancesService(dingTalkConfig,
+                dingTalkCCF,
                 userService,
                 new com.aliyun.dingtalkworkflow_1_0.Client(getConfig()));
         //注册到工厂供后续使用

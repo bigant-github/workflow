@@ -2,6 +2,7 @@ package org.bigant.fw.dingtalk.form.component.convert;
 
 import com.aliyun.dingtalkworkflow_1_0.models.GetProcessInstanceResponseBody;
 import org.bigant.wf.form.bean.FormComponent;
+import org.bigant.wf.form.component.ComponentParseAll;
 import org.bigant.wf.form.component.ComponentType;
 
 import java.util.Collection;
@@ -9,16 +10,17 @@ import java.util.Collections;
 import java.util.Map;
 
 /**
- * 钉钉字符串转换器
+ * 钉钉日期转换器
  *
  * @author galen
  * @date 2024/3/115:29
  */
-public class DingTalkTextCC extends DingTalkBaseCC {
+public class DingTalkDateCC extends DingTalkBaseCC {
 
     @Override
     public Map<String, String> toOther(FormComponent component, String dingTalkUserId) {
-        return toOtherValue(component);
+        return toMap(component.getName(),
+                ComponentParseAll.COMPONENT_PARSE_DATE.toJava(component.getValue()).toDateStr());
     }
 
     @Override
@@ -28,11 +30,11 @@ public class DingTalkTextCC extends DingTalkBaseCC {
 
     @Override
     public ComponentType getType() {
-        return ComponentType.TEXT;
+        return ComponentType.MULTI_SELECT;
     }
 
     @Override
     public Collection<String> getOtherType() {
-        return Collections.singletonList("TextField");
+        return Collections.singletonList("DDDateField");
     }
 }

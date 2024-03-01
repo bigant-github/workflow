@@ -9,12 +9,12 @@ import java.util.Collections;
 import java.util.Map;
 
 /**
- * 钉钉字符串转换器
+ * 钉钉多选框转换器
  *
  * @author galen
  * @date 2024/3/115:29
  */
-public class DingTalkTextCC extends DingTalkBaseCC {
+public class DingTalkMultiSelectCC extends DingTalkBaseCC {
 
     @Override
     public Map<String, String> toOther(FormComponent component, String dingTalkUserId) {
@@ -22,17 +22,18 @@ public class DingTalkTextCC extends DingTalkBaseCC {
     }
 
     @Override
-    public FormComponent toComponent(GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues component) {
+    public FormComponent toComponent(
+            GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues component) {
         return FormComponent.text(component.getName(), component.getValue());
     }
 
     @Override
     public ComponentType getType() {
-        return ComponentType.TEXT;
+        return ComponentType.MULTI_SELECT;
     }
 
     @Override
     public Collection<String> getOtherType() {
-        return Collections.singletonList("TextField");
+        return Collections.singletonList("DDMultiSelectField");
     }
 }
