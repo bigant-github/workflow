@@ -35,12 +35,12 @@ public class BaseTest {
             }
 
             @Override
-            public String getUserId(String id, String thirdPartyType) {
+            public String getOtherUserIdByUserId(String id, String thirdPartyType) {
                 return larkUserId;
             }
 
             @Override
-            public String getDeptId(String deptId, String thirdPartyType) {
+            public String getOtherDeptIdByDeptId(String deptId, String thirdPartyType) {
                 return larkDeptId;
             }
         };

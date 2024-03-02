@@ -45,12 +45,12 @@ public class ApplicationTestStartSuccess {
             }
 
             @Override
-            public String getUserId(String userId, String type) {
+            public String getOtherUserIdByUserId(String userId, String type) {
                 return null;
             }
 
             @Override
-            public String getDeptId(String deptId, String type) {
+            public String getOtherDeptIdByDeptId(String deptId, String type) {
                 return null;
             }
 

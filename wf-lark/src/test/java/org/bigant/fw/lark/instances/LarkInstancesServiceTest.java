@@ -4,10 +4,12 @@ package org.bigant.fw.lark.instances;
 import lombok.extern.slf4j.Slf4j;
 import org.bigant.fw.lark.BaseTest;
 import org.bigant.fw.lark.process.LarkProcessService;
-import org.bigant.wf.form.bean.FormComponent;
-import org.bigant.wf.form.component.ComponentDateFormat;
-import org.bigant.wf.form.component.bean.AmountComponent;
-import org.bigant.wf.form.component.bean.AttachmentComponent;
+import org.bigant.wf.instances.form.FormData;
+import org.bigant.wf.form.option.AmountOption;
+import org.bigant.wf.instances.form.databean.AttachmentComponent;
+import org.bigant.wf.instances.form.databean.ImageComponent;
+import org.bigant.wf.form.option.DateOption;
+import org.bigant.wf.instances.bean.InstanceDetailResult;
 import org.bigant.wf.instances.bean.InstanceStart;
 import org.junit.Test;
 
@@ -42,37 +44,37 @@ public class LarkInstancesServiceTest extends BaseTest {
                                         .userIds(Arrays.asList("1"))
                                         .build()
                         ))
-                .formComponents(
+                .formData(
                         Arrays.asList(
-                                FormComponent.text("单行文本", "测试"),
-                                FormComponent.textarea("多行文本", "测试"),
-                                FormComponent.number("数字", 1),
-                                FormComponent.amount("金额", new BigDecimal("1.22"), AmountComponent.AmountType.CNY),
-                                FormComponent.select("单选", "选项 1"),
-                                FormComponent.multiSelect("多选", "选项 1", "选项 2"),
-                                FormComponent.date("日期", LocalDateTime.now(), ComponentDateFormat.YYYY_MM_DD),
-                                FormComponent.dateRange("开始时间", LocalDateTime.now(), "结束时间", LocalDateTime.now(), ComponentDateFormat.YYYY_MM_DD_HH_MM),
-                                FormComponent.image("图片", Arrays.asList(
+                                FormData.text("单行文本", "测试"),
+                                FormData.textarea("多行文本", "测试"),
+                                FormData.number("数字", 1),
+                                FormData.amount("金额", new BigDecimal("1.22"), AmountOption.AmountType.CNY),
+                                FormData.select("单选", "选项 1"),
+                                FormData.multiSelect("多选", "选项 1", "选项 2"),
+                                FormData.date("日期", LocalDateTime.now(), DateOption.ComponentDateFormat.YYYY_MM_DD),
+                                FormData.dateRange("开始时间", LocalDateTime.now(), "结束时间", LocalDateTime.now(), DateOption.ComponentDateFormat.YYYY_MM_DD_HH_MM),
+                                FormData.image("图片", Arrays.asList(
+                                        ImageComponent.builder().name("测试1.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
+                                        ImageComponent.builder().name("测试2.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
+                                        ImageComponent.builder().name("测试3.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build())),
+                                FormData.attachment("附件", Arrays.asList(
                                         AttachmentComponent.builder().name("测试1.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
                                         AttachmentComponent.builder().name("测试2.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
                                         AttachmentComponent.builder().name("测试3.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build())),
-                                FormComponent.attachment("附件", Arrays.asList(
-                                        AttachmentComponent.builder().name("测试1.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
-                                        AttachmentComponent.builder().name("测试2.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
-                                        AttachmentComponent.builder().name("测试3.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build())),
-                                FormComponent.table("表格",
+                                FormData.table("表格",
                                         Arrays.asList(
                                                 Arrays.asList(
-                                                        FormComponent.text("单行文本", "表格单行输入框1"),
-                                                        FormComponent.date("日期", LocalDateTime.now(), ComponentDateFormat.YYYY_MM_DD_HH_MM),
-                                                        FormComponent.attachment("附件", Arrays.asList(
+                                                        FormData.text("单行文本", "表格单行输入框1"),
+                                                        FormData.date("日期", LocalDateTime.now(), DateOption.ComponentDateFormat.YYYY_MM_DD_HH_MM),
+                                                        FormData.attachment("附件", Arrays.asList(
                                                                 AttachmentComponent.builder().name("测试1.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
                                                                 AttachmentComponent.builder().name("测试2.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build()))
                                                 ),
                                                 Arrays.asList(
-                                                        FormComponent.text("单行文本", "表格单行输入框2"),
-                                                        FormComponent.date("日期", LocalDateTime.now(), ComponentDateFormat.YYYY_MM_DD_HH_MM),
-                                                        FormComponent.attachment("附件", Arrays.asList(
+                                                        FormData.text("单行文本", "表格单行输入框2"),
+                                                        FormData.date("日期", LocalDateTime.now(), DateOption.ComponentDateFormat.YYYY_MM_DD_HH_MM),
+                                                        FormData.attachment("附件", Arrays.asList(
                                                                 AttachmentComponent.builder().name("测试1.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
                                                                 AttachmentComponent.builder().name("测试2.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build()))
                                                 )))))
@@ -80,6 +82,14 @@ public class LarkInstancesServiceTest extends BaseTest {
 
         LarkInstancesService larkInstancesService = this.getLarkInstancesService();
         larkInstancesService.start(instanceStart);
+    }
+
+
+    public void detail(){
+        String larkTestProcessCode = System.getenv("larkTestInstanceCode");
+
+        InstanceDetailResult detail = getLarkInstancesService().detail(larkTestProcessCode);
+
     }
 
     public LarkInstancesService getLarkInstancesService() {

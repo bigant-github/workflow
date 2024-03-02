@@ -3,7 +3,6 @@ package org.bigant.fw.dingtalk.process;
 import com.aliyun.dingtalkworkflow_1_0.Client;
 import com.aliyun.dingtalkworkflow_1_0.models.GetManageProcessByStaffIdResponse;
 import com.aliyun.tea.TeaException;
-import com.aliyun.teaopenapi.models.Config;
 import com.aliyun.teautil.models.RuntimeOptions;
 import lombok.AllArgsConstructor;
 import org.bigant.fw.dingtalk.DingTalkConfig;
@@ -39,7 +38,7 @@ public class DingTalkProcessService implements ProcessService {
             com.aliyun.dingtalkworkflow_1_0.models.ListUserVisibleBpmsProcessesHeaders listUserVisibleBpmsProcessesHeaders = new com.aliyun.dingtalkworkflow_1_0.models.ListUserVisibleBpmsProcessesHeaders();
             listUserVisibleBpmsProcessesHeaders.xAcsDingtalkAccessToken = dingTalkConfig.accessToken();
             com.aliyun.dingtalkworkflow_1_0.models.ListUserVisibleBpmsProcessesRequest listUserVisibleBpmsProcessesRequest = new com.aliyun.dingtalkworkflow_1_0.models.ListUserVisibleBpmsProcessesRequest()
-                    .setUserId(userService.getUserId(userId, this.getType()))
+                    .setUserId(userService.getOtherUserIdByUserId(userId, this.getType()))
                     .setMaxResults(100L)
                     .setNextToken(0L);
             return client.listUserVisibleBpmsProcessesWithOptions(listUserVisibleBpmsProcessesRequest,
@@ -110,7 +109,7 @@ public class DingTalkProcessService implements ProcessService {
      * @return
      */
     private String getDingTalkUserId(String userId) {
-        return userService.getUserId(userId, getType());
+        return userService.getOtherUserIdByUserId(userId, getType());
     }
 
     @Override

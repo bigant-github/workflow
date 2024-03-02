@@ -38,7 +38,7 @@ public class DingTalkConfig {
 
     private Client client;
 
-    private static final String ACCESS_TOKEN_CACHE_KEY = "WF:DINGTALK:ACCESS_TOKEN:";
+    private static final String ACCESS_TOKEN_CACHE_KEY = DingTalkConstant.CACHE_KEY+"access_token:";
 
 
 

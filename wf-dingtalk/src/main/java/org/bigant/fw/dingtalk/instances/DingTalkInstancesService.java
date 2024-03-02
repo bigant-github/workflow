@@ -11,11 +11,16 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.bigant.fw.dingtalk.DingTalkConfig;
 import org.bigant.fw.dingtalk.DingTalkConstant;
-import org.bigant.fw.dingtalk.form.component.DingTalkCCF;
-import org.bigant.wf.form.bean.FormComponent;
+import org.bigant.fw.dingtalk.instances.form.DingTalkFDCF;
+import org.bigant.fw.dingtalk.instances.form.convert.DingTalkBaseFDC;
+import org.bigant.wf.exception.WfException;
 import org.bigant.wf.instances.InstancesService;
+import org.bigant.wf.instances.InstancesStatus;
 import org.bigant.wf.instances.bean.*;
+import org.bigant.wf.instances.form.FormData;
+import org.bigant.wf.task.TaskStatus;
 import org.bigant.wf.user.UserService;
+import org.bigant.wf.user.vo.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,7 +40,7 @@ import java.util.stream.Collectors;
 public class DingTalkInstancesService implements InstancesService {
 
     private DingTalkConfig dingTalkConfig;
-    private DingTalkCCF ccf;
+    private DingTalkFDCF dingTalkFDCF;
     private UserService userService;
     private com.aliyun.dingtalkworkflow_1_0.Client client;
 
@@ -52,7 +57,7 @@ public class DingTalkInstancesService implements InstancesService {
 
         log.debug("发起审批实例：{}", JSONObject.toJSONString(instanceStart));
 
-        String dingTalkUserId = userService.getUserId(instanceStart.getUserId(), this.getType());
+        String dingTalkUserId = userService.getOtherUserIdByUserId(instanceStart.getUserId(), this.getType());
 
         StartProcessInstanceHeaders startProcessInstanceHeaders = new
                 StartProcessInstanceHeaders();
@@ -61,7 +66,7 @@ public class DingTalkInstancesService implements InstancesService {
                 = new ArrayList<>();
 
         //转换表单值
-        HashMap<String, String> formComponents = this.parseFormValue(instanceStart.getFormComponents(), dingTalkUserId);
+        HashMap<String, String> formComponents = this.parseFormValue(instanceStart.getFormData(), dingTalkUserId);
 
         for (Map.Entry<String, String> formComponent : formComponents.entrySet()) {
             StartProcessInstanceRequest.StartProcessInstanceRequestFormComponentValues value =
@@ -86,7 +91,7 @@ public class DingTalkInstancesService implements InstancesService {
                 .setOriginatorUserId(dingTalkUserId)
                 .setProcessCode(instanceStart.getProcessCode())
                 .setDeptId(instanceStart.getDeptId() != null && instanceStart.getDeptId().length() > 0 ?
-                        Long.parseLong(userService.getDeptId(instanceStart.getDeptId(), this.getType()))
+                        Long.parseLong(userService.getOtherDeptIdByDeptId(instanceStart.getDeptId(), this.getType()))
                         : null)
                 /*.setMicroappAgentId(41605932L)*/
                 /*.setApprovers(java.util.Arrays.asList(approvers0))*/
@@ -103,7 +108,7 @@ public class DingTalkInstancesService implements InstancesService {
                     new RuntimeOptions());
 
             String instanceId = processInstanceResponse.getBody().getInstanceId();
-            log.debug("发起审批实例成功：code:{}，instanceId:{}", instanceStart.getProcessCode(), instanceId);
+            log.debug("发起审批实例成功：processCode:{}，instanceCode:{}", instanceStart.getProcessCode(), instanceId);
 
             return InstanceStartResult.builder()
                     .processCode(instanceStart.getProcessCode())
@@ -121,35 +126,214 @@ public class DingTalkInstancesService implements InstancesService {
         return null;
     }
 
+    /**
+     * 查询审批示例详情
+     * 接口地址：https://open.dingtalk.com/document/orgapp/obtains-the-details-of-a-single-approval-instance-pop
+     *
+     * @param instanceCode
+     * @return
+     */
     @Override
     public InstanceDetailResult detail(String instanceCode) {
 
-        com.aliyun.dingtalkworkflow_1_0.models.GetProcessInstanceHeaders getProcessInstanceHeaders = new com.aliyun.dingtalkworkflow_1_0.models.GetProcessInstanceHeaders();
+        log.debug("钉钉-查询审批示例详情。instanceCode:{}", instanceCode);
+
+        com.aliyun.dingtalkworkflow_1_0.models.GetProcessInstanceHeaders getProcessInstanceHeaders =
+                new com.aliyun.dingtalkworkflow_1_0.models.GetProcessInstanceHeaders();
+
         getProcessInstanceHeaders.xAcsDingtalkAccessToken = dingTalkConfig.accessToken();
 
         com.aliyun.dingtalkworkflow_1_0.models.GetProcessInstanceRequest getProcessInstanceRequest =
                 new com.aliyun.dingtalkworkflow_1_0.models.GetProcessInstanceRequest()
                         .setProcessInstanceId(instanceCode);
+
         try {
-            GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues getProcessInstanceResponseBodyResultFormComponentValues = client.getProcessInstanceWithOptions(getProcessInstanceRequest, getProcessInstanceHeaders
-                            , new RuntimeOptions())
-                    .getBody()
-                    .getResult()
-                    .getFormComponentValues()
-                    .get(0);
-        } catch (TeaException err) {
-            if (!com.aliyun.teautil.Common.empty(err.code) && !com.aliyun.teautil.Common.empty(err.message)) {
-                // err 中含有 code 和 message 属性，可帮助开发定位问题
+
+
+            GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResult result =
+                    client.getProcessInstanceWithOptions(getProcessInstanceRequest, getProcessInstanceHeaders
+                                    , new RuntimeOptions())
+                            .getBody()
+                            .getResult();
+
+            log.debug("钉钉-查询审批示例成功。instanceCode:{}", instanceCode);
+
+            //将钉钉返回数据转换为InstanceDetailResult
+
+            //钉钉userId获取系统userId
+            String userId = userService.getUserIdByOtherUserId(result.getOriginatorUserId(), getType());
+            //钉钉部门Id获取系统部门Id
+            String deptId = userService.getOtherDeptIdByDeptId(result.getOriginatorDeptId(), getType());
+
+
+            String status = result.getStatus();
+            String resultStatus = result.getResult();
+
+
+            InstancesStatus instancesStatus = null;
+            /*
+             * status 状态
+             * NEW：新创建
+             * RUNNING：审批中
+             * TERMINATED：被终止
+             * COMPLETED：完成
+             * CANCELED：取消
+             */
+
+            /*
+             * resultStatus 状态 status为COMPLETED且result为agree时，表示审批单完结并审批通过。
+             * agree：同意
+             * refuse：拒绝
+             */
+            switch (status) {
+                case "NEW":
+                    instancesStatus = InstancesStatus.WAITING;
+                    break;
+                case "RUNNING":
+                    instancesStatus = InstancesStatus.RUNNING;
+                    break;
+                case "COMPLETED":
+                    switch (resultStatus) {
+                        case "agree":
+                            instancesStatus = InstancesStatus.AGREED;
+                            break;
+                        case "refuse":
+                            instancesStatus = InstancesStatus.REFUSED;
+                            break;
+                        default:
+                            String errMsg = String.format("钉钉-查询审批示例详情，无法识别的实例状态 resultStatus:%s", resultStatus);
+                            log.error(errMsg);
+                            throw new WfException(errMsg);
+                    }
+                    break;
+                case "TERMINATED":
+                case "CANCELED":
+                    instancesStatus = InstancesStatus.CANCELED;
+                    break;
+                default:
+                    String errMsg = String.format("钉钉-查询审批示例详情，无法识别的实例状态 status:%s", status);
+                    log.error(errMsg);
+                    throw new WfException(errMsg);
             }
+
+
+            List<FormData> formDataList = new ArrayList<>();
+            //将form数据转换成系统form实体
+            for (GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues formComponentValue
+                    : result.getFormComponentValues()) {
+
+                DingTalkBaseFDC fdc = dingTalkFDCF.getByOtherType(formComponentValue.getComponentType());
+                FormData formData = fdc.toFormData(formComponentValue);
+                formDataList.add(formData);
+
+            }
+
+            List<InstanceDetailResult.Task> tasks = new ArrayList<>();
+            //将task转换为系统task实体
+            for (GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultTasks task : result.getTasks()) {
+
+                String taskUserId = userService.getUserIdByOtherUserId(task.getUserId(), getType());
+                User taskUser = userService.getUser(taskUserId);
+
+                TaskStatus taskStatus;
+
+                String instancesTaskStatus = task.getStatus();
+
+                String instancesTaskResultStatus = task.getResult();
+
+
+
+                /*
+                 *  instancesTaskStatus
+                 *  NEW：未启动
+                 *  RUNNING：处理中
+                 *  PAUSED：暂停
+                 *  CANCELED：取消
+                 *  COMPLETED：完成
+                 *  TERMINATED：终止
+                 */
+                /*
+                 *  instancesTaskResultStatus
+                 *  AGREE：同意
+                 *  REFUSE：拒绝
+                 *  REDIRECTED：转交
+                 */
+
+                switch (instancesTaskStatus) {
+                    case "NEW":
+                        taskStatus = TaskStatus.WAITING;
+                        break;
+                    case "RUNNING":
+                        taskStatus = TaskStatus.RUNNING;
+                        break;
+                    case "PAUSED":
+                        taskStatus = TaskStatus.PAUSED;
+                        break;
+                    case "CANCELED":
+                        taskStatus = TaskStatus.CANCELED;
+                        break;
+                    case "COMPLETED":
+                        switch (instancesTaskResultStatus) {
+                            case "AGREE":
+                                taskStatus = TaskStatus.AGREED;
+                                break;
+                            case "REFUSE":
+                                taskStatus = TaskStatus.REFUSED;
+                                break;
+                            case "REDIRECTED":
+                                taskStatus = TaskStatus.REDIRECTED;
+                                break;
+                            default:
+                                String errMsg = String.format("钉钉-查询审批示例详情，无法识别的任务状态 resultStatus:%s", status);
+                                log.error(errMsg);
+                                throw new WfException(errMsg);
+                        }
+                    case "TERMINATED":
+                        taskStatus = TaskStatus.CANCELED;
+                        break;
+                    default:
+                        String errMsg = String.format("钉钉-查询审批示例详情，无法识别的任务状态 status:%s", status);
+                        log.error(errMsg);
+                        throw new WfException(errMsg);
+                }
+
+
+                tasks.add(InstanceDetailResult.Task.builder()
+                        .taskId(task.getTaskId().toString())
+                        .userId(taskUserId)
+                        .userName(taskUser.getUserName())
+                        .status(taskStatus)
+                        .build());
+
+            }
+
+
+            return InstanceDetailResult.builder()
+                    .title(result.getTitle())
+                    .instanceCode(instanceCode)
+                    .userId(userId)
+                    .deptId(deptId)
+                    .status(instancesStatus)
+                    .formData(formDataList)
+                    .tasks(tasks)
+                    .build();
+
+
+        } catch (TeaException err) {
+
+            String errMsg = String.format("钉钉-获取审批示例详情失败。instanceCode:%s,errorCode:%s,message:%s",
+                    instanceCode,
+                    err.code,
+                    err.message);
+
+            log.error(errMsg, errMsg);
+            throw new WfException(errMsg, err);
 
         } catch (Exception _err) {
-            TeaException err = new TeaException(_err.getMessage(), _err);
-            if (!com.aliyun.teautil.Common.empty(err.code) && !com.aliyun.teautil.Common.empty(err.message)) {
-                // err 中含有 code 和 message 属性，可帮助开发定位问题
-            }
-
+            String errMsg = String.format("钉钉-获取审批示例详情失败。instanceCode:%s", instanceCode);
+            log.error(errMsg, _err);
+            throw new WfException(errMsg, _err);
         }
-        return null;
     }
 
     /**
@@ -187,7 +371,7 @@ public class DingTalkInstancesService implements InstancesService {
 
             List<String> userIds = targetSelectUsersAuthMatch.get(i).getUserIds()
                     .stream()
-                    .map(x -> userService.getUserId(x, this.getType()))
+                    .map(x -> userService.getOtherUserIdByUserId(x, this.getType()))
                     .collect(Collectors.toList());
 
             ProcessForecastResponseBody.ProcessForecastResponseBodyResultWorkflowActivityRulesWorkflowActor actor
@@ -233,7 +417,7 @@ public class DingTalkInstancesService implements InstancesService {
 
             List<String> userIds = targetSelectUser.getUserIds()
                     .stream()
-                    .map(x -> userService.getUserId(x, this.getType()))
+                    .map(x -> userService.getOtherUserIdByUserId(x, this.getType()))
                     .collect(Collectors.toList());
 
             log.debug(" 发起审批实例：{}，节点Key：{}，共{}个用户：{}。"
@@ -290,8 +474,8 @@ public class DingTalkInstancesService implements InstancesService {
 
         ProcessForecastRequest processForecastRequest = new ProcessForecastRequest()
                 .setProcessCode(code)
-                .setDeptId(Integer.valueOf(userService.getDeptId(deptId, getType())))
-                .setUserId(userService.getUserId(userId, getType()))
+                .setDeptId(Integer.valueOf(userService.getOtherDeptIdByDeptId(deptId, getType())))
+                .setUserId(userService.getOtherUserIdByUserId(userId, getType()))
                 .setFormComponentValues(values);
 
         try {
@@ -339,19 +523,19 @@ public class DingTalkInstancesService implements InstancesService {
     /**
      * 预测是否有自定义审批节点
      *
-     * @param formComponents
+     * @param formData
      * @return
      * @throws Exception
      */
-    private ProcessForecastResponseBody.ProcessForecastResponseBodyResult forecast(String code, String userId, String deptId, List<FormComponent> formComponents) {
+    private ProcessForecastResponseBody.ProcessForecastResponseBodyResult forecast(String code, String userId, String deptId, List<FormData> formData) {
 
         log.debug(" 预测是否有自定义审批节点：code:{}，userId:{}，deptId:{}，formComponents:{}。",
                 code,
                 userId,
                 deptId,
-                formComponents);
+                formData);
 
-        return this.forecast(code, userId, deptId, this.parseFormValue(formComponents, userId));
+        return this.forecast(code, userId, deptId, this.parseFormValue(formData, userId));
 
     }
 
@@ -377,16 +561,16 @@ public class DingTalkInstancesService implements InstancesService {
     /**
      * 解析表单值,主要是解决个平台数据格式不一样的问题
      *
-     * @param formComponents
+     * @param formDataList
      * @param dingTalkUserId
      * @return
      */
-    private HashMap<String, String> parseFormValue(List<FormComponent> formComponents, String dingTalkUserId) {
-        HashMap<String, String> formMap = new HashMap<>(formComponents.size());
+    private HashMap<String, String> parseFormValue(List<FormData> formDataList, String dingTalkUserId) {
+        HashMap<String, String> formMap = new HashMap<>(formDataList.size());
 
 
-        for (FormComponent formComponent : formComponents) {
-            formMap.putAll(this.parseFormValue(formComponent, dingTalkUserId));
+        for (FormData formData : formDataList) {
+            formMap.putAll(this.parseFormValue(formData, dingTalkUserId));
         }
 
         return formMap;
@@ -397,12 +581,12 @@ public class DingTalkInstancesService implements InstancesService {
     /**
      * 解析将form数据转换为Map
      *
-     * @param formComponent
+     * @param formData
      * @param dingTalkUserId
      * @return
      */
-    private Map<String, String> parseFormValue(FormComponent formComponent, String dingTalkUserId) {
-        return ccf.getConvert(formComponent.getComponentType()).toOther(formComponent, dingTalkUserId);
+    private Map<String, String> parseFormValue(FormData formData, String dingTalkUserId) {
+        return dingTalkFDCF.getByFormType(formData.getComponentType()).toOther(formData, dingTalkUserId);
     }
 /*    private HashMap<String, String> parseFormValue(FormComponent formComponent, String userId) {
         HashMap<String, String> formMap = new HashMap<>(1);
@@ -494,7 +678,7 @@ public class DingTalkInstancesService implements InstancesService {
         com.aliyun.dingtalkworkflow_1_0.models.GetAttachmentSpaceHeaders getAttachmentSpaceHeaders = new com.aliyun.dingtalkworkflow_1_0.models.GetAttachmentSpaceHeaders();
 
         com.aliyun.dingtalkworkflow_1_0.models.GetAttachmentSpaceRequest getAttachmentSpaceRequest = new com.aliyun.dingtalkworkflow_1_0.models.GetAttachmentSpaceRequest()
-                .setUserId(userService.getUserId(userId, getType()))
+                .setUserId(userService.getOtherUserIdByUserId(userId, getType()))
                 .setAgentId(dingTalkConfig.getAgentId());
 
         try {

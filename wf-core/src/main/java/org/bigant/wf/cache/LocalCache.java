@@ -37,7 +37,7 @@ public class LocalCache implements ICache {
     public String get(String key) {
         Value v = CACHE.get(key);
         if (v == null || new Date().after(v.end)) {
-            return "";
+            return null;
         }
 
         log.debug("get key:{},time left:{}s", key, (v.end.getTime() - new Date().getTime()) / 1000);

@@ -8,8 +8,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.concurrent.TimeUnit;
-
 /**
  * 飞书配置
  *

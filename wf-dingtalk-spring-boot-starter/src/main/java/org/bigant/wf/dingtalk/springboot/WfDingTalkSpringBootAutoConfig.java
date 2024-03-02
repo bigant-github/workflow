@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.bigant.fw.dingtalk.DingTalkCallback;
 import org.bigant.fw.dingtalk.DingTalkConfig;
 import org.bigant.fw.dingtalk.DingTalkUser;
-import org.bigant.fw.dingtalk.form.component.DingTalkCCF;
+import org.bigant.fw.dingtalk.instances.form.DingTalkFDCF;
 import org.bigant.fw.dingtalk.instances.DingTalkInstancesService;
 import org.bigant.fw.dingtalk.process.DingTalkProcessService;
 import org.bigant.wf.Factory;
@@ -67,8 +67,8 @@ public class WfDingTalkSpringBootAutoConfig {
 
     @Bean
     @ConditionalOnMissingBean
-    public DingTalkCCF dingTalkCCF(DingTalkConfig dingTalkConfig, DingTalkUser dingTalkUser, ICache cache) throws Exception {
-        return new DingTalkCCF(dingTalkConfig,
+    public DingTalkFDCF dingTalkCCF(DingTalkConfig dingTalkConfig, DingTalkUser dingTalkUser, ICache cache) throws Exception {
+        return new DingTalkFDCF(dingTalkConfig,
                 dingTalkUser,
                 cache,
                 new com.aliyun.dingtalkworkflow_1_0.Client(getConfig()));
@@ -76,9 +76,9 @@ public class WfDingTalkSpringBootAutoConfig {
 
     @Bean
     @ConditionalOnMissingBean
-    public DingTalkInstancesService dingTalkInstancesService(DingTalkConfig dingTalkConfig, DingTalkCCF dingTalkCCF, UserService userService) throws Exception {
+    public DingTalkInstancesService dingTalkInstancesService(DingTalkConfig dingTalkConfig, DingTalkFDCF dingTalkFDCF, UserService userService) throws Exception {
         DingTalkInstancesService dingTalkInstancesService = new DingTalkInstancesService(dingTalkConfig,
-                dingTalkCCF,
+                dingTalkFDCF,
                 userService,
                 new com.aliyun.dingtalkworkflow_1_0.Client(getConfig()));
         //注册到工厂供后续使用

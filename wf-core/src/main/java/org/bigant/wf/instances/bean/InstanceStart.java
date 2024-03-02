@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bigant.wf.form.bean.FormComponent;
+import org.bigant.wf.instances.form.FormData;
 import java.util.List;
 
 /**
@@ -37,7 +37,7 @@ public class InstanceStart {
     private List<TargetSelectUserAuthMatch> targetSelectUsersAuthMatch;
 
     @ApiModelProperty("表单字段集合")
-    private List<FormComponent> formComponents;
+    private List<FormData> formData;
 
 
     @ApiModel("自选节点用户")

@@ -19,22 +19,26 @@ public interface UserService {
     User getUser(String id);
 
     /**
-     * 获取第三方id
+     * 获取实现方用户id
      *
      * @param userId
      * @param type
      * @return
      */
-    String getUserId(String userId, String type);
+    String getOtherUserIdByUserId(String userId, String type);
 
 
     /**
-     * 获取第三方部门id
+     * 获取实现方部门id
      *
      * @param deptId
      * @param type
      * @return
      */
-    String getDeptId(String deptId, String type);
+    String getOtherDeptIdByDeptId(String deptId, String type);
+
+    String getUserIdByOtherUserId(String otherUserId, String type);
+
+    String getByDeptIdByOtherDeptId(String otherDeptId, String type);
 
 }

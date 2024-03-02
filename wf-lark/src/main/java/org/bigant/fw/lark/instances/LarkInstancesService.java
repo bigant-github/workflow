@@ -19,14 +19,14 @@ import org.bigant.fw.lark.LarkConfig;
 import org.bigant.fw.lark.LarkConstant;
 import org.bigant.fw.lark.process.LarkProcessService;
 import org.bigant.wf.exception.WfException;
-import org.bigant.wf.form.ComponentConvertTTT;
-import org.bigant.wf.form.bean.FormComponent;
-import org.bigant.wf.form.component.ComponentParseAll;
-import org.bigant.wf.form.component.ComponentType;
-import org.bigant.wf.form.component.bean.AttachmentComponent;
-import org.bigant.wf.form.component.bean.DateComponent;
-import org.bigant.wf.form.component.bean.DateRangeComponent;
-import org.bigant.wf.form.component.bean.ImageComponent;
+import org.bigant.wf.instances.form.ComponentConvertTTT;
+import org.bigant.wf.instances.form.FormData;
+import org.bigant.wf.instances.form.FormDataParseAll;
+import org.bigant.wf.instances.form.ComponentType;
+import org.bigant.wf.instances.form.databean.AttachmentComponent;
+import org.bigant.wf.instances.form.databean.DateComponent;
+import org.bigant.wf.instances.form.databean.DateRangeComponent;
+import org.bigant.wf.instances.form.databean.ImageComponent;
 import org.bigant.wf.form.option.MultiSelectOption;
 import org.bigant.wf.form.option.SelectOption;
 import org.bigant.wf.instances.InstancesService;
@@ -60,6 +60,8 @@ public class LarkInstancesService implements InstancesService {
 
     private FormConvert formConvert;
 
+    private FormConvert formConvert;
+
     public LarkInstancesService(LarkConfig larkConfig, LarkProcessService larkProcessService, UserService userService) {
         this.larkConfig = larkConfig;
         this.userService = userService;
@@ -79,16 +81,16 @@ public class LarkInstancesService implements InstancesService {
         // 构建client
         Client client = larkConfig.getClient();
 
-        String userId = userService.getUserId(instanceStart.getUserId(), LarkConstant.NAME);
+        String userId = userService.getOtherUserIdByUserId(instanceStart.getUserId(), LarkConstant.NAME);
 
         ProcessDetail processDetail = larkProcessService.detail(instanceStart.getProcessCode());
 
         Map<String, ProcessDetail.FormItem> formItemMap =
                 processDetail.getForm().stream().collect(Collectors.toMap(ProcessDetail.FormItem::getName, x -> x));
 
-        List<FormComponent> formComponents = instanceStart.getFormComponents();
+        List<FormData> formData = instanceStart.getFormData();
 
-        String form = this.parseFormValues(formComponents, formItemMap);
+        String form = this.parseFormValues(formData, formItemMap);
 
         ArrayList<NodeApprover> nodeApprovers = new ArrayList<>();
 
@@ -98,7 +100,7 @@ public class LarkInstancesService implements InstancesService {
             targetSelectUsers.forEach(targetSelectUser -> {
 
                 String[] userIds = targetSelectUser.getUserIds().stream()
-                        .map(x -> userService.getUserId(x, LarkConstant.NAME))
+                        .map(x -> userService.getOtherUserIdByUserId(x, LarkConstant.NAME))
                         .collect(Collectors.toList())
                         .toArray(new String[]{});
 
@@ -129,7 +131,7 @@ public class LarkInstancesService implements InstancesService {
                 InstanceStart.TargetSelectUserAuthMatch targetSelectUser = targetSelectUsersAuthMatch.get(i);
                 PreviewNode previewNode = needApproverNodes.get(i);
                 String[] userIds = targetSelectUser.getUserIds().stream()
-                        .map(x -> userService.getUserId(x, LarkConstant.NAME))
+                        .map(x -> userService.getOtherUserIdByUserId(x, LarkConstant.NAME))
                         .collect(Collectors.toList())
                         .toArray(new String[]{});
 
@@ -194,13 +196,13 @@ public class LarkInstancesService implements InstancesService {
         Map<String, ProcessDetail.FormItem> formItemMap =
                 processDetail.getForm().stream().collect(Collectors.toMap(ProcessDetail.FormItem::getName, x -> x));
 
-        List<FormComponent> formComponents = instancePreview.getFormComponents();
+        List<FormData> formData = instancePreview.getFormData();
 
-        String form = this.parseFormValues(formComponents, formItemMap);
+        String form = this.parseFormValues(formData, formItemMap);
 
         this.preview(instancePreview.getInstanceCode(),
-                userService.getUserId(instancePreview.getUserId(), LarkConstant.NAME),
-                userService.getDeptId(instancePreview.getDeptId(), LarkConstant.NAME),
+                userService.getOtherUserIdByUserId(instancePreview.getUserId(), LarkConstant.NAME),
+                userService.getOtherDeptIdByDeptId(instancePreview.getDeptId(), LarkConstant.NAME),
                 form);
 
         return null;
@@ -208,7 +210,6 @@ public class LarkInstancesService implements InstancesService {
 
     @Override
     public InstanceDetailResult detail(String instanceCode) {
-
 
 
         return null;
@@ -263,18 +264,18 @@ public class LarkInstancesService implements InstancesService {
     }
 
 
-    public String parseFormValues(List<FormComponent> formComponents, Map<String, ProcessDetail.FormItem> formItemMap) {
+    public String parseFormValues(List<FormData> formData, Map<String, ProcessDetail.FormItem> formItemMap) {
 
         ArrayList<Map<String, Object>> maps = new ArrayList<>();
-        for (FormComponent formComponent : formComponents) {
-            maps.add(this.parseFormValues(formComponent, formItemMap.get(formComponent.getName())));
+        for (FormData formData : formData) {
+            maps.add(this.parseFormValues(formData, formItemMap.get(formData.getName())));
         }
 
         return Jsons.DEFAULT.toJson(maps);
     }
 
 
-    public Map<String, Object> parseFormValues(FormComponent formComponents, ProcessDetail.FormItem formItem) {
+    public Map<String, Object> parseFormValues(FormData formComponents, ProcessDetail.FormItem formItem) {
 
         return formConvert.convert(formComponents.getComponentType(), new FormItemConvert(formComponents, formItem));
     }
@@ -329,9 +330,9 @@ public class LarkInstancesService implements InstancesService {
         @Override
         protected Map<String, Object> multiSelect(FormItemConvert component) {
 
-            List<String> list = ComponentParseAll
+            List<String> list = FormDataParseAll
                     .COMPONENT_PARSE_MULTI_SELECT
-                    .toJava(component.getFormComponents().getValue());
+                    .strToJava(component.getFormComponents().getValue());
 
 
             MultiSelectOption option = (MultiSelectOption) component.getFormItem().getOption();
@@ -346,9 +347,9 @@ public class LarkInstancesService implements InstancesService {
         @Override
         protected Map<String, Object> date(FormItemConvert component) {
 
-            DateComponent dateComponent = ComponentParseAll
+            DateComponent dateComponent = FormDataParseAll
                     .COMPONENT_PARSE_DATE
-                    .toJava(component.getFormComponents().getValue());
+                    .strToJava(component.getFormComponents().getValue());
 
             return this.base(component, "date", dateComponent.getDate().atOffset(ZoneOffset.ofHours(8))
                     .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
@@ -356,9 +357,9 @@ public class LarkInstancesService implements InstancesService {
 
         @Override
         protected Map<String, Object> dateRange(FormItemConvert component) {
-            DateRangeComponent dateRange = ComponentParseAll
+            DateRangeComponent dateRange = FormDataParseAll
                     .COMPONENT_PARSE_DATE_RANGE
-                    .toJava(component.getFormComponents().getValue());
+                    .strToJava(component.getFormComponents().getValue());
             String begin = dateRange.getBegin().atOffset(ZoneOffset.ofHours(8))
                     .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
             String end = dateRange.getEnd().atOffset(ZoneOffset.ofHours(8))
@@ -401,9 +402,9 @@ public class LarkInstancesService implements InstancesService {
         @Override
         protected Map<String, Object> image(FormItemConvert component) {
 
-            List<ImageComponent> imageComponents = ComponentParseAll
+            List<ImageComponent> imageComponents = FormDataParseAll
                     .COMPONENT_PARSE_IMAGE
-                    .toJava(component.getFormComponents().getValue());
+                    .strToJava(component.getFormComponents().getValue());
 
             List<String> list = new ArrayList<>();
             for (ImageComponent imageComponent : imageComponents) {
@@ -422,9 +423,9 @@ public class LarkInstancesService implements InstancesService {
 
         @Override
         protected Map<String, Object> attachment(FormItemConvert component) {
-            List<AttachmentComponent> attachmentComponents = ComponentParseAll
+            List<AttachmentComponent> attachmentComponents = FormDataParseAll
                     .COMPONENT_PARSE_ATTACHMENT
-                    .toJava(component.getFormComponents().getValue());
+                    .strToJava(component.getFormComponents().getValue());
 
             List<String> list = new ArrayList<>();
             for (AttachmentComponent attachmentComponent : attachmentComponents) {
@@ -451,9 +452,9 @@ public class LarkInstancesService implements InstancesService {
         @Override
         protected Map<String, Object> table(FormItemConvert component) {
 
-            Collection<Collection<FormComponent>> table = ComponentParseAll
+            Collection<Collection<FormData>> table = FormDataParseAll
                     .COMPONENT_PARSE_TABLE
-                    .toJava(component.getFormComponents().getValue());
+                    .strToJava(component.getFormComponents().getValue());
 
             List<ProcessDetail.FormItem> children = component.getFormItem().getChildren();
             Map<String, ProcessDetail.FormItem> childrenMap = children.stream()
@@ -577,7 +578,7 @@ public class LarkInstancesService implements InstancesService {
     @Data
     @AllArgsConstructor
     public static class FormItemConvert {
-        private FormComponent formComponents;
+        private FormData formComponents;
         private ProcessDetail.FormItem formItem;
     }
 }

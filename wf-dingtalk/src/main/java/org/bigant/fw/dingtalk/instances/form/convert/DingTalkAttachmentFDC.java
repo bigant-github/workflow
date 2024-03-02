@@ -1,0 +1,138 @@
+package org.bigant.fw.dingtalk.instances.form.convert;
+
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
+import com.aliyun.dingtalkstorage_1_0.models.CommitFileResponseBody;
+import com.aliyun.dingtalkworkflow_1_0.models.GetAttachmentSpaceResponse;
+import com.aliyun.dingtalkworkflow_1_0.models.GetProcessInstanceResponseBody;
+import com.aliyun.tea.TeaException;
+import com.aliyun.teautil.models.RuntimeOptions;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.bigant.fw.dingtalk.DingTalkConfig;
+import org.bigant.fw.dingtalk.DingTalkConstant;
+import org.bigant.fw.dingtalk.DingTalkFile;
+import org.bigant.fw.dingtalk.DingTalkUser;
+import org.bigant.wf.cache.ICache;
+import org.bigant.wf.exception.WfException;
+import org.bigant.wf.instances.form.FormData;
+import org.bigant.wf.instances.form.FormDataParseAll;
+import org.bigant.wf.instances.form.ComponentType;
+import org.bigant.wf.instances.form.databean.AttachmentComponent;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * 钉钉附件类型转换器
+ *
+ * @author galen
+ * @date 2024/3/115:29
+ */
+@Slf4j
+@AllArgsConstructor
+public class DingTalkAttachmentFDC extends DingTalkBaseFDC {
+
+    private final ICache cache;
+    private final DingTalkConfig dingTalkConfig;
+    private final DingTalkUser dingTalkUser;
+
+    @Getter
+    private com.aliyun.dingtalkworkflow_1_0.Client client;
+
+    public static final String CACHE_KEY_SPACE_ID = DingTalkConstant.CACHE_KEY + "spaceId:";
+
+
+
+
+    @Override
+    public Map<String, String> toOther(FormData component, String dingTalkUserId) {
+
+        String spaceId = this.getProcessInstancesSpaces(dingTalkUserId).toString();
+
+        String unionId = dingTalkUser.getUnionId(dingTalkUserId);
+
+        List<AttachmentComponent> attachmentComponents =
+                FormDataParseAll.COMPONENT_PARSE_ATTACHMENT.strToJava(component.getValue());
+        JSONArray array = new JSONArray();
+        for (AttachmentComponent attachmentComponent : attachmentComponents) {
+
+            CommitFileResponseBody fileBody = DingTalkFile.uploadFile(unionId,
+                    spaceId,
+                    attachmentComponent.getName(),
+                    attachmentComponent.getSize(),
+                    attachmentComponent.getUrl(),
+                    dingTalkConfig);
+
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("spaceId", fileBody.getDentry().getSpaceId());
+            jsonObject.put("fileName", fileBody.getDentry().getName());
+            jsonObject.put("fileSize", fileBody.getDentry().getSize());
+            jsonObject.put("fileType", fileBody.getDentry().getType());
+            jsonObject.put("fileId", fileBody.getDentry().getId());
+            array.add(jsonObject);
+        }
+        return toMap(component.getName(), array.toJSONString());
+    }
+
+    @Override
+    public FormData toFormData(
+            GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues component) {
+        return FormData.text(component.getName(), component.getValue());
+    }
+
+    @Override
+    public ComponentType getType() {
+        return ComponentType.ATTACHMENT;
+    }
+
+    @Override
+    public Collection<String> getOtherType() {
+        return Collections.singletonList("DDAttachment");
+    }
+
+    private Long getProcessInstancesSpaces(String dingTalkUserId) {
+
+        String spaceIdStr = cache.get(CACHE_KEY_SPACE_ID + dingTalkUserId);
+        if (spaceIdStr != null) {
+            return Long.valueOf(spaceIdStr);
+        }
+
+        log.debug("钉钉-获取流程实例的空间：userId:{}。",
+                dingTalkUserId);
+        com.aliyun.dingtalkworkflow_1_0.models.GetAttachmentSpaceHeaders getAttachmentSpaceHeaders = new com.aliyun.dingtalkworkflow_1_0.models.GetAttachmentSpaceHeaders();
+
+        com.aliyun.dingtalkworkflow_1_0.models.GetAttachmentSpaceRequest getAttachmentSpaceRequest = new com.aliyun.dingtalkworkflow_1_0.models.GetAttachmentSpaceRequest()
+                .setUserId(dingTalkUserId)
+                .setAgentId(dingTalkConfig.getAgentId());
+
+        try {
+            com.aliyun.dingtalkworkflow_1_0.Client client = getClient();
+            getAttachmentSpaceHeaders.xAcsDingtalkAccessToken = dingTalkConfig.accessToken();
+            GetAttachmentSpaceResponse attachmentSpaceWithOptions = client.getAttachmentSpaceWithOptions(getAttachmentSpaceRequest, getAttachmentSpaceHeaders, new RuntimeOptions());
+            Long spaceId = attachmentSpaceWithOptions.getBody().getResult().getSpaceId();
+
+            log.debug("钉钉-获取审批空间详情成功，userId:{},spaceId:{}", dingTalkUserId, spaceId);
+
+
+            cache.set(CACHE_KEY_SPACE_ID + dingTalkUserId, spaceId.toString(), 1000, TimeUnit.DAYS);
+
+            return spaceId;
+
+        } catch (TeaException err) {
+            String errMsg = String.format("钉钉-获取审批空间详情失败，userId%s,code:%s,message:%s",
+                    dingTalkUserId,
+                    err.getCode(),
+                    err.getMessage());
+            log.error(errMsg);
+            throw new WfException(errMsg, err);
+        } catch (Exception _err) {
+            throw new WfException(_err.getMessage(), _err);
+        }
+    }
+
+}

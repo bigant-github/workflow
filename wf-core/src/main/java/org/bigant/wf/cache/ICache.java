@@ -21,4 +21,5 @@ public interface ICache {
 
     // 设置缓存值
     void set(String key, String value, int expire, TimeUnit timeUnit);
+
 }
