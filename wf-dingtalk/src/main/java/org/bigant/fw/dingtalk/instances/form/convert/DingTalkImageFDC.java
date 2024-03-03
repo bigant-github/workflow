@@ -1,12 +1,10 @@
 package org.bigant.fw.dingtalk.instances.form.convert;
 
 import com.alibaba.fastjson2.JSONArray;
-import com.alibaba.fastjson2.JSONObject;
 import com.aliyun.dingtalkworkflow_1_0.models.GetProcessInstanceResponseBody;
 import org.bigant.wf.instances.form.FormData;
 import org.bigant.wf.instances.form.FormDataParseAll;
-import org.bigant.wf.instances.form.ComponentType;
-import org.bigant.wf.instances.form.databean.FormDataAttachment;
+import org.bigant.wf.ComponentType;
 import org.bigant.wf.instances.form.databean.FormDataImage;
 
 import java.util.*;
@@ -22,7 +20,7 @@ public class DingTalkImageFDC extends DingTalkBaseFDC {
 
     @Override
     public Map<String, String> toOther(FormData data, String dingTalkUserId) {
-        List<FormDataImage> rangeComponent = FormDataParseAll.COMPONENT_PARSE_IMAGE.strToJava(data.getValue());
+        Collection<FormDataImage> rangeComponent = FormDataParseAll.COMPONENT_PARSE_IMAGE.strToJava(data.getValue());
         List<String> urls = rangeComponent
                 .stream()
                 .map(FormDataImage::getUrl)

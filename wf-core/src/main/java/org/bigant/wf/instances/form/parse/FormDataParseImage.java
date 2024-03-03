@@ -2,10 +2,10 @@ package org.bigant.wf.instances.form.parse;
 
 import com.alibaba.fastjson2.JSONArray;
 import org.bigant.wf.instances.form.FormDataParse;
-import org.bigant.wf.instances.form.ComponentType;
+import org.bigant.wf.ComponentType;
 import org.bigant.wf.instances.form.databean.FormDataImage;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * 组建工具
@@ -13,21 +13,21 @@ import java.util.List;
  * @author galen
  * @date 2024/1/3116:30
  */
-public class FormDataParseImage implements FormDataParse<List<FormDataImage>> {
+public class FormDataParseImage implements FormDataParse<Collection<FormDataImage>> {
 
 
     @Override
-    public List<FormDataImage> strToJava(String str) {
+    public Collection<FormDataImage> strToJava(String str) {
         return JSONArray.parse(str).toJavaList(FormDataImage.class);
     }
 
     @Override
-    public String toStr(List<FormDataImage> data) {
+    public String toStr(Collection<FormDataImage> data) {
         return JSONArray.toJSONString(data);
     }
 
     @Override
-    public void verify(List<FormDataImage> data) {
+    public void verify(Collection<FormDataImage> data) {
 
     }
 

@@ -2,11 +2,10 @@ package org.bigant.fw.dingtalk.instances.form.convert;
 
 import com.aliyun.dingtalkworkflow_1_0.models.GetProcessInstanceResponseBody;
 import org.bigant.wf.form.option.DateOption;
-import org.bigant.wf.instances.form.ComponentType;
+import org.bigant.wf.ComponentType;
 import org.bigant.wf.instances.form.FormData;
 import org.bigant.wf.instances.form.FormDataParseAll;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -39,7 +38,7 @@ public class DingTalkDateFDC extends DingTalkBaseFDC {
 
     @Override
     public ComponentType getType() {
-        return ComponentType.MULTI_SELECT;
+        return ComponentType.DATE;
     }
 
     @Override

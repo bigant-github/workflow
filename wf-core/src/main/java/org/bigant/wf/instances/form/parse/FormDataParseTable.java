@@ -3,7 +3,7 @@ package org.bigant.wf.instances.form.parse;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.TypeReference;
-import org.bigant.wf.instances.form.ComponentType;
+import org.bigant.wf.ComponentType;
 import org.bigant.wf.instances.form.FormData;
 import org.bigant.wf.instances.form.FormDataParse;
 

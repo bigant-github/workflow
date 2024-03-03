@@ -1,18 +1,20 @@
-package org.bigant.fw.dingtalk.instances.form.convert;
+package org.bigant.fw.lark.instances.form.convert;
 
-import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import com.aliyun.dingtalkworkflow_1_0.models.GetProcessInstanceResponseBody;
 import lombok.AllArgsConstructor;
-import org.bigant.fw.dingtalk.instances.form.DingTalkFDCF;
+import org.bigant.fw.lark.LarkConfig;
+import org.bigant.fw.lark.LarkFormType;
+import org.bigant.fw.lark.instances.form.LarkFDCF;
 import org.bigant.wf.ComponentType;
 import org.bigant.wf.instances.form.FormData;
 import org.bigant.wf.instances.form.FormDataParseAll;
+import org.bigant.wf.process.bean.ProcessDetail;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 钉钉数字类型转换器
@@ -21,41 +23,36 @@ import java.util.Map;
  * @date 2024/3/115:29
  */
 @AllArgsConstructor
-public class DingTalkTableFDC extends DingTalkBaseFDC {
+public class LarkTableFDC extends LarkBaseFDC {
 
-    private final DingTalkFDCF dingTalkFDCF;
+    private final LarkFDCF dingTalkFDCF;
 
     @Override
-    public Map<String, String> toOther(FormData data, String dingTalkUserId) {
-        Collection<Collection<FormData>> tableValue =
-                FormDataParseAll.COMPONENT_PARSE_TABLE.strToJava(data.getValue());
+    public Map<String, Object> toOther(LarkBaseFDC.FormItemConvert component) {
 
-        JSONArray table = new JSONArray();
-        for (Collection<FormData> componentList : tableValue) {
+        Collection<Collection<FormData>> table = FormDataParseAll
+                .COMPONENT_PARSE_TABLE
+                .strToJava(component.getFormComponents().getValue());
 
-            JSONArray row = new JSONArray();
-            for (FormData child : componentList) {
-                Map<String, String> value = dingTalkFDCF.getByFormType(child.getComponentType()).toOther(child, dingTalkUserId);
+        List<ProcessDetail.FormItem> children = component.getFormItem().getChildren();
+        Map<String, ProcessDetail.FormItem> childrenMap = children.stream()
+                .collect(Collectors.toMap(ProcessDetail.FormItem::getName, x -> x));
 
-                for (Map.Entry<String, String> entry : value.entrySet()) {
-                    JSONObject json = new JSONObject();
-                    json.put("name", entry.getKey());
-                    json.put("value", entry.getValue());
-                    row.add(json);
-                }
+        List<List<Map<String, Object>>> value = table.stream()
+                .map(row -> row.stream()
+                        .map(x -> dingTalkFDCF.getByFormType(x.getComponentType())
+                                        .toOther(new LarkBaseFDC.FormItemConvert(x, childrenMap.get(x.getName()))))
+                        .collect(Collectors.toList()))
+                .collect(Collectors.toList());
 
-            }
-
-            table.add(row);
-        }
-        return toMap(data.getName(), table.toJSONString());
+        return this.base(component, "fieldList", value);
     }
 
     @Override
     public FormData toFormData(
-            GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues data) {
+            JSONObject data) {
 
-        String value = data.getValue();
+        /*String value = data.getValue();
         JSONArray jsonVal = JSONArray.parse(value);
 
         ArrayList<Collection<FormData>> rows = new ArrayList<>(jsonVal.size());
@@ -74,7 +71,7 @@ public class DingTalkTableFDC extends DingTalkBaseFDC {
                 model.setComponentType(type);
                 model.setValue(field.getString("value"));
 
-                DingTalkBaseFDC fdc = dingTalkFDCF.getByOtherType(type);
+                LarkBaseFDC fdc = dingTalkFDCF.getByOtherType(type);
                 fieldList.add(fdc.toFormData(model));
             }
 
@@ -83,7 +80,8 @@ public class DingTalkTableFDC extends DingTalkBaseFDC {
         }
 
 
-        return FormData.table(data.getName(), rows);
+        return FormData.table(data.getName(), rows);*/
+        return null;
     }
 
     @Override
@@ -93,6 +91,6 @@ public class DingTalkTableFDC extends DingTalkBaseFDC {
 
     @Override
     public Collection<String> getOtherType() {
-        return Collections.singletonList("TableField");
+        return LarkFormType.TABLE.getLarkType();
     }
 }

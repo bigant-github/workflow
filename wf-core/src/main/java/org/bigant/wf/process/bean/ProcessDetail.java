@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
-import org.bigant.wf.instances.form.ComponentType;
+import org.bigant.wf.ComponentType;
 
 import java.util.List;
 

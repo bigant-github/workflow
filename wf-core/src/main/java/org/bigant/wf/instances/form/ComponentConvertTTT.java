@@ -1,7 +1,7 @@
 package org.bigant.wf.instances.form;
 
 import org.bigant.wf.exception.WfException;
-import org.bigant.wf.instances.form.ComponentType;
+import org.bigant.wf.ComponentType;
 
 /**
  * 组件转换器

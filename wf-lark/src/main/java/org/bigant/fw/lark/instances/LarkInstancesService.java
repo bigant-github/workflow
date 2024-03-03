@@ -1,45 +1,26 @@
 package org.bigant.fw.lark.instances;
 
-import com.google.gson.annotations.SerializedName;
 import com.lark.oapi.Client;
-import com.lark.oapi.core.request.RequestOptions;
-import com.lark.oapi.core.response.BaseResponse;
-import com.lark.oapi.core.response.RawResponse;
-import com.lark.oapi.core.token.AccessTokenType;
 import com.lark.oapi.core.utils.Jsons;
-import com.lark.oapi.core.utils.UnmarshalRespUtil;
 import com.lark.oapi.service.approval.v4.model.*;
-import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.bigant.fw.lark.IOUtils;
 import org.bigant.fw.lark.LarkConfig;
 import org.bigant.fw.lark.LarkConstant;
+import org.bigant.fw.lark.instances.form.LarkFDCF;
+import org.bigant.fw.lark.instances.form.convert.LarkBaseFDC;
 import org.bigant.fw.lark.process.LarkProcessService;
 import org.bigant.wf.exception.WfException;
-import org.bigant.wf.instances.form.ComponentConvertTTT;
-import org.bigant.wf.instances.form.FormData;
-import org.bigant.wf.instances.form.FormDataParseAll;
-import org.bigant.wf.instances.form.ComponentType;
-import org.bigant.wf.instances.form.databean.FormDataAttachment;
-import org.bigant.wf.instances.form.databean.FormDataDate;
-import org.bigant.wf.instances.form.databean.FormDataDateRange;
-import org.bigant.wf.instances.form.databean.FormDataImage;
-import org.bigant.wf.form.option.MultiSelectOption;
-import org.bigant.wf.form.option.SelectOption;
 import org.bigant.wf.instances.InstancesService;
 import org.bigant.wf.instances.bean.*;
+import org.bigant.wf.instances.form.FormData;
 import org.bigant.wf.process.bean.ProcessDetail;
 import org.bigant.wf.user.UserService;
 
-import java.io.File;
-import java.net.URL;
-import java.time.Duration;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -50,6 +31,7 @@ import java.util.stream.Collectors;
  * @date 2024/2/1815:49
  */
 @Slf4j
+@AllArgsConstructor
 public class LarkInstancesService implements InstancesService {
 
     private LarkConfig larkConfig;
@@ -58,14 +40,8 @@ public class LarkInstancesService implements InstancesService {
 
     private UserService userService;
 
-    private FormConvert formConvert;
+    private LarkFDCF larkFDCF;
 
-    public LarkInstancesService(LarkConfig larkConfig, LarkProcessService larkProcessService, UserService userService) {
-        this.larkConfig = larkConfig;
-        this.userService = userService;
-        this.larkProcessService = larkProcessService;
-        formConvert = new FormConvert(larkConfig);
-    }
 
     /**
      * 发起审批实例
@@ -209,6 +185,34 @@ public class LarkInstancesService implements InstancesService {
     @Override
     public InstanceDetailResult detail(String instanceCode) {
 
+        // 创建请求对象
+        GetInstanceReq getInstanceReq = GetInstanceReq.newBuilder()
+                .instanceId(instanceCode)
+                .build();
+        // 发起请求
+        GetInstanceResp resp;
+        try {
+            resp = larkConfig.getClient().approval().instance().get(getInstanceReq);
+        } catch (Exception e) {
+            String errMsg = String.format("飞书-创建查询审批实例失败。instanceCode:%s", instanceCode);
+            log.error(errMsg);
+            throw new WfException(errMsg, e);
+        }
+
+        // 处理服务端错误
+        if (!resp.success()) {
+            String errMsg = String.format("飞书-创建查询审批实例失败。instanceCode:%s,code:%s,msg:%s,reqId:%s",
+                    instanceCode,
+                    resp.getCode(),
+                    resp.getMsg(),
+                    resp.getRequestId());
+            log.error(errMsg);
+            throw new WfException(errMsg);
+        }
+
+        GetInstanceRespBody body = resp.getData();
+        log.debug("飞书-创建查询审批实例成功。instanceCode:{},data:{}", instanceCode, Jsons.DEFAULT.toJson(body));
+        String form = body.getForm();
 
         return null;
     }
@@ -274,8 +278,16 @@ public class LarkInstancesService implements InstancesService {
 
 
     public Map<String, Object> parseFormValues(FormData formComponents, ProcessDetail.FormItem formItem) {
-
-        return formConvert.convert(formComponents.getComponentType(), new FormItemConvert(formComponents, formItem));
+        if (!formComponents.getComponentType().equals(formItem.getType())) {
+            String errMsg = String.format("飞书-转换表单内容失败，传入表单类型与飞书平台配置类型不匹配或飞书平台设置类型系统不支持。name:%s,系统类型:%s,飞书类型:%s",
+                    formItem.getName(),
+                    formComponents.getComponentType(),
+                    formItem.getType());
+            log.error(errMsg);
+            throw new WfException(errMsg);
+        }
+        return larkFDCF.getByFormType(formComponents.getComponentType())
+                .toOther(new LarkBaseFDC.FormItemConvert(formComponents, formItem));
     }
 
 
@@ -285,14 +297,14 @@ public class LarkInstancesService implements InstancesService {
     }
 
 
-    @Slf4j
+    /*@Slf4j
     @AllArgsConstructor
-    public static class FormConvert extends ComponentConvertTTT<FormItemConvert, Map<String, Object>> {
+    public static class FormConvert extends ComponentConvertTTT<LarkBaseFDC.FormItemConvert, Map<String, Object>> {
 
         private LarkConfig larkConfig;
 
         @Override
-        public Map<String, Object> convert(ComponentType type, FormItemConvert component) {
+        public Map<String, Object> convert(ComponentType type, LarkBaseFDC.FormItemConvert component) {
             if (!type.equals(component.getFormItem().getType())) {
                 String errMsg = String.format("飞书-转换表单内容失败，传入表单类型与飞书平台配置类型不匹配或飞书平台设置类型系统不支持。name:%s,系统类型:%s,飞书类型:%s",
                         component.getFormItem().getName(),
@@ -305,17 +317,17 @@ public class LarkInstancesService implements InstancesService {
         }
 
         @Override
-        protected Map<String, Object> text(FormItemConvert component) {
+        protected Map<String, Object> text(LarkBaseFDC.FormItemConvert component) {
             return this.base(component, "input", component.getFormComponents().getValue());
         }
 
         @Override
-        protected Map<String, Object> textarea(FormItemConvert component) {
+        protected Map<String, Object> textarea(LarkBaseFDC.FormItemConvert component) {
             return this.base(component, "textarea", component.getFormComponents().getValue());
         }
 
         @Override
-        protected Map<String, Object> select(FormItemConvert component) {
+        protected Map<String, Object> select(LarkBaseFDC.FormItemConvert component) {
 
             SelectOption option = (SelectOption) component.getFormItem().getOption();
 
@@ -326,9 +338,9 @@ public class LarkInstancesService implements InstancesService {
         }
 
         @Override
-        protected Map<String, Object> multiSelect(FormItemConvert component) {
+        protected Map<String, Object> multiSelect(LarkBaseFDC.FormItemConvert component) {
 
-            List<String> list = FormDataParseAll
+            Collection<String> list = FormDataParseAll
                     .COMPONENT_PARSE_MULTI_SELECT
                     .strToJava(component.getFormComponents().getValue());
 
@@ -343,7 +355,7 @@ public class LarkInstancesService implements InstancesService {
         }
 
         @Override
-        protected Map<String, Object> date(FormItemConvert component) {
+        protected Map<String, Object> date(LarkBaseFDC.FormItemConvert component) {
 
             FormDataDate formDataDate = FormDataParseAll
                     .COMPONENT_PARSE_DATE
@@ -354,7 +366,7 @@ public class LarkInstancesService implements InstancesService {
         }
 
         @Override
-        protected Map<String, Object> dateRange(FormItemConvert component) {
+        protected Map<String, Object> dateRange(LarkBaseFDC.FormItemConvert component) {
             FormDataDateRange dateRange = FormDataParseAll
                     .COMPONENT_PARSE_DATE_RANGE
                     .strToJava(component.getFormComponents().getValue());
@@ -386,21 +398,21 @@ public class LarkInstancesService implements InstancesService {
         }
 
         @Override
-        protected Map<String, Object> number(FormItemConvert component) {
+        protected Map<String, Object> number(LarkBaseFDC.FormItemConvert component) {
             return this.base(component, "number", component.getFormComponents().getValue());
         }
 
         @Override
-        protected Map<String, Object> amount(FormItemConvert component) {
+        protected Map<String, Object> amount(LarkBaseFDC.FormItemConvert component) {
             Map<String, Object> map = this.base(component, "amount", component.getFormComponents().getValue());
             map.put("currency", "CNY");
             return map;
         }
 
         @Override
-        protected Map<String, Object> image(FormItemConvert component) {
+        protected Map<String, Object> image(LarkBaseFDC.FormItemConvert component) {
 
-            List<FormDataImage> formDataImages = FormDataParseAll
+            Collection<FormDataImage> formDataImages = FormDataParseAll
                     .COMPONENT_PARSE_IMAGE
                     .strToJava(component.getFormComponents().getValue());
 
@@ -420,8 +432,8 @@ public class LarkInstancesService implements InstancesService {
 
 
         @Override
-        protected Map<String, Object> attachment(FormItemConvert component) {
-            List<FormDataAttachment> formDataAttachments = FormDataParseAll
+        protected Map<String, Object> attachment(LarkBaseFDC.FormItemConvert component) {
+            Collection<FormDataAttachment> formDataAttachments = FormDataParseAll
                     .COMPONENT_PARSE_ATTACHMENT
                     .strToJava(component.getFormComponents().getValue());
 
@@ -438,7 +450,7 @@ public class LarkInstancesService implements InstancesService {
         }
 
         @Override
-        protected Map<String, Object> unknown(FormItemConvert component) {
+        protected Map<String, Object> unknown(LarkBaseFDC.FormItemConvert component) {
             String errMsg = String.format("飞书-转换表单内容失败，无法识别的类型。name:%s,id:%s,value:%s",
                     component.getFormItem().getName(),
                     component.getFormItem().getId(),
@@ -448,7 +460,7 @@ public class LarkInstancesService implements InstancesService {
         }
 
         @Override
-        protected Map<String, Object> table(FormItemConvert component) {
+        protected Map<String, Object> table(LarkBaseFDC.FormItemConvert component) {
 
             Collection<Collection<FormData>> table = FormDataParseAll
                     .COMPONENT_PARSE_TABLE
@@ -461,7 +473,7 @@ public class LarkInstancesService implements InstancesService {
             List<List<Map<String, Object>>> value = table.stream()
                     .map(row -> row.stream()
                             .map(x -> this.convert(x.getComponentType()
-                                    , new FormItemConvert(x, childrenMap.get(x.getName()))))
+                                    , new LarkBaseFDC.FormItemConvert(x, childrenMap.get(x.getName()))))
                             .collect(Collectors.toList()))
                     .collect(Collectors.toList());
 
@@ -469,7 +481,7 @@ public class LarkInstancesService implements InstancesService {
             return this.base(component, "fieldList", value);
         }
 
-        private Map<String, Object> base(FormItemConvert component, String type, Object value) {
+        private Map<String, Object> base(LarkBaseFDC.FormItemConvert component, String type, Object value) {
             HashMap<String, Object> map = new HashMap<>(3);
             map.put("id", component.getFormItem().getId());
             map.put("type", type);
@@ -502,7 +514,7 @@ public class LarkInstancesService implements InstancesService {
                 RequestOptions reqOptions = new RequestOptions();
                 reqOptions.setSupportUpload(true);
 
-                UploadFileBody fileBody = UploadFileBody.builder()
+                LarkFile.UploadFileBody fileBody = LarkFile.UploadFileBody.builder()
                         .content(file)
                         .name(fileName)
                         .type(type)
@@ -513,7 +525,7 @@ public class LarkInstancesService implements InstancesService {
                         , AccessTokenType.Tenant, reqOptions);
 
                 // 反序列化
-                UploadFileRsp resp = UnmarshalRespUtil.unmarshalResp(rsp, UploadFileRsp.class);
+                LarkFile.UploadFileRsp resp = UnmarshalRespUtil.unmarshalResp(rsp, LarkFile.UploadFileRsp.class);
                 //上传失败
                 if (!resp.success()) {
                     String errMsg = String.format("飞书-上传审批文件失败 name:%s,filesize:%s,filepath:%s,code:%s,msg:%s",
@@ -538,9 +550,9 @@ public class LarkInstancesService implements InstancesService {
                 throw new WfException(errMsg, e);
             } finally {
                 try {
-                    /*if (file != null) {
+                    if (file != null) {
                         file.delete();
-                    }*/
+                    }
                     if (dir != null) {
                         boolean delete = dir.delete();
                     }
@@ -551,32 +563,7 @@ public class LarkInstancesService implements InstancesService {
             }
         }
 
-        @ApiModel("飞书-上传审批文件参数")
-        @Data
-        @Builder
-        public static class UploadFileBody {
-            @SerializedName("name")
-            private String name;
-            @SerializedName("type")
-            private String type;
-            @SerializedName("content")
-            private File content;
-        }
 
-        @ApiModel("飞书-上传文件返回")
-        @Data
-        @Builder
-        public static class UploadFileRsp extends BaseResponse<Map<String, String>> {
+    }*/
 
-        }
-
-
-    }
-
-    @Data
-    @AllArgsConstructor
-    public static class FormItemConvert {
-        private FormData formComponents;
-        private ProcessDetail.FormItem formItem;
-    }
 }

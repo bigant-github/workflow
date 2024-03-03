@@ -1,6 +1,6 @@
 package org.bigant.wf.instances.form;
 
-import java.util.Collection;
+import org.bigant.wf.ComponentTypeAndOtherType;
 
 /**
  * 控件转换器
@@ -9,14 +9,10 @@ import java.util.Collection;
  * @author galen
  * @date 2024/1/3115:33
  */
-public interface FormDataConvert<R, P> {
+public interface FormDataConvert<R, OP, FP> extends ComponentTypeAndOtherType {
 
-    R toOther(FormData component);
+    R toOther(OP component);
 
-    FormData toFormData(P component);
-
-    ComponentType getType();
-
-    Collection<String> getOtherType();
+    FormData toFormData(FP component);
 
 }

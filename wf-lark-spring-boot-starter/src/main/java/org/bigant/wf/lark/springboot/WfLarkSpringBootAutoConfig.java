@@ -3,7 +3,9 @@ package org.bigant.wf.lark.springboot;
 import com.lark.oapi.Client;
 import org.bigant.fw.lark.LarkCallback;
 import org.bigant.fw.lark.LarkConfig;
+import org.bigant.fw.lark.LarkFile;
 import org.bigant.fw.lark.instances.LarkInstancesService;
+import org.bigant.fw.lark.instances.form.LarkFDCF;
 import org.bigant.fw.lark.process.LarkProcessService;
 import org.bigant.wf.Factory;
 import org.bigant.wf.cache.ICache;
@@ -60,6 +62,13 @@ public class WfLarkSpringBootAutoConfig {
 
     @Bean
     @ConditionalOnMissingBean
+    public LarkFile larkFile(LarkConfig larkConfig) {
+        return new LarkFile(larkConfig);
+    }
+
+
+    @Bean
+    @ConditionalOnMissingBean
     public LarkProcessService larkProcessService(LarkConfig larkConfig) {
         LarkProcessService larkProcessService = new LarkProcessService(larkConfig);
         Factory.registerProcessService(larkProcessService.getType(), larkProcessService);
@@ -68,8 +77,17 @@ public class WfLarkSpringBootAutoConfig {
 
     @Bean
     @ConditionalOnMissingBean
-    public LarkInstancesService larkInstancesService(LarkConfig larkConfig, LarkProcessService larkProcessService, UserService userService) {
-        LarkInstancesService larkInstancesService = new LarkInstancesService(larkConfig, larkProcessService, userService);
+    public LarkFDCF larkFDCF(LarkFile larkFile) {
+        return new LarkFDCF(larkFile);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public LarkInstancesService larkInstancesService(LarkConfig larkConfig,
+                                                     LarkProcessService larkProcessService,
+                                                     UserService userService,
+                                                     LarkFDCF larkFDCF) {
+        LarkInstancesService larkInstancesService = new LarkInstancesService(larkConfig, larkProcessService, userService, larkFDCF);
         Factory.registerInstancesService(larkInstancesService.getType(), larkInstancesService);
         return larkInstancesService;
     }

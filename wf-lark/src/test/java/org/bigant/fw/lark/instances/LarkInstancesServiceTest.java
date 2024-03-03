@@ -3,14 +3,15 @@ package org.bigant.fw.lark.instances;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bigant.fw.lark.BaseTest;
+import org.bigant.fw.lark.instances.form.LarkFDCF;
 import org.bigant.fw.lark.process.LarkProcessService;
-import org.bigant.wf.instances.form.FormData;
 import org.bigant.wf.form.option.AmountOption;
-import org.bigant.wf.instances.form.databean.FormDataAttachment;
-import org.bigant.wf.instances.form.databean.FormDataImage;
 import org.bigant.wf.form.option.DateOption;
 import org.bigant.wf.instances.bean.InstanceDetailResult;
 import org.bigant.wf.instances.bean.InstanceStart;
+import org.bigant.wf.instances.form.FormData;
+import org.bigant.wf.instances.form.databean.FormDataAttachment;
+import org.bigant.wf.instances.form.databean.FormDataImage;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -23,7 +24,6 @@ import java.util.Arrays;
  */
 @Slf4j
 public class LarkInstancesServiceTest extends BaseTest {
-
 
 
     @Test
@@ -85,7 +85,7 @@ public class LarkInstancesServiceTest extends BaseTest {
     }
 
 
-    public void detail(){
+    public void detail() {
         String larkTestProcessCode = System.getenv("larkTestInstanceCode");
 
         InstanceDetailResult detail = getLarkInstancesService().detail(larkTestProcessCode);
@@ -95,9 +95,11 @@ public class LarkInstancesServiceTest extends BaseTest {
     public LarkInstancesService getLarkInstancesService() {
         LarkProcessService processService = new LarkProcessService(larkConfig);
 
+
         return new LarkInstancesService(larkConfig,
                 processService,
-                userService);
+                userService,
+                new LarkFDCF(larkFile));
 
     }
 

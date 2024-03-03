@@ -6,6 +6,7 @@ import org.bigant.fw.dingtalk.DingTalkConfig;
 import org.bigant.fw.dingtalk.DingTalkUser;
 import org.bigant.fw.dingtalk.instances.form.convert.*;
 import org.bigant.wf.cache.ICache;
+import org.bigant.wf.instances.form.FormData;
 import org.bigant.wf.instances.form.FormDataConvertFactory;
 
 import java.util.Map;
@@ -20,6 +21,7 @@ import java.util.Map;
 public class DingTalkFDCF
         extends FormDataConvertFactory<
         Map<String, String>,
+        FormData,
         GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues,
         DingTalkBaseFDC> {
 

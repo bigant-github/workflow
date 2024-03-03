@@ -16,7 +16,7 @@ import org.bigant.fw.dingtalk.DingTalkFile;
 import org.bigant.fw.dingtalk.DingTalkUser;
 import org.bigant.wf.cache.ICache;
 import org.bigant.wf.exception.WfException;
-import org.bigant.wf.instances.form.ComponentType;
+import org.bigant.wf.ComponentType;
 import org.bigant.wf.instances.form.FormData;
 import org.bigant.wf.instances.form.FormDataParseAll;
 import org.bigant.wf.instances.form.databean.FormDataAttachment;
@@ -51,7 +51,7 @@ public class DingTalkAttachmentFDC extends DingTalkBaseFDC {
 
         String unionId = dingTalkUser.getUnionId(dingTalkUserId);
 
-        List<FormDataAttachment> formDataAttachments =
+        Collection<FormDataAttachment> formDataAttachments =
                 FormDataParseAll.COMPONENT_PARSE_ATTACHMENT.strToJava(data.getValue());
         JSONArray array = new JSONArray();
         for (FormDataAttachment formDataAttachment : formDataAttachments) {

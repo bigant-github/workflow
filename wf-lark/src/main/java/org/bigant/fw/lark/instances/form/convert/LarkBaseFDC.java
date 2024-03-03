@@ -1,11 +1,14 @@
-package org.bigant.fw.dingtalk.instances.form.convert;
+package org.bigant.fw.lark.instances.form.convert;
 
-import com.aliyun.dingtalkworkflow_1_0.models.GetProcessInstanceResponseBody;
+import com.alibaba.fastjson2.JSONObject;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.bigant.wf.exception.WfException;
 import org.bigant.wf.form.option.DateOption;
 import org.bigant.wf.instances.form.FormData;
 import org.bigant.wf.instances.form.FormDataConvert;
+import org.bigant.wf.process.bean.ProcessDetail;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -19,19 +22,11 @@ import java.util.Map;
  * @date 2024/3/115:38
  */
 @Slf4j
-public abstract class DingTalkBaseFDC implements FormDataConvert<Map<String, String>, FormData
-        , GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues> {
+public abstract class LarkBaseFDC implements FormDataConvert<Map<String, Object>, LarkBaseFDC.FormItemConvert
+        , JSONObject> {
 
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
-    @Override
-    public Map<String, String> toOther(FormData component) {
-        throw new WfException("钉钉-类型转换器暂不支持使用此方法，请使用toOther(FormComponent,String)方法。");
-    }
-
-
-    public abstract Map<String, String> toOther(FormData component, String dingTalkUserId);
 
 
     /**
@@ -45,16 +40,6 @@ public abstract class DingTalkBaseFDC implements FormDataConvert<Map<String, Str
         return map;
     }
 
-    /**
-     * 快速构建map
-     *
-     * @return
-     */
-    public Map<String, String> toMap(String name, String value) {
-        HashMap<String, String> map = new HashMap<>(1);
-        map.put(name, value);
-        return map;
-    }
 
     /**
      * 日期格式
@@ -98,4 +83,18 @@ public abstract class DingTalkBaseFDC implements FormDataConvert<Map<String, Str
 
     }
 
+    protected Map<String, Object> base(FormItemConvert component, String type, Object value) {
+        HashMap<String, Object> map = new HashMap<>(3);
+        map.put("id", component.getFormItem().getId());
+        map.put("type", type);
+        map.put("value", value);
+        return map;
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class FormItemConvert {
+        private FormData formComponents;
+        private ProcessDetail.FormItem formItem;
+    }
 }

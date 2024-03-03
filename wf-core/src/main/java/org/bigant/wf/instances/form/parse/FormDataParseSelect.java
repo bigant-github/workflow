@@ -1,6 +1,6 @@
 package org.bigant.wf.instances.form.parse;
 
-import org.bigant.wf.instances.form.ComponentType;
+import org.bigant.wf.ComponentType;
 import org.bigant.wf.instances.form.FormDataParse;
 
 /**

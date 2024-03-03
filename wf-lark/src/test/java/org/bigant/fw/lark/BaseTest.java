@@ -4,6 +4,8 @@ import org.bigant.wf.user.UserService;
 import org.bigant.wf.user.vo.User;
 import org.junit.Before;
 
+import java.util.Arrays;
+
 /**
  * 基础测试
  *
@@ -14,6 +16,7 @@ public class BaseTest {
 
     protected LarkConfig larkConfig;
     protected UserService userService;
+    protected LarkFile larkFile;
 
 
     @Before
@@ -31,7 +34,12 @@ public class BaseTest {
 
             @Override
             public User getUser(String id) {
-                return null;
+                return User.builder()
+                        .userId("1")
+                        .userName("galen")
+                        .deptName(Arrays.asList("研发部"))
+                        .build();
+
             }
 
             @Override
@@ -43,7 +51,19 @@ public class BaseTest {
             public String getOtherDeptIdByDeptId(String deptId, String thirdPartyType) {
                 return larkDeptId;
             }
+
+            @Override
+            public String getUserIdByOtherUserId(String otherUserId, String type) {
+                return null;
+            }
+
+            @Override
+            public String getByDeptIdByOtherDeptId(String otherDeptId, String type) {
+                return null;
+            }
         };
+
+        this.larkFile = new LarkFile(larkConfig);
     }
 
 

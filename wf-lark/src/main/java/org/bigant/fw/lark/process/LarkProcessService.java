@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.bigant.fw.lark.LarkConfig;
 import org.bigant.fw.lark.LarkConstant;
 import org.bigant.wf.exception.WfException;
-import org.bigant.wf.instances.form.ComponentType;
+import org.bigant.wf.ComponentType;
 import org.bigant.wf.form.option.MultiSelectOption;
 import org.bigant.wf.form.option.SelectOption;
 import org.bigant.wf.process.ProcessService;

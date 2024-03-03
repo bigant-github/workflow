@@ -1,5 +1,7 @@
 package org.bigant.wf.instances.form;
 
+import org.bigant.wf.ComponentType;
+
 /**
  * 组建工具
  *

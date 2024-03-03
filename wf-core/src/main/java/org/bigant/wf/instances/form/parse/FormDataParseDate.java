@@ -2,7 +2,7 @@ package org.bigant.wf.instances.form.parse;
 
 import com.alibaba.fastjson2.JSONObject;
 import org.bigant.wf.instances.form.FormDataParse;
-import org.bigant.wf.instances.form.ComponentType;
+import org.bigant.wf.ComponentType;
 import org.bigant.wf.instances.form.databean.FormDataDate;
 
 /**
