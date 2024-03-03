@@ -1,0 +1,78 @@
+{
+  "deptId": "903745013",
+  "formData": [
+    {
+      "componentType": "TEXT",
+      "name": "单行输入框",
+      "value": "测试"
+    },
+    {
+      "componentType": "TEXTAREA",
+      "name": "多行输入框",
+      "value": "测试"
+    },
+    {
+      "componentType": "NUMBER",
+      "name": "数字输入框",
+      "value": "1"
+    },
+    {
+      "componentType": "AMOUNT",
+      "name": "金额（元）",
+      "value": "{\"amount\":1.23,\"amountType\":\"CNY\"}"
+    },
+    {
+      "componentType": "SELECT",
+      "name": "单选框",
+      "value": "选项1"
+    },
+    {
+      "componentType": "MULTI_SELECT",
+      "name": "多选框",
+      "value": "[\"选项1\",\"选项2\"]"
+    },
+    {
+      "componentType": "DATE",
+      "name": "日期",
+      "value": "{\"date\":\"2024-03-02 00:00:00\",\"dateFormat\":\"YYYY_MM_DD\"}"
+    },
+    {
+      "componentType": "DATE_RANGE",
+      "name": "[\"开始时间\",\"结束时间\"]",
+      "value": "{\"begin\":\"2024-03-02 00:00:00\",\"dateFormat\":\"YYYY_MM_DD\",\"end\":\"2024-03-02 00:00:00\"}"
+    },
+    {
+      "componentType": "ATTACHMENT",
+      "name": "附件",
+      "value": "[{\"name\":\"测试1(23).gif\",\"size\":63086},{\"name\":\"测试2(23).gif\",\"size\":63086},{\"name\":\"测试3(11).gif\",\"size\":63086}]"
+    },
+    {
+      "componentType": "IMAGE",
+      "name": "图片",
+      "value": "[{\"url\":\"https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF\"},{\"url\":\"https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF\"},{\"url\":\"https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF\"}]"
+    },
+    {
+      "componentType": "TABLE",
+      "name": "表格",
+      "value": "[[{\"componentType\":\"ATTACHMENT\",\"name\":\"附件\",\"value\":\"[{\\\"name\\\":\\\"测试1(24).gif\\\",\\\"size\\\":63086},{\\\"name\\\":\\\"测试2(24).gif\\\",\\\"size\\\":63086}]\"},{\"componentType\":\"TEXT\",\"name\":\"单行输入框\",\"value\":\"表格单行输入框1\"},{\"componentType\":\"DATE\",\"name\":\"日期\",\"value\":\"{\\\"date\\\":\\\"2024-03-02 21:00:00\\\",\\\"dateFormat\\\":\\\"YYYY_MM_DD_HH_MM\\\"}\"}],[{\"componentType\":\"ATTACHMENT\",\"name\":\"附件\",\"value\":\"[{\\\"name\\\":\\\"测试1(25).gif\\\",\\\"size\\\":63086},{\\\"name\\\":\\\"测试2(25).gif\\\",\\\"size\\\":63086}]\"},{\"componentType\":\"TEXT\",\"name\":\"单行输入框\",\"value\":\"表格单行输入框2\"},{\"componentType\":\"DATE\",\"name\":\"日期\",\"value\":\"{\\\"date\\\":\\\"2024-03-02 21:00:00\\\",\\\"dateFormat\\\":\\\"YYYY_MM_DD_HH_MM\\\"}\"}]]"
+    }
+  ],
+  "instanceCode": "htlPGgYtRs2rsjY3RYbb2Q06791709384453",
+  "status": "AGREED",
+  "tasks": [
+    {
+      "status": "CANCELED",
+      "taskId": "85246850431",
+      "userId": "tt",
+      "userName": "galen"
+    },
+    {
+      "status": "CANCELED",
+      "taskId": "85269499294",
+      "userId": "tt",
+      "userName": "galen"
+    }
+  ],
+  "title": "高亚鹏提交的数字化中心测试",
+  "userId": "tt"
+}

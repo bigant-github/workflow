@@ -1,8 +1,8 @@
 package org.bigant.fw.dingtalk.instances.form.convert;
 
 import com.aliyun.dingtalkworkflow_1_0.models.GetProcessInstanceResponseBody;
-import org.bigant.wf.instances.form.FormData;
 import org.bigant.wf.instances.form.ComponentType;
+import org.bigant.wf.instances.form.FormData;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -17,13 +17,14 @@ import java.util.Map;
 public class DingTalkTextFDC extends DingTalkBaseFDC {
 
     @Override
-    public Map<String, String> toOther(FormData component, String dingTalkUserId) {
-        return toOtherValue(component);
+    public Map<String, String> toOther(FormData data, String dingTalkUserId) {
+        return toOtherValue(data);
     }
 
     @Override
-    public FormData toFormData(GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues component) {
-        return FormData.text(component.getName(), component.getValue());
+    public FormData toFormData(
+            GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues data) {
+        return FormData.text(data.getName(), data.getValue());
     }
 
     @Override

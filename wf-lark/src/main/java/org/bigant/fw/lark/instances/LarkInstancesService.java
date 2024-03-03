@@ -23,10 +23,10 @@ import org.bigant.wf.instances.form.ComponentConvertTTT;
 import org.bigant.wf.instances.form.FormData;
 import org.bigant.wf.instances.form.FormDataParseAll;
 import org.bigant.wf.instances.form.ComponentType;
-import org.bigant.wf.instances.form.databean.AttachmentComponent;
-import org.bigant.wf.instances.form.databean.DateComponent;
-import org.bigant.wf.instances.form.databean.DateRangeComponent;
-import org.bigant.wf.instances.form.databean.ImageComponent;
+import org.bigant.wf.instances.form.databean.FormDataAttachment;
+import org.bigant.wf.instances.form.databean.FormDataDate;
+import org.bigant.wf.instances.form.databean.FormDataDateRange;
+import org.bigant.wf.instances.form.databean.FormDataImage;
 import org.bigant.wf.form.option.MultiSelectOption;
 import org.bigant.wf.form.option.SelectOption;
 import org.bigant.wf.instances.InstancesService;
@@ -57,8 +57,6 @@ public class LarkInstancesService implements InstancesService {
     private LarkProcessService larkProcessService;
 
     private UserService userService;
-
-    private FormConvert formConvert;
 
     private FormConvert formConvert;
 
@@ -96,7 +94,7 @@ public class LarkInstancesService implements InstancesService {
 
         List<InstanceStart.TargetSelectUser> targetSelectUsers = instanceStart.getTargetSelectUsers();
         List<InstanceStart.TargetSelectUserAuthMatch> targetSelectUsersAuthMatch = instanceStart.getTargetSelectUsersAuthMatch();
-        if (targetSelectUsers != null && targetSelectUsers.size() > 0) {
+        if (targetSelectUsers != null && !targetSelectUsers.isEmpty()) {
             targetSelectUsers.forEach(targetSelectUser -> {
 
                 String[] userIds = targetSelectUser.getUserIds().stream()
@@ -109,7 +107,7 @@ public class LarkInstancesService implements InstancesService {
                         .value(userIds)
                         .build());
             });
-        } else if (targetSelectUsersAuthMatch != null && targetSelectUsersAuthMatch.size() > 0) {
+        } else if (targetSelectUsersAuthMatch != null && !targetSelectUsersAuthMatch.isEmpty()) {
             // 自选节点自动匹配
             log.debug("飞书-发起审批实例：code:{}，共{}个节点，使用自选节点自动匹配。", instanceStart.getProcessCode(), targetSelectUsersAuthMatch.size());
 
@@ -264,10 +262,10 @@ public class LarkInstancesService implements InstancesService {
     }
 
 
-    public String parseFormValues(List<FormData> formData, Map<String, ProcessDetail.FormItem> formItemMap) {
+    public String parseFormValues(List<FormData> formDataList, Map<String, ProcessDetail.FormItem> formItemMap) {
 
         ArrayList<Map<String, Object>> maps = new ArrayList<>();
-        for (FormData formData : formData) {
+        for (FormData formData : formDataList) {
             maps.add(this.parseFormValues(formData, formItemMap.get(formData.getName())));
         }
 
@@ -347,17 +345,17 @@ public class LarkInstancesService implements InstancesService {
         @Override
         protected Map<String, Object> date(FormItemConvert component) {
 
-            DateComponent dateComponent = FormDataParseAll
+            FormDataDate formDataDate = FormDataParseAll
                     .COMPONENT_PARSE_DATE
                     .strToJava(component.getFormComponents().getValue());
 
-            return this.base(component, "date", dateComponent.getDate().atOffset(ZoneOffset.ofHours(8))
+            return this.base(component, "date", formDataDate.getDate().atOffset(ZoneOffset.ofHours(8))
                     .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
         }
 
         @Override
         protected Map<String, Object> dateRange(FormItemConvert component) {
-            DateRangeComponent dateRange = FormDataParseAll
+            FormDataDateRange dateRange = FormDataParseAll
                     .COMPONENT_PARSE_DATE_RANGE
                     .strToJava(component.getFormComponents().getValue());
             String begin = dateRange.getBegin().atOffset(ZoneOffset.ofHours(8))
@@ -402,17 +400,17 @@ public class LarkInstancesService implements InstancesService {
         @Override
         protected Map<String, Object> image(FormItemConvert component) {
 
-            List<ImageComponent> imageComponents = FormDataParseAll
+            List<FormDataImage> formDataImages = FormDataParseAll
                     .COMPONENT_PARSE_IMAGE
                     .strToJava(component.getFormComponents().getValue());
 
             List<String> list = new ArrayList<>();
-            for (ImageComponent imageComponent : imageComponents) {
+            for (FormDataImage formDataImage : formDataImages) {
 
                 String code = uploadFile("image",
-                        imageComponent.getName(),
-                        imageComponent.getUrl(),
-                        imageComponent.getSize());
+                        formDataImage.getName(),
+                        formDataImage.getUrl(),
+                        formDataImage.getSize());
                 list.add(code);
 
             }
@@ -423,16 +421,16 @@ public class LarkInstancesService implements InstancesService {
 
         @Override
         protected Map<String, Object> attachment(FormItemConvert component) {
-            List<AttachmentComponent> attachmentComponents = FormDataParseAll
+            List<FormDataAttachment> formDataAttachments = FormDataParseAll
                     .COMPONENT_PARSE_ATTACHMENT
                     .strToJava(component.getFormComponents().getValue());
 
             List<String> list = new ArrayList<>();
-            for (AttachmentComponent attachmentComponent : attachmentComponents) {
+            for (FormDataAttachment formDataAttachment : formDataAttachments) {
                 String code = uploadFile("attachment",
-                        attachmentComponent.getName(),
-                        attachmentComponent.getUrl(),
-                        attachmentComponent.getSize());
+                        formDataAttachment.getName(),
+                        formDataAttachment.getUrl(),
+                        formDataAttachment.getSize());
                 list.add(code);
             }
 

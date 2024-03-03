@@ -5,7 +5,7 @@ import org.bigant.wf.instances.form.FormData;
 import org.bigant.wf.form.option.AmountOption;
 import org.bigant.wf.instances.form.FormDataParseAll;
 import org.bigant.wf.instances.form.ComponentType;
-import org.bigant.wf.instances.form.databean.AmountComponent;
+import org.bigant.wf.instances.form.databean.FormDataAmount;
 
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -21,18 +21,18 @@ import java.util.Map;
 public class DingTalkAmountFDC extends DingTalkBaseFDC {
 
     @Override
-    public Map<String, String> toOther(FormData component, String dingTalkUserId) {
-        AmountComponent value =
-                FormDataParseAll.COMPONENT_PARSE_AMOUNT.strToJava(component.getValue());
-        return this.toMap(component.getName(), value.getAmount().toString());
+    public Map<String, String> toOther(FormData data, String dingTalkUserId) {
+        FormDataAmount value =
+                FormDataParseAll.COMPONENT_PARSE_AMOUNT.strToJava(data.getValue());
+        return this.toMap(data.getName(), value.getAmount().toString());
     }
 
     @Override
     public FormData toFormData(
-            GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues component) {
+            GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues data) {
 
-        return FormData.amount(component.getName(),
-                new BigDecimal(component.getValue()),
+        return FormData.amount(data.getName(),
+                new BigDecimal(data.getValue()),
                 AmountOption.AmountType.CNY);
     }
 

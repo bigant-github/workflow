@@ -1,10 +1,14 @@
 package org.bigant.fw.dingtalk.instances.form.convert;
 
 import com.aliyun.dingtalkworkflow_1_0.models.GetProcessInstanceResponseBody;
+import lombok.extern.slf4j.Slf4j;
 import org.bigant.wf.exception.WfException;
+import org.bigant.wf.form.option.DateOption;
 import org.bigant.wf.instances.form.FormData;
 import org.bigant.wf.instances.form.FormDataConvert;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,9 +18,12 @@ import java.util.Map;
  * @author galen
  * @date 2024/3/115:38
  */
+@Slf4j
 public abstract class DingTalkBaseFDC implements FormDataConvert<Map<String, String>
         , GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues> {
 
+
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Override
     public Map<String, String> toOther(FormData component) {
@@ -47,6 +54,48 @@ public abstract class DingTalkBaseFDC implements FormDataConvert<Map<String, Str
         HashMap<String, String> map = new HashMap<>(1);
         map.put(name, value);
         return map;
+    }
+
+    /**
+     * 日期格式
+     *
+     * @param dateStr
+     * @return
+     */
+    public DateOption.ComponentDateFormat dateType(String dateStr) {
+        int length = dateStr.length();
+        //YYYY-MM-DD 格式
+        if (length == 10) {
+            return DateOption.ComponentDateFormat.YYYY_MM_DD;
+        } else if (length == 16) {
+            return DateOption.ComponentDateFormat.YYYY_MM_DD_HH_MM;
+        } else {
+            String errMsg = String.format("钉钉-无法识别的日期格式。data:%s", dateStr);
+            log.error(errMsg);
+            throw new WfException(errMsg);
+        }
+
+    }
+
+
+    /**
+     * 日期格式
+     *
+     * @param dateStr
+     * @return
+     */
+    public LocalDateTime toLocalDateTime(String dateStr, DateOption.ComponentDateFormat format) {
+        switch (format) {
+            case YYYY_MM_DD:
+                return LocalDateTime.parse(dateStr + " 00:00:00", DATE_TIME_FORMATTER);
+            case YYYY_MM_DD_HH_MM:
+                return LocalDateTime.parse(dateStr + ":00", DATE_TIME_FORMATTER);
+            default:
+                String errMsg = String.format("钉钉-无法识别的日期格式。date:%s", dateStr);
+                log.error(errMsg);
+                throw new WfException(errMsg);
+        }
+
     }
 
 }

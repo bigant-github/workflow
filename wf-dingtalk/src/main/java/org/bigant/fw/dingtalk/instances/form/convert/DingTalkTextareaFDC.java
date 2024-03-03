@@ -17,13 +17,14 @@ import java.util.Map;
 public class DingTalkTextareaFDC extends DingTalkBaseFDC {
 
     @Override
-    public Map<String, String> toOther(FormData component, String dingTalkUserId) {
-        return toOtherValue(component);
+    public Map<String, String> toOther(FormData data, String dingTalkUserId) {
+        return toOtherValue(data);
     }
 
     @Override
-    public FormData toFormData(GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues component) {
-        return FormData.textarea(component.getName(), component.getValue());
+    public FormData toFormData(
+            GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues data) {
+        return FormData.textarea(data.getName(), data.getValue());
     }
 
     @Override

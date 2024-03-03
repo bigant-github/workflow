@@ -18,14 +18,14 @@ import java.util.Map;
 public class DingTalkNumberFDC extends DingTalkBaseFDC {
 
     @Override
-    public Map<String, String> toOther(FormData component, String dingTalkUserId) {
-        return this.toOtherValue(component);
+    public Map<String, String> toOther(FormData data, String dingTalkUserId) {
+        return this.toOtherValue(data);
     }
 
     @Override
     public FormData toFormData(
-            GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues component) {
-        return FormData.number(component.getName(), new BigDecimal(component.getValue()));
+            GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues data) {
+        return FormData.number(data.getName(), new BigDecimal(data.getValue()));
     }
 
     @Override

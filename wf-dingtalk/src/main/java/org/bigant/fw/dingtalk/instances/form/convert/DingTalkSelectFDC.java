@@ -17,14 +17,14 @@ import java.util.Map;
 public class DingTalkSelectFDC extends DingTalkBaseFDC {
 
     @Override
-    public Map<String, String> toOther(FormData component, String dingTalkUserId) {
-        return toOtherValue(component);
+    public Map<String, String> toOther(FormData data, String dingTalkUserId) {
+        return toOtherValue(data);
     }
 
     @Override
     public FormData toFormData(
-            GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues component) {
-        return FormData.text(component.getName(), component.getValue());
+            GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues data) {
+        return FormData.select(data.getName(), data.getValue());
     }
 
     @Override

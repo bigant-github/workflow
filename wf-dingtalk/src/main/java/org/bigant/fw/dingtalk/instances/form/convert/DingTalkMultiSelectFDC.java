@@ -1,5 +1,6 @@
 package org.bigant.fw.dingtalk.instances.form.convert;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.aliyun.dingtalkworkflow_1_0.models.GetProcessInstanceResponseBody;
 import org.bigant.wf.instances.form.FormData;
 import org.bigant.wf.instances.form.ComponentType;
@@ -17,14 +18,14 @@ import java.util.Map;
 public class DingTalkMultiSelectFDC extends DingTalkBaseFDC {
 
     @Override
-    public Map<String, String> toOther(FormData component, String dingTalkUserId) {
-        return toOtherValue(component);
+    public Map<String, String> toOther(FormData data, String dingTalkUserId) {
+        return toOtherValue(data);
     }
 
     @Override
     public FormData toFormData(
-            GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues component) {
-        return FormData.text(component.getName(), component.getValue());
+            GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues data) {
+        return FormData.multiSelect(data.getName(), JSONArray.parseArray(data.getValue(), String.class));
     }
 
     @Override

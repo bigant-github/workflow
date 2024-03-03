@@ -5,12 +5,11 @@ import com.alibaba.fastjson2.JSONObject;
 import com.aliyun.dingtalkworkflow_1_0.models.GetProcessInstanceResponseBody;
 import lombok.AllArgsConstructor;
 import org.bigant.fw.dingtalk.instances.form.DingTalkFDCF;
-import org.bigant.wf.instances.form.FormData;
-import org.bigant.wf.form.option.AmountOption;
-import org.bigant.wf.instances.form.FormDataParseAll;
 import org.bigant.wf.instances.form.ComponentType;
+import org.bigant.wf.instances.form.FormData;
+import org.bigant.wf.instances.form.FormDataParseAll;
 
-import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -27,9 +26,9 @@ public class DingTalkTableFDC extends DingTalkBaseFDC {
     private final DingTalkFDCF dingTalkFDCF;
 
     @Override
-    public Map<String, String> toOther(FormData component, String dingTalkUserId) {
+    public Map<String, String> toOther(FormData data, String dingTalkUserId) {
         Collection<Collection<FormData>> tableValue =
-                FormDataParseAll.COMPONENT_PARSE_TABLE.strToJava(component.getValue());
+                FormDataParseAll.COMPONENT_PARSE_TABLE.strToJava(data.getValue());
 
         JSONArray table = new JSONArray();
         for (Collection<FormData> componentList : tableValue) {
@@ -49,16 +48,42 @@ public class DingTalkTableFDC extends DingTalkBaseFDC {
 
             table.add(row);
         }
-        return toMap(component.getName(), table.toJSONString());
+        return toMap(data.getName(), table.toJSONString());
     }
 
     @Override
     public FormData toFormData(
-            GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues component) {
+            GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues data) {
 
-        return FormData.amount(component.getName(),
-                new BigDecimal(component.getValue()),
-                AmountOption.AmountType.CNY);
+        String value = data.getValue();
+        JSONArray jsonVal = JSONArray.parse(value);
+
+        ArrayList<Collection<FormData>> rows = new ArrayList<>(jsonVal.size());
+
+        for (int i = 0; i < jsonVal.size(); i++) {
+            JSONArray row = jsonVal.getJSONObject(i).getJSONArray("rowValue");
+            ArrayList<FormData> fieldList = new ArrayList<>(row.size());
+
+            for (int i1 = 0; i1 < row.size(); i1++) {
+                JSONObject field = row.getJSONObject(i1);
+                GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues model
+                        = new GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues();
+
+                String type = field.getString("key").split("_")[0];
+                model.setName(field.getString("label"));
+                model.setComponentType(type);
+                model.setValue(field.getString("value"));
+
+                DingTalkBaseFDC fdc = dingTalkFDCF.getByOtherType(type);
+                fieldList.add(fdc.toFormData(model));
+            }
+
+            rows.add(fieldList);
+
+        }
+
+
+        return FormData.table(data.getName(), rows);
     }
 
     @Override

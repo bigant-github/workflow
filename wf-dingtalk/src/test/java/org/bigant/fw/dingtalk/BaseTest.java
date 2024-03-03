@@ -9,6 +9,9 @@ import org.bigant.wf.user.UserService;
 import org.bigant.wf.user.vo.User;
 import org.junit.Before;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 /**
  * 基础测试
  *
@@ -43,7 +46,11 @@ public class BaseTest {
 
             @Override
             public User getUser(String id) {
-                return null;
+                return User.builder()
+                        .userName("galen")
+                        .userId("1")
+                        .deptName(Collections.singletonList("研发部"))
+                        .build();
             }
 
             @Override

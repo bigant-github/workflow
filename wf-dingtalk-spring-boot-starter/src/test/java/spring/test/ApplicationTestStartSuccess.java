@@ -54,6 +54,16 @@ public class ApplicationTestStartSuccess {
                 return null;
             }
 
+            @Override
+            public String getUserIdByOtherUserId(String otherUserId, String type) {
+                return null;
+            }
+
+            @Override
+            public String getByDeptIdByOtherDeptId(String otherDeptId, String type) {
+                return null;
+            }
+
 
         };
     }

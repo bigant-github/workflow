@@ -9,8 +9,8 @@ import org.bigant.wf.form.option.DateOption;
 import org.bigant.wf.instances.bean.InstanceDetailResult;
 import org.bigant.wf.instances.bean.InstanceStart;
 import org.bigant.wf.instances.form.FormData;
-import org.bigant.wf.instances.form.databean.AttachmentComponent;
-import org.bigant.wf.instances.form.databean.ImageComponent;
+import org.bigant.wf.instances.form.databean.FormDataAttachment;
+import org.bigant.wf.instances.form.databean.FormDataImage;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -53,28 +53,28 @@ public class DingTalkInstancesServiceTest extends BaseTest {
                                 FormData.date("日期", LocalDateTime.now(), DateOption.ComponentDateFormat.YYYY_MM_DD),
                                 FormData.dateRange("开始时间", LocalDateTime.now(), "结束时间", LocalDateTime.now(), DateOption.ComponentDateFormat.YYYY_MM_DD),
                                 FormData.attachment("附件", Arrays.asList(
-                                        AttachmentComponent.builder().name("测试1.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
-                                        AttachmentComponent.builder().name("测试2.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
-                                        AttachmentComponent.builder().name("测试3.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build())),
+                                        FormDataAttachment.builder().name("测试1.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
+                                        FormDataAttachment.builder().name("测试2.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
+                                        FormDataAttachment.builder().name("测试3.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build())),
                                 FormData.image("图片", Arrays.asList(
-                                        ImageComponent.builder().name("测试1.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
-                                        ImageComponent.builder().name("测试2.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
-                                        ImageComponent.builder().name("测试3.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build())),
+                                        FormDataImage.builder().name("测试1.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
+                                        FormDataImage.builder().name("测试2.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
+                                        FormDataImage.builder().name("测试3.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build())),
                                 FormData.table("表格",
                                         Arrays.asList(
                                                 Arrays.asList(
                                                         FormData.text("单行输入框", "表格单行输入框1"),
                                                         FormData.date("日期", LocalDateTime.now(), DateOption.ComponentDateFormat.YYYY_MM_DD_HH_MM),
                                                         FormData.attachment("附件", Arrays.asList(
-                                                                AttachmentComponent.builder().name("测试1.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
-                                                                AttachmentComponent.builder().name("测试2.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build()))
+                                                                FormDataAttachment.builder().name("测试1.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
+                                                                FormDataAttachment.builder().name("测试2.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build()))
                                                 ),
                                                 Arrays.asList(
                                                         FormData.text("单行输入框", "表格单行输入框2"),
                                                         FormData.date("日期", LocalDateTime.now(), DateOption.ComponentDateFormat.YYYY_MM_DD_HH_MM),
                                                         FormData.attachment("附件", Arrays.asList(
-                                                                AttachmentComponent.builder().name("测试1.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
-                                                                AttachmentComponent.builder().name("测试2.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build()))
+                                                                FormDataAttachment.builder().name("测试1.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
+                                                                FormDataAttachment.builder().name("测试2.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build()))
                                                 )))))
                 .build();
 

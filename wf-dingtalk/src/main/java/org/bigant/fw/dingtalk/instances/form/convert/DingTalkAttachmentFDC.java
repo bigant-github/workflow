@@ -16,15 +16,12 @@ import org.bigant.fw.dingtalk.DingTalkFile;
 import org.bigant.fw.dingtalk.DingTalkUser;
 import org.bigant.wf.cache.ICache;
 import org.bigant.wf.exception.WfException;
+import org.bigant.wf.instances.form.ComponentType;
 import org.bigant.wf.instances.form.FormData;
 import org.bigant.wf.instances.form.FormDataParseAll;
-import org.bigant.wf.instances.form.ComponentType;
-import org.bigant.wf.instances.form.databean.AttachmentComponent;
+import org.bigant.wf.instances.form.databean.FormDataAttachment;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -47,25 +44,23 @@ public class DingTalkAttachmentFDC extends DingTalkBaseFDC {
     public static final String CACHE_KEY_SPACE_ID = DingTalkConstant.CACHE_KEY + "spaceId:";
 
 
-
-
     @Override
-    public Map<String, String> toOther(FormData component, String dingTalkUserId) {
+    public Map<String, String> toOther(FormData data, String dingTalkUserId) {
 
         String spaceId = this.getProcessInstancesSpaces(dingTalkUserId).toString();
 
         String unionId = dingTalkUser.getUnionId(dingTalkUserId);
 
-        List<AttachmentComponent> attachmentComponents =
-                FormDataParseAll.COMPONENT_PARSE_ATTACHMENT.strToJava(component.getValue());
+        List<FormDataAttachment> formDataAttachments =
+                FormDataParseAll.COMPONENT_PARSE_ATTACHMENT.strToJava(data.getValue());
         JSONArray array = new JSONArray();
-        for (AttachmentComponent attachmentComponent : attachmentComponents) {
+        for (FormDataAttachment formDataAttachment : formDataAttachments) {
 
             CommitFileResponseBody fileBody = DingTalkFile.uploadFile(unionId,
                     spaceId,
-                    attachmentComponent.getName(),
-                    attachmentComponent.getSize(),
-                    attachmentComponent.getUrl(),
+                    formDataAttachment.getName(),
+                    formDataAttachment.getSize(),
+                    formDataAttachment.getUrl(),
                     dingTalkConfig);
 
             JSONObject jsonObject = new JSONObject();
@@ -76,13 +71,29 @@ public class DingTalkAttachmentFDC extends DingTalkBaseFDC {
             jsonObject.put("fileId", fileBody.getDentry().getId());
             array.add(jsonObject);
         }
-        return toMap(component.getName(), array.toJSONString());
+        return toMap(data.getName(), array.toJSONString());
     }
 
     @Override
     public FormData toFormData(
-            GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues component) {
-        return FormData.text(component.getName(), component.getValue());
+            GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues data) {
+
+        String value = data.getValue();
+        JSONArray jsonVal = JSONArray.parse(value);
+        ArrayList<FormDataAttachment> attachments = new ArrayList<>();
+        for (int i = 0; i < jsonVal.size(); i++) {
+
+            JSONObject jsonFile = jsonVal.getJSONObject(i);
+
+            attachments
+                    .add(FormDataAttachment.builder()
+                            .name(jsonFile.getString("fileName"))
+                            .size(jsonFile.getLong("fileSize"))
+                            .build());
+
+        }
+
+        return FormData.attachment(data.getName(), attachments);
     }
 
     @Override

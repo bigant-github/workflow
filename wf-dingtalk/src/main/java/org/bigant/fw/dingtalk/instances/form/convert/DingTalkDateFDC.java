@@ -1,10 +1,12 @@
 package org.bigant.fw.dingtalk.instances.form.convert;
 
 import com.aliyun.dingtalkworkflow_1_0.models.GetProcessInstanceResponseBody;
+import org.bigant.wf.form.option.DateOption;
+import org.bigant.wf.instances.form.ComponentType;
 import org.bigant.wf.instances.form.FormData;
 import org.bigant.wf.instances.form.FormDataParseAll;
-import org.bigant.wf.instances.form.ComponentType;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -18,14 +20,21 @@ import java.util.Map;
 public class DingTalkDateFDC extends DingTalkBaseFDC {
 
     @Override
-    public Map<String, String> toOther(FormData component, String dingTalkUserId) {
-        return toMap(component.getName(),
-                FormDataParseAll.COMPONENT_PARSE_DATE.strToJava(component.getValue()).toDateStr());
+    public Map<String, String> toOther(FormData data, String dingTalkUserId) {
+        return toMap(data.getName(),
+                FormDataParseAll.COMPONENT_PARSE_DATE.strToJava(data.getValue()).toDateStr());
     }
 
     @Override
-    public FormData toFormData(GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues component) {
-        return FormData.text(component.getName(), component.getValue());
+    public FormData toFormData(
+            GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues data) {
+
+        String value = data.getValue();
+        DateOption.ComponentDateFormat componentDateFormat = dateType(value);
+
+        return FormData.date(data.getName(),
+                this.toLocalDateTime(value, componentDateFormat),
+                componentDateFormat);
     }
 
     @Override
@@ -37,4 +46,5 @@ public class DingTalkDateFDC extends DingTalkBaseFDC {
     public Collection<String> getOtherType() {
         return Collections.singletonList("DDDateField");
     }
+
 }

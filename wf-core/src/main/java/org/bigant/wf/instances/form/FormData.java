@@ -47,7 +47,7 @@ public class FormData {
 
     public static FormData amount(String name, BigDecimal value, AmountOption.AmountType amountType) {
         FormData formData = new FormData();
-        return formData.setValue(name, new AmountComponent(value, amountType), ComponentType.AMOUNT);
+        return formData.setValue(name, new FormDataAmount(value, amountType), ComponentType.AMOUNT);
     }
 
     public static FormData select(String name, String value) {
@@ -65,22 +65,22 @@ public class FormData {
         return formData.setValue(name, Arrays.asList(values), ComponentType.MULTI_SELECT);
     }
 
-    public static FormData attachment(String name, Collection<AttachmentComponent> value) {
+    public static FormData attachment(String name, Collection<FormDataAttachment> value) {
         FormData formData = new FormData();
         return formData.setValue(name, value, ComponentType.ATTACHMENT);
     }
 
-    public static FormData image(String name, List<ImageComponent> value) {
+    public static FormData image(String name, List<FormDataImage> value) {
         FormData formData = new FormData();
         return formData.setValue(name, value, ComponentType.IMAGE);
     }
 
     public static FormData date(String name, LocalDateTime value, DateOption.ComponentDateFormat dateFormat) {
         FormData formData = new FormData();
-        return formData.setValue(name, new DateComponent(dateFormat, value), ComponentType.DATE);
+        return formData.setValue(name, new FormDataDate(dateFormat, value), ComponentType.DATE);
     }
 
-    public static FormData dateRange(String beginName, String endName, DateRangeComponent value) {
+    public static FormData dateRange(String beginName, String endName, FormDataDateRange value) {
         FormData formData = new FormData();
         return formData.setValue(JSONArray.of(beginName, endName).toJSONString(), value, ComponentType.DATE_RANGE);
     }
@@ -90,7 +90,7 @@ public class FormData {
                                      String endName,
                                      LocalDateTime end,
                                      DateOption.ComponentDateFormat dateFormat) {
-        return dateRange(beginName, endName, new DateRangeComponent(dateFormat, beginDate, end));
+        return dateRange(beginName, endName, new FormDataDateRange(dateFormat, beginDate, end));
     }
 
     public static FormData table(String name, Collection<Collection<FormData>> table) {

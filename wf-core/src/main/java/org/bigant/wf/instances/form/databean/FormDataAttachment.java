@@ -14,7 +14,7 @@ import lombok.Data;
 @Data
 @ApiModel(value = "附件")
 @Builder
-public class AttachmentComponent {
+public class FormDataAttachment {
 
     @ApiModelProperty("文件名")
     private String name;

@@ -2,13 +2,15 @@ package org.bigant.fw.dingtalk.instances.form.convert;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.aliyun.dingtalkworkflow_1_0.models.GetProcessInstanceResponseBody;
+import org.bigant.wf.form.option.DateOption;
+import org.bigant.wf.instances.form.ComponentType;
 import org.bigant.wf.instances.form.FormData;
 import org.bigant.wf.instances.form.FormDataParseAll;
-import org.bigant.wf.instances.form.ComponentType;
-import org.bigant.wf.instances.form.databean.DateRangeComponent;
+import org.bigant.wf.instances.form.databean.FormDataDateRange;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,19 +22,37 @@ import java.util.Map;
 public class DingTalkDateRangeFDC extends DingTalkBaseFDC {
 
     @Override
-    public Map<String, String> toOther(FormData component, String dingTalkUserId) {
-        DateRangeComponent rangeComponent = FormDataParseAll.COMPONENT_PARSE_DATE_RANGE.strToJava(component.getValue());
+    public Map<String, String> toOther(FormData data, String dingTalkUserId) {
+        FormDataDateRange rangeComponent = FormDataParseAll.COMPONENT_PARSE_DATE_RANGE.strToJava(data.getValue());
         String begin = rangeComponent.getDateFormat().getParse().format(rangeComponent.getBegin());
         String end = rangeComponent.getDateFormat().getParse().format(rangeComponent.getEnd());
-        return toMap(component.getName(), JSONArray.toJSONString(new String[]{begin, end}));
+        return toMap(data.getName(), JSONArray.toJSONString(new String[]{begin, end}));
     }
 
     @Override
     public FormData toFormData(
-            GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues component) {
+            GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues data) {
+
+        String value = data.getValue();
+        String name = data.getName();
+
+        List<String> jsonVal = JSONArray.parseArray(value,String.class);
+        List<String> jsonName = JSONArray.parseArray(name,String.class);
+
+        String beginDate = jsonVal.get(0);
+        String endDate = jsonVal.get(1);
+
+        String beginName = jsonName.get(0);
+        String endName = jsonName.get(1);
+
+        DateOption.ComponentDateFormat dateFormat = dateType(beginDate);
 
 
-        return FormData.text(component.getName(), component.getValue());
+        return FormData.dateRange(
+                beginName, this.toLocalDateTime(beginDate, dateFormat),
+                endName, this.toLocalDateTime(endDate, dateFormat),
+                dateFormat);
+
     }
 
     @Override

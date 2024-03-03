@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class DateComponent {
+public class FormDataDate {
 
     @ApiModelProperty("时间格式")
     private DateOption.ComponentDateFormat dateFormat;

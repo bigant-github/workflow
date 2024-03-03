@@ -17,7 +17,7 @@ public class DateOption {
     public enum ComponentDateFormat {
 
         YYYY_MM_DD("年-月-日", DateTimeFormatter.ofPattern("yyyy-MM-dd")),
-        YYYY_MM_DD_HH_MM("年-月-日 时:分",DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+        YYYY_MM_DD_HH_MM("年-月-日 时:分", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
 
         String desc;
 

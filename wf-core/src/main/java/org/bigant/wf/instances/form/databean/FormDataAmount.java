@@ -21,7 +21,7 @@ import java.math.BigDecimal;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AmountComponent {
+public class FormDataAmount {
 
     @ApiModelProperty("金额")
     private BigDecimal amount;
