@@ -21,7 +21,8 @@ public class User {
 
     private String userId;
     private String userName;
-    private List<String> deptName;
+    private List<String> deptIds;
+    private List<String> deptNames;
 
 
 }
