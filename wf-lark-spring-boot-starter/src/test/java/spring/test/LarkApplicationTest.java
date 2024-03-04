@@ -18,11 +18,11 @@ import org.springframework.context.annotation.Configuration;
  */
 @SpringBootApplication
 @Configuration
-public class ApplicationTestStartSuccess {
+public class LarkApplicationTest {
 
 
     public static void main(String[] args) {
-        ConfigurableApplicationContext context = SpringApplication.run(ApplicationTestStartSuccess.class, args);
+        ConfigurableApplicationContext context = SpringApplication.run(LarkApplicationTest.class, args);
         LarkConfig config = context.getBean(LarkConfig.class);
         assert config == null;
         LarkInstancesService larkInstancesService = context.getBean(LarkInstancesService.class);
@@ -87,7 +87,7 @@ public class ApplicationTestStartSuccess {
             }
 
             @Override
-            public String getByDeptIdByOtherDeptId(String otherDeptId, String type) {
+            public String getDeptIdByOtherDeptId(String otherDeptId, String type) {
                 return null;
             }
 

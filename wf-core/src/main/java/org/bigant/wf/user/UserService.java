@@ -39,6 +39,6 @@ public interface UserService {
 
     String getUserIdByOtherUserId(String otherUserId, String type);
 
-    String getByDeptIdByOtherDeptId(String otherDeptId, String type);
+    String getDeptIdByOtherDeptId(String otherDeptId, String type);
 
 }

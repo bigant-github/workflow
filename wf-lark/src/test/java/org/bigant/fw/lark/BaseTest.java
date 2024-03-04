@@ -58,7 +58,7 @@ public class BaseTest {
             }
 
             @Override
-            public String getByDeptIdByOtherDeptId(String otherDeptId, String type) {
+            public String getDeptIdByOtherDeptId(String otherDeptId, String type) {
                 return null;
             }
         };

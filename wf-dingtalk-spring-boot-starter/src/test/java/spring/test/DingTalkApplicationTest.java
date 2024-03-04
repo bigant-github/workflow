@@ -20,11 +20,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
  */
 @SpringBootApplication
 @Configuration
-public class ApplicationTestStartSuccess {
+public class DingTalkApplicationTest {
 
 
     public static void main(String[] args) {
-        ConfigurableApplicationContext context = SpringApplication.run(ApplicationTestStartSuccess.class, args);
+        ConfigurableApplicationContext context = SpringApplication.run(DingTalkApplicationTest.class, args);
         DingTalkConfig bean = context.getBean(DingTalkConfig.class);
         assert bean == null;
         DingTalkInstancesService dingTalkInstancesService = context.getBean(DingTalkInstancesService.class);
@@ -60,7 +60,7 @@ public class ApplicationTestStartSuccess {
             }
 
             @Override
-            public String getByDeptIdByOtherDeptId(String otherDeptId, String type) {
+            public String getDeptIdByOtherDeptId(String otherDeptId, String type) {
                 return null;
             }
 
