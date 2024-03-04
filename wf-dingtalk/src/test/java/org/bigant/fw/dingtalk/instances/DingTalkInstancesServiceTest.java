@@ -8,7 +8,7 @@ import org.bigant.wf.form.option.AmountOption;
 import org.bigant.wf.form.option.DateOption;
 import org.bigant.wf.instances.bean.InstanceDetailResult;
 import org.bigant.wf.instances.bean.InstanceStart;
-import org.bigant.wf.instances.form.FormData;
+import org.bigant.wf.instances.form.FormDataItem;
 import org.bigant.wf.instances.form.databean.FormDataAttachment;
 import org.bigant.wf.instances.form.databean.FormDataImage;
 import org.junit.Test;
@@ -44,35 +44,35 @@ public class DingTalkInstancesServiceTest extends BaseTest {
                         ))
                 .formData(
                         Arrays.asList(
-                                FormData.text("单行输入框", "测试"),
-                                FormData.text("多行输入框", "测试"),
-                                FormData.number("数字输入框", 1),
-                                FormData.amount("金额（元）", new BigDecimal("1.23"), AmountOption.AmountType.CNY),
-                                FormData.select("单选框", "选项1"),
-                                FormData.multiSelect("多选框", "选项1", "选项2"),
-                                FormData.date("日期", LocalDateTime.now(), DateOption.ComponentDateFormat.YYYY_MM_DD),
-                                FormData.dateRange("开始时间", LocalDateTime.now(), "结束时间", LocalDateTime.now(), DateOption.ComponentDateFormat.YYYY_MM_DD),
-                                FormData.attachment("附件", Arrays.asList(
+                                FormDataItem.text("单行输入框", "测试"),
+                                FormDataItem.text("多行输入框", "测试"),
+                                FormDataItem.number("数字输入框", 1),
+                                FormDataItem.amount("金额（元）", new BigDecimal("1.23"), AmountOption.AmountType.CNY),
+                                FormDataItem.select("单选框", "选项1"),
+                                FormDataItem.multiSelect("多选框", "选项1", "选项2"),
+                                FormDataItem.date("日期", LocalDateTime.now(), DateOption.ComponentDateFormat.YYYY_MM_DD),
+                                FormDataItem.dateRange("开始时间", LocalDateTime.now(), "结束时间", LocalDateTime.now(), DateOption.ComponentDateFormat.YYYY_MM_DD),
+                                FormDataItem.attachment("附件", Arrays.asList(
                                         FormDataAttachment.builder().name("测试1.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
                                         FormDataAttachment.builder().name("测试2.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
                                         FormDataAttachment.builder().name("测试3.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build())),
-                                FormData.image("图片", Arrays.asList(
+                                FormDataItem.image("图片", Arrays.asList(
                                         FormDataImage.builder().name("测试1.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
                                         FormDataImage.builder().name("测试2.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
                                         FormDataImage.builder().name("测试3.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build())),
-                                FormData.table("表格",
+                                FormDataItem.table("表格",
                                         Arrays.asList(
                                                 Arrays.asList(
-                                                        FormData.text("单行输入框", "表格单行输入框1"),
-                                                        FormData.date("日期", LocalDateTime.now(), DateOption.ComponentDateFormat.YYYY_MM_DD_HH_MM),
-                                                        FormData.attachment("附件", Arrays.asList(
+                                                        FormDataItem.text("单行输入框", "表格单行输入框1"),
+                                                        FormDataItem.date("日期", LocalDateTime.now(), DateOption.ComponentDateFormat.YYYY_MM_DD_HH_MM),
+                                                        FormDataItem.attachment("附件", Arrays.asList(
                                                                 FormDataAttachment.builder().name("测试1.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
                                                                 FormDataAttachment.builder().name("测试2.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build()))
                                                 ),
                                                 Arrays.asList(
-                                                        FormData.text("单行输入框", "表格单行输入框2"),
-                                                        FormData.date("日期", LocalDateTime.now(), DateOption.ComponentDateFormat.YYYY_MM_DD_HH_MM),
-                                                        FormData.attachment("附件", Arrays.asList(
+                                                        FormDataItem.text("单行输入框", "表格单行输入框2"),
+                                                        FormDataItem.date("日期", LocalDateTime.now(), DateOption.ComponentDateFormat.YYYY_MM_DD_HH_MM),
+                                                        FormDataItem.attachment("附件", Arrays.asList(
                                                                 FormDataAttachment.builder().name("测试1.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
                                                                 FormDataAttachment.builder().name("测试2.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build()))
                                                 )))))

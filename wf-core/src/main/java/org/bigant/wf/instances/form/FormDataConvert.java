@@ -13,6 +13,6 @@ public interface FormDataConvert<R, OP, FP> extends ComponentTypeAndOtherType {
 
     R toOther(OP component);
 
-    FormData toFormData(FP component);
+    FormDataItem toFormData(FP component);
 
 }

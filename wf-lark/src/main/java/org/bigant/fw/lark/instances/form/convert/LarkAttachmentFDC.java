@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.bigant.fw.lark.LarkFile;
 import org.bigant.fw.lark.LarkFormType;
 import org.bigant.wf.ComponentType;
-import org.bigant.wf.instances.form.FormData;
+import org.bigant.wf.instances.form.FormDataItem;
 import org.bigant.wf.instances.form.FormDataParseAll;
 import org.bigant.wf.instances.form.databean.FormDataAttachment;
 
@@ -45,7 +45,7 @@ public class LarkAttachmentFDC extends LarkBaseFDC {
     }
 
     @Override
-    public FormData toFormData(
+    public FormDataItem toFormData(
             JSONObject data) {
 
         /*String value = data.getValue();

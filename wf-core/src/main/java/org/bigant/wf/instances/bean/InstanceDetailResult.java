@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
-import org.bigant.wf.instances.form.FormData;
+import org.bigant.wf.instances.form.FormDataItem;
 import org.bigant.wf.instances.InstancesStatus;
 import org.bigant.wf.task.TaskStatus;
 
@@ -39,7 +39,7 @@ public class InstanceDetailResult {
     private InstancesStatus status;
 
     @ApiModelProperty("表单字段集合")
-    private List<FormData> formData;
+    private List<FormDataItem> formData;
 
     @ApiModelProperty("表单字段集合")
     private List<Task> tasks;

@@ -3,7 +3,7 @@ package org.bigant.fw.lark.instances.form.convert;
 import com.alibaba.fastjson2.JSONObject;
 import org.bigant.wf.ComponentType;
 import org.bigant.wf.exception.WfException;
-import org.bigant.wf.instances.form.FormData;
+import org.bigant.wf.instances.form.FormDataItem;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,7 +25,7 @@ public class LarkUnknownFDC extends LarkBaseFDC {
     }
 
     @Override
-    public FormData toFormData(JSONObject component) {
+    public FormDataItem toFormData(JSONObject component) {
         String errorMsg = String.format("飞书-无法将%s转换为 form组件。", getType());
         throw new WfException(errorMsg);
     }

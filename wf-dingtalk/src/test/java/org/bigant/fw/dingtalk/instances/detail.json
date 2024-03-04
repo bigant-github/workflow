@@ -1,6 +1,6 @@
 {
   "deptId": "903745013",
-  "formData": [
+  "formDataItem": [
     {
       "componentType": "TEXT",
       "name": "单行输入框",

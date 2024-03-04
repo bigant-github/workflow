@@ -2,16 +2,14 @@ package org.bigant.fw.lark.instances.form.convert;
 
 import com.alibaba.fastjson2.JSONObject;
 import lombok.AllArgsConstructor;
-import org.bigant.fw.lark.LarkConfig;
 import org.bigant.fw.lark.LarkFormType;
 import org.bigant.fw.lark.instances.form.LarkFDCF;
 import org.bigant.wf.ComponentType;
-import org.bigant.wf.instances.form.FormData;
+import org.bigant.wf.instances.form.FormDataItem;
 import org.bigant.wf.instances.form.FormDataParseAll;
 import org.bigant.wf.process.bean.ProcessDetail;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -30,7 +28,7 @@ public class LarkTableFDC extends LarkBaseFDC {
     @Override
     public Map<String, Object> toOther(LarkBaseFDC.FormItemConvert component) {
 
-        Collection<Collection<FormData>> table = FormDataParseAll
+        Collection<Collection<FormDataItem>> table = FormDataParseAll
                 .COMPONENT_PARSE_TABLE
                 .strToJava(component.getFormComponents().getValue());
 
@@ -49,7 +47,7 @@ public class LarkTableFDC extends LarkBaseFDC {
     }
 
     @Override
-    public FormData toFormData(
+    public FormDataItem toFormData(
             JSONObject data) {
 
         /*String value = data.getValue();

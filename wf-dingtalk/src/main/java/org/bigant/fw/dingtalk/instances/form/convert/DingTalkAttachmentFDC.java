@@ -17,7 +17,7 @@ import org.bigant.fw.dingtalk.DingTalkUser;
 import org.bigant.wf.cache.ICache;
 import org.bigant.wf.exception.WfException;
 import org.bigant.wf.ComponentType;
-import org.bigant.wf.instances.form.FormData;
+import org.bigant.wf.instances.form.FormDataItem;
 import org.bigant.wf.instances.form.FormDataParseAll;
 import org.bigant.wf.instances.form.databean.FormDataAttachment;
 
@@ -45,7 +45,7 @@ public class DingTalkAttachmentFDC extends DingTalkBaseFDC {
 
 
     @Override
-    public Map<String, String> toOther(FormData data, String dingTalkUserId) {
+    public Map<String, String> toOther(FormDataItem data, String dingTalkUserId) {
 
         String spaceId = this.getProcessInstancesSpaces(dingTalkUserId).toString();
 
@@ -75,7 +75,7 @@ public class DingTalkAttachmentFDC extends DingTalkBaseFDC {
     }
 
     @Override
-    public FormData toFormData(
+    public FormDataItem toFormData(
             GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues data) {
 
         String value = data.getValue();
@@ -93,7 +93,7 @@ public class DingTalkAttachmentFDC extends DingTalkBaseFDC {
 
         }
 
-        return FormData.attachment(data.getName(), attachments);
+        return FormDataItem.attachment(data.getName(), attachments);
     }
 
     @Override

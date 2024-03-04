@@ -3,7 +3,7 @@ package org.bigant.fw.lark.instances.form.convert;
 import com.alibaba.fastjson2.JSONObject;
 import org.bigant.fw.lark.LarkFormType;
 import org.bigant.wf.ComponentType;
-import org.bigant.wf.instances.form.FormData;
+import org.bigant.wf.instances.form.FormDataItem;
 import org.bigant.wf.instances.form.FormDataParseAll;
 import org.bigant.wf.instances.form.databean.FormDataDate;
 
@@ -32,7 +32,7 @@ public class LarkDateFDC extends LarkBaseFDC {
     }
 
     @Override
-    public FormData toFormData(JSONObject data) {
+    public FormDataItem toFormData(JSONObject data) {
 
         /*String value = data.getValue();
         DateOption.ComponentDateFormat componentDateFormat = dateType(value);

@@ -13,7 +13,7 @@ import org.bigant.fw.lark.process.LarkProcessService;
 import org.bigant.wf.exception.WfException;
 import org.bigant.wf.instances.InstancesService;
 import org.bigant.wf.instances.bean.*;
-import org.bigant.wf.instances.form.FormData;
+import org.bigant.wf.instances.form.FormDataItem;
 import org.bigant.wf.process.bean.ProcessDetail;
 import org.bigant.wf.user.UserService;
 
@@ -62,7 +62,7 @@ public class LarkInstancesService implements InstancesService {
         Map<String, ProcessDetail.FormItem> formItemMap =
                 processDetail.getForm().stream().collect(Collectors.toMap(ProcessDetail.FormItem::getName, x -> x));
 
-        List<FormData> formData = instanceStart.getFormData();
+        List<FormDataItem> formData = instanceStart.getFormData();
 
         String form = this.parseFormValues(formData, formItemMap);
 
@@ -170,7 +170,7 @@ public class LarkInstancesService implements InstancesService {
         Map<String, ProcessDetail.FormItem> formItemMap =
                 processDetail.getForm().stream().collect(Collectors.toMap(ProcessDetail.FormItem::getName, x -> x));
 
-        List<FormData> formData = instancePreview.getFormData();
+        List<FormDataItem> formData = instancePreview.getFormData();
 
         String form = this.parseFormValues(formData, formItemMap);
 
@@ -266,18 +266,18 @@ public class LarkInstancesService implements InstancesService {
     }
 
 
-    public String parseFormValues(List<FormData> formDataList, Map<String, ProcessDetail.FormItem> formItemMap) {
+    public String parseFormValues(List<FormDataItem> formDataItemList, Map<String, ProcessDetail.FormItem> formItemMap) {
 
         ArrayList<Map<String, Object>> maps = new ArrayList<>();
-        for (FormData formData : formDataList) {
-            maps.add(this.parseFormValues(formData, formItemMap.get(formData.getName())));
+        for (FormDataItem formDataItem : formDataItemList) {
+            maps.add(this.parseFormValues(formDataItem, formItemMap.get(formDataItem.getName())));
         }
 
         return Jsons.DEFAULT.toJson(maps);
     }
 
 
-    public Map<String, Object> parseFormValues(FormData formComponents, ProcessDetail.FormItem formItem) {
+    public Map<String, Object> parseFormValues(FormDataItem formComponents, ProcessDetail.FormItem formItem) {
         if (!formComponents.getComponentType().equals(formItem.getType())) {
             String errMsg = String.format("飞书-转换表单内容失败，传入表单类型与飞书平台配置类型不匹配或飞书平台设置类型系统不支持。name:%s,系统类型:%s,飞书类型:%s",
                     formItem.getName(),

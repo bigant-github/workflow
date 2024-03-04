@@ -1,7 +1,7 @@
 package org.bigant.fw.dingtalk.instances.form.convert;
 
 import com.aliyun.dingtalkworkflow_1_0.models.GetProcessInstanceResponseBody;
-import org.bigant.wf.instances.form.FormData;
+import org.bigant.wf.instances.form.FormDataItem;
 import org.bigant.wf.form.option.AmountOption;
 import org.bigant.wf.instances.form.FormDataParseAll;
 import org.bigant.wf.ComponentType;
@@ -21,17 +21,17 @@ import java.util.Map;
 public class DingTalkAmountFDC extends DingTalkBaseFDC {
 
     @Override
-    public Map<String, String> toOther(FormData data, String dingTalkUserId) {
+    public Map<String, String> toOther(FormDataItem data, String dingTalkUserId) {
         FormDataAmount value =
                 FormDataParseAll.COMPONENT_PARSE_AMOUNT.strToJava(data.getValue());
         return this.toMap(data.getName(), value.getAmount().toString());
     }
 
     @Override
-    public FormData toFormData(
+    public FormDataItem toFormData(
             GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues data) {
 
-        return FormData.amount(data.getName(),
+        return FormDataItem.amount(data.getName(),
                 new BigDecimal(data.getValue()),
                 AmountOption.AmountType.CNY);
     }

@@ -3,10 +3,9 @@ package org.bigant.fw.lark.instances.form.convert;
 import com.alibaba.fastjson2.JSONObject;
 import org.bigant.fw.lark.LarkFormType;
 import org.bigant.wf.ComponentType;
-import org.bigant.wf.instances.form.FormData;
+import org.bigant.wf.instances.form.FormDataItem;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -22,7 +21,7 @@ public class LarkNumberFDC extends LarkBaseFDC {
         return this.base(component, "number", component.getFormComponents().getValue());
     }
 
-    public FormData toFormData(
+    public FormDataItem toFormData(
             JSONObject data) {
         /*return FormData.number(data.getName(), new BigDecimal(data.getValue()));*/
         return null;

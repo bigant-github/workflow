@@ -17,7 +17,7 @@ import org.bigant.wf.exception.WfException;
 import org.bigant.wf.instances.InstancesService;
 import org.bigant.wf.instances.InstancesStatus;
 import org.bigant.wf.instances.bean.*;
-import org.bigant.wf.instances.form.FormData;
+import org.bigant.wf.instances.form.FormDataItem;
 import org.bigant.wf.task.TaskStatus;
 import org.bigant.wf.user.UserService;
 import org.bigant.wf.user.vo.User;
@@ -217,14 +217,14 @@ public class DingTalkInstancesService implements InstancesService {
             }
 
 
-            List<FormData> formDataList = new ArrayList<>();
+            List<FormDataItem> formDataItemList = new ArrayList<>();
             //将form数据转换成系统form实体
             for (GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues formComponentValue
                     : result.getFormComponentValues()) {
 
                 DingTalkBaseFDC fdc = dingTalkFDCF.getByOtherType(formComponentValue.getComponentType());
-                FormData formData = fdc.toFormData(formComponentValue);
-                formDataList.add(formData);
+                FormDataItem formDataItem = fdc.toFormData(formComponentValue);
+                formDataItemList.add(formDataItem);
 
             }
 
@@ -314,7 +314,7 @@ public class DingTalkInstancesService implements InstancesService {
                     .userId(userId)
                     .deptId(deptId)
                     .status(instancesStatus)
-                    .formData(formDataList)
+                    .formData(formDataItemList)
                     .tasks(tasks)
                     .build();
 
@@ -527,7 +527,7 @@ public class DingTalkInstancesService implements InstancesService {
      * @return
      * @throws Exception
      */
-    private ProcessForecastResponseBody.ProcessForecastResponseBodyResult forecast(String code, String userId, String deptId, List<FormData> formData) {
+    private ProcessForecastResponseBody.ProcessForecastResponseBodyResult forecast(String code, String userId, String deptId, List<FormDataItem> formData) {
 
         log.debug(" 预测是否有自定义审批节点：code:{}，userId:{}，deptId:{}，formComponents:{}。",
                 code,
@@ -561,16 +561,16 @@ public class DingTalkInstancesService implements InstancesService {
     /**
      * 解析表单值,主要是解决个平台数据格式不一样的问题
      *
-     * @param formDataList
+     * @param formDataItemList
      * @param dingTalkUserId
      * @return
      */
-    private HashMap<String, String> parseFormValue(List<FormData> formDataList, String dingTalkUserId) {
-        HashMap<String, String> formMap = new HashMap<>(formDataList.size());
+    private HashMap<String, String> parseFormValue(List<FormDataItem> formDataItemList, String dingTalkUserId) {
+        HashMap<String, String> formMap = new HashMap<>(formDataItemList.size());
 
 
-        for (FormData formData : formDataList) {
-            formMap.putAll(this.parseFormValue(formData, dingTalkUserId));
+        for (FormDataItem formDataItem : formDataItemList) {
+            formMap.putAll(this.parseFormValue(formDataItem, dingTalkUserId));
         }
 
         return formMap;
@@ -581,12 +581,12 @@ public class DingTalkInstancesService implements InstancesService {
     /**
      * 解析将form数据转换为Map
      *
-     * @param formData
+     * @param formDataItem
      * @param dingTalkUserId
      * @return
      */
-    private Map<String, String> parseFormValue(FormData formData, String dingTalkUserId) {
-        return dingTalkFDCF.getByFormType(formData.getComponentType()).toOther(formData, dingTalkUserId);
+    private Map<String, String> parseFormValue(FormDataItem formDataItem, String dingTalkUserId) {
+        return dingTalkFDCF.getByFormType(formDataItem.getComponentType()).toOther(formDataItem, dingTalkUserId);
     }
 /*    private HashMap<String, String> parseFormValue(FormComponent formComponent, String userId) {
         HashMap<String, String> formMap = new HashMap<>(1);

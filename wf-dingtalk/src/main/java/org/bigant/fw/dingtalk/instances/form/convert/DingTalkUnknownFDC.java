@@ -2,7 +2,7 @@ package org.bigant.fw.dingtalk.instances.form.convert;
 
 import com.aliyun.dingtalkworkflow_1_0.models.GetProcessInstanceResponseBody;
 import org.bigant.wf.exception.WfException;
-import org.bigant.wf.instances.form.FormData;
+import org.bigant.wf.instances.form.FormDataItem;
 import org.bigant.wf.ComponentType;
 
 import java.util.Arrays;
@@ -27,13 +27,13 @@ public class DingTalkUnknownFDC extends DingTalkBaseFDC {
             "DepartmentField");
 
     @Override
-    public Map<String, String> toOther(FormData component, String dingTalkUserId) {
+    public Map<String, String> toOther(FormDataItem component, String dingTalkUserId) {
         String errorMsg = String.format("钉钉-无法将%s转换为 form组件。", getType());
         throw new WfException(errorMsg);
     }
 
     @Override
-    public FormData toFormData(GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues component) {
+    public FormDataItem toFormData(GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues component) {
         String errorMsg = String.format("钉钉-无法将%s转换为 form组件。", DING_TALK_TYPES);
         throw new WfException(errorMsg);
     }

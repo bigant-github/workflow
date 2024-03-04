@@ -6,7 +6,7 @@ import com.aliyun.dingtalkworkflow_1_0.models.GetProcessInstanceResponseBody;
 import lombok.AllArgsConstructor;
 import org.bigant.fw.dingtalk.instances.form.DingTalkFDCF;
 import org.bigant.wf.ComponentType;
-import org.bigant.wf.instances.form.FormData;
+import org.bigant.wf.instances.form.FormDataItem;
 import org.bigant.wf.instances.form.FormDataParseAll;
 
 import java.util.ArrayList;
@@ -26,15 +26,15 @@ public class DingTalkTableFDC extends DingTalkBaseFDC {
     private final DingTalkFDCF dingTalkFDCF;
 
     @Override
-    public Map<String, String> toOther(FormData data, String dingTalkUserId) {
-        Collection<Collection<FormData>> tableValue =
+    public Map<String, String> toOther(FormDataItem data, String dingTalkUserId) {
+        Collection<Collection<FormDataItem>> tableValue =
                 FormDataParseAll.COMPONENT_PARSE_TABLE.strToJava(data.getValue());
 
         JSONArray table = new JSONArray();
-        for (Collection<FormData> componentList : tableValue) {
+        for (Collection<FormDataItem> componentList : tableValue) {
 
             JSONArray row = new JSONArray();
-            for (FormData child : componentList) {
+            for (FormDataItem child : componentList) {
                 Map<String, String> value = dingTalkFDCF.getByFormType(child.getComponentType()).toOther(child, dingTalkUserId);
 
                 for (Map.Entry<String, String> entry : value.entrySet()) {
@@ -52,17 +52,17 @@ public class DingTalkTableFDC extends DingTalkBaseFDC {
     }
 
     @Override
-    public FormData toFormData(
+    public FormDataItem toFormData(
             GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues data) {
 
         String value = data.getValue();
         JSONArray jsonVal = JSONArray.parse(value);
 
-        ArrayList<Collection<FormData>> rows = new ArrayList<>(jsonVal.size());
+        ArrayList<Collection<FormDataItem>> rows = new ArrayList<>(jsonVal.size());
 
         for (int i = 0; i < jsonVal.size(); i++) {
             JSONArray row = jsonVal.getJSONObject(i).getJSONArray("rowValue");
-            ArrayList<FormData> fieldList = new ArrayList<>(row.size());
+            ArrayList<FormDataItem> fieldList = new ArrayList<>(row.size());
 
             for (int i1 = 0; i1 < row.size(); i1++) {
                 JSONObject field = row.getJSONObject(i1);
@@ -83,7 +83,7 @@ public class DingTalkTableFDC extends DingTalkBaseFDC {
         }
 
 
-        return FormData.table(data.getName(), rows);
+        return FormDataItem.table(data.getName(), rows);
     }
 
     @Override

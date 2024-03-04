@@ -4,7 +4,7 @@ import com.aliyun.dingtalkworkflow_1_0.models.GetProcessInstanceResponseBody;
 import lombok.extern.slf4j.Slf4j;
 import org.bigant.wf.exception.WfException;
 import org.bigant.wf.form.option.DateOption;
-import org.bigant.wf.instances.form.FormData;
+import org.bigant.wf.instances.form.FormDataItem;
 import org.bigant.wf.instances.form.FormDataConvert;
 
 import java.time.LocalDateTime;
@@ -19,19 +19,19 @@ import java.util.Map;
  * @date 2024/3/115:38
  */
 @Slf4j
-public abstract class DingTalkBaseFDC implements FormDataConvert<Map<String, String>, FormData
+public abstract class DingTalkBaseFDC implements FormDataConvert<Map<String, String>, FormDataItem
         , GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues> {
 
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Override
-    public Map<String, String> toOther(FormData component) {
+    public Map<String, String> toOther(FormDataItem component) {
         throw new WfException("钉钉-类型转换器暂不支持使用此方法，请使用toOther(FormComponent,String)方法。");
     }
 
 
-    public abstract Map<String, String> toOther(FormData component, String dingTalkUserId);
+    public abstract Map<String, String> toOther(FormDataItem component, String dingTalkUserId);
 
 
     /**
@@ -39,7 +39,7 @@ public abstract class DingTalkBaseFDC implements FormDataConvert<Map<String, Str
      *
      * @return
      */
-    public Map<String, String> toOtherValue(FormData component) {
+    public Map<String, String> toOtherValue(FormDataItem component) {
         HashMap<String, String> map = new HashMap<>(1);
         map.put(component.getName(), component.getValue());
         return map;

@@ -2,7 +2,7 @@ package org.bigant.fw.dingtalk.instances.form.convert;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.aliyun.dingtalkworkflow_1_0.models.GetProcessInstanceResponseBody;
-import org.bigant.wf.instances.form.FormData;
+import org.bigant.wf.instances.form.FormDataItem;
 import org.bigant.wf.instances.form.FormDataParseAll;
 import org.bigant.wf.ComponentType;
 import org.bigant.wf.instances.form.databean.FormDataImage;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class DingTalkImageFDC extends DingTalkBaseFDC {
 
     @Override
-    public Map<String, String> toOther(FormData data, String dingTalkUserId) {
+    public Map<String, String> toOther(FormDataItem data, String dingTalkUserId) {
         Collection<FormDataImage> rangeComponent = FormDataParseAll.COMPONENT_PARSE_IMAGE.strToJava(data.getValue());
         List<String> urls = rangeComponent
                 .stream()
@@ -29,7 +29,7 @@ public class DingTalkImageFDC extends DingTalkBaseFDC {
     }
 
     @Override
-    public FormData toFormData(
+    public FormDataItem toFormData(
             GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues data) {
 
         String value = data.getValue();
@@ -46,7 +46,7 @@ public class DingTalkImageFDC extends DingTalkBaseFDC {
 
         }
 
-        return FormData.image(data.getName(), images);
+        return FormDataItem.image(data.getName(), images);
     }
 
     @Override

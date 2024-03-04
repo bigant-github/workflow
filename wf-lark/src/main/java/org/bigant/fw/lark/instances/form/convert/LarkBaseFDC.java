@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.bigant.wf.exception.WfException;
 import org.bigant.wf.form.option.DateOption;
-import org.bigant.wf.instances.form.FormData;
+import org.bigant.wf.instances.form.FormDataItem;
 import org.bigant.wf.instances.form.FormDataConvert;
 import org.bigant.wf.process.bean.ProcessDetail;
 
@@ -34,7 +34,7 @@ public abstract class LarkBaseFDC implements FormDataConvert<Map<String, Object>
      *
      * @return
      */
-    public Map<String, String> toOtherValue(FormData component) {
+    public Map<String, String> toOtherValue(FormDataItem component) {
         HashMap<String, String> map = new HashMap<>(1);
         map.put(component.getName(), component.getValue());
         return map;
@@ -94,7 +94,7 @@ public abstract class LarkBaseFDC implements FormDataConvert<Map<String, Object>
     @Data
     @AllArgsConstructor
     public static class FormItemConvert {
-        private FormData formComponents;
+        private FormDataItem formComponents;
         private ProcessDetail.FormItem formItem;
     }
 }

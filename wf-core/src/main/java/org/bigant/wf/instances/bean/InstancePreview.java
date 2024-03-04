@@ -3,7 +3,7 @@ package org.bigant.wf.instances.bean;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import org.bigant.wf.instances.form.FormData;
+import org.bigant.wf.instances.form.FormDataItem;
 
 import java.util.List;
 
@@ -32,7 +32,7 @@ public class InstancePreview {
     private List<TargetSelectUserAuthMatch> targetSelectUsersAuthMatch;
 
     @ApiModelProperty("表单字段集合")
-    private List<FormData> formData;
+    private List<FormDataItem> formData;
     @ApiModel("自选节点用户")
     @Data
     public static class TargetSelectUser {
