@@ -24,5 +24,6 @@ public enum LarkFormType {
     IMAGE(asList("image", "imageV2")),
     TABLE(Collections.singletonList("fieldList"));
 
-    private final Collection<String> larkType;
+    private final
+    Collection<String> larkType;
 }

@@ -5,6 +5,7 @@ import com.aliyun.dingtalkworkflow_1_0.models.GetManageProcessByStaffIdResponse;
 import com.aliyun.tea.TeaException;
 import com.aliyun.teautil.models.RuntimeOptions;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.bigant.fw.dingtalk.DingTalkConfig;
 import org.bigant.fw.dingtalk.DingTalkConstant;
 import org.bigant.wf.process.ProcessService;
@@ -29,6 +30,7 @@ public class DingTalkProcessService implements ProcessService {
 
     private DingTalkConfig dingTalkConfig;
     private UserService userService;
+    @Getter
     private com.aliyun.dingtalkworkflow_1_0.Client client;
     @Override
     public List<ProcessPage> page(ProcessPageQuery processPageQuery, String userId) {
@@ -98,6 +100,9 @@ public class DingTalkProcessService implements ProcessService {
 
     @Override
     public ProcessDetail detail(String code) {
+
+        
+
         return null;
     }
 
@@ -105,8 +110,6 @@ public class DingTalkProcessService implements ProcessService {
     /**
      * 获取钉钉用户id
      *
-     * @param userId
-     * @return
      */
     private String getDingTalkUserId(String userId) {
         return userService.getOtherUserIdByUserId(userId, getType());
@@ -117,21 +120,4 @@ public class DingTalkProcessService implements ProcessService {
         return DingTalkConstant.NAME;
     }
 
-
-    /**
-     * 使用 Token 初始化账号Client
-     *
-     * @return Client
-     * @throws Exception
-     */
-    /*public static com.aliyun.dingtalkworkflow_1_0.Client getClient() throws Exception {
-        Config config = new Config();
-        config.protocol = "https";
-        config.regionId = "central";
-        return new com.aliyun.dingtalkworkflow_1_0.Client(config);
-    }*/
-
-    public Client getClient() {
-        return client;
-    }
 }
