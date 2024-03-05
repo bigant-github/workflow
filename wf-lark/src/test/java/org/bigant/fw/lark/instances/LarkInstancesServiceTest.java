@@ -32,8 +32,7 @@ public class LarkInstancesServiceTest extends BaseTest {
 
         String larkTestProcessCode = System.getenv("larkTestProcessCode");
 
-        InstanceStart.InstanceStartBuilder builder = InstanceStart.builder();
-        InstanceStart instanceStart = builder.processCode(larkTestProcessCode)
+        InstanceStart instanceStart = InstanceStart.builder().processCode(larkTestProcessCode)
                 .userId("123456789")
                 .deptId("123456789")
                 .targetSelectUsersAuthMatch(
