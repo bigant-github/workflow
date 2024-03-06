@@ -15,6 +15,7 @@ import org.bigant.wf.ComponentType;
 import org.bigant.wf.form.option.MultiSelectOption;
 import org.bigant.wf.form.option.SelectOption;
 import org.bigant.wf.process.ProcessService;
+import org.bigant.wf.process.form.FormDetailItem;
 import org.bigant.wf.process.bean.ProcessDetail;
 import org.bigant.wf.process.bean.ProcessPage;
 import org.bigant.wf.process.bean.ProcessPageQuery;
@@ -82,15 +83,15 @@ public class LarkProcessService implements ProcessService {
             GetApprovalRespBody data = resp.getData();
             List<Map<String, Object>> formItems = Jsons.DEFAULT.fromJson(data.getForm(), LIST_MAP);
 
-            List<ProcessDetail.FormItem> formItemList = formItems.stream()
+            List<FormDetailItem> formDetailItemList = formItems.stream()
                     .map(this::convertFormItem)
                     .collect(Collectors.toList());
 
             return ProcessDetail.builder()
-                    .code(code)
+                    .processCode(code)
                     .name(data.getApprovalName())
                     .iconUrl(null)
-                    .form(formItemList)
+                    .form(formDetailItemList)
                     .build();
 
         } catch (Exception e) {
@@ -130,35 +131,35 @@ public class LarkProcessService implements ProcessService {
      * @param item
      * @return
      */
-    public ProcessDetail.FormItem convertFormItem(Map<String, Object> item) {
+    public FormDetailItem convertFormItem(Map<String, Object> item) {
 
         switch (item.get("type").toString()) {
             case "input":
-                return ProcessDetail.FormItem.builder()
+                return FormDetailItem.builder()
                         .name(item.get("name").toString())
                         .id(item.get("id").toString())
                         .type(ComponentType.TEXT)
                         .build();
             case "textarea":
-                return ProcessDetail.FormItem.builder()
+                return FormDetailItem.builder()
                         .name(item.get("name").toString())
                         .id(item.get("id").toString())
                         .type(ComponentType.TEXTAREA)
                         .build();
             case "number":
-                return ProcessDetail.FormItem.builder()
+                return FormDetailItem.builder()
                         .name(item.get("name").toString())
                         .id(item.get("id").toString())
                         .type(ComponentType.NUMBER)
                         .build();
             case "amount":
-                return ProcessDetail.FormItem.builder()
+                return FormDetailItem.builder()
                         .name(item.get("name").toString())
                         .id(item.get("id").toString())
                         .type(ComponentType.AMOUNT)
                         .build();
             case "date":
-                return ProcessDetail.FormItem.builder()
+                return FormDetailItem.builder()
                         .name(item.get("name").toString())
                         .id(item.get("id").toString())
                         .type(ComponentType.DATE)
@@ -166,21 +167,21 @@ public class LarkProcessService implements ProcessService {
             case "dateInterval":
                 Map<String, Object> option = (Map<String, Object>) item.get("option");
                 List<String> names = Arrays.asList(option.get("start").toString(), option.get("end").toString());
-                return ProcessDetail.FormItem.builder()
+                return FormDetailItem.builder()
                         .name(Jsons.DEFAULT.toJson(names))
                         .id(item.get("id").toString())
                         .type(ComponentType.DATE_RANGE)
                         .build();
             case "attachment":
             case "attachmentV2":
-                return ProcessDetail.FormItem.builder()
+                return FormDetailItem.builder()
                         .name(item.get("name").toString())
                         .id(item.get("id").toString())
                         .type(ComponentType.ATTACHMENT)
                         .build();
             case "image":
             case "imageV2":
-                return ProcessDetail.FormItem.builder()
+                return FormDetailItem.builder()
                         .name(item.get("name").toString())
                         .id(item.get("id").toString())
                         .type(ComponentType.IMAGE)
@@ -191,7 +192,7 @@ public class LarkProcessService implements ProcessService {
                 List<SelectOption.Option> radioOptions = radioOption.stream()
                         .map(x -> SelectOption.Option.builder().name(x.get("text")).value(x.get("value")).build())
                         .collect(Collectors.toList());
-                return ProcessDetail.FormItem.builder()
+                return FormDetailItem.builder()
                         .name(item.get("name").toString())
                         .id(item.get("id").toString())
                         .option(SelectOption.builder().options(radioOptions).build())
@@ -203,7 +204,7 @@ public class LarkProcessService implements ProcessService {
                 List<MultiSelectOption.Option> checkboxOptions = checkboxOption.stream()
                         .map(x -> MultiSelectOption.Option.builder().name(x.get("text")).value(x.get("value")).build())
                         .collect(Collectors.toList());
-                return ProcessDetail.FormItem.builder()
+                return FormDetailItem.builder()
                         .name(item.get("name").toString())
                         .id(item.get("id").toString())
                         .option(MultiSelectOption.builder().options(checkboxOptions).build())
@@ -211,16 +212,16 @@ public class LarkProcessService implements ProcessService {
                         .build();
             case "fieldList":
                 List<Map<String, Object>> children = (List<Map<String, Object>>) item.get("children");
-                List<ProcessDetail.FormItem> childrenItems =
+                List<FormDetailItem> childrenItems =
                         children.stream().map(this::convertFormItem).collect(Collectors.toList());
-                return ProcessDetail.FormItem.builder()
+                return FormDetailItem.builder()
                         .name(item.get("name").toString())
                         .id(item.get("id").toString())
                         .type(ComponentType.TABLE)
                         .children(childrenItems)
                         .build();
             default:
-                return ProcessDetail.FormItem.builder()
+                return FormDetailItem.builder()
                         .name(item.get("name").toString())
                         .id(item.get("id").toString())
                         .type(ComponentType.UNKNOWN)

@@ -1,6 +1,5 @@
 package org.bigant.fw.lark.instances.form.convert;
 
-import com.alibaba.fastjson2.JSONObject;
 import org.bigant.fw.lark.LarkFormType;
 import org.bigant.wf.ComponentType;
 import org.bigant.wf.form.option.SelectOption;
@@ -20,7 +19,7 @@ public class LarkSelectFDC extends LarkBaseFDC {
     @Override
     public Map<String, Object> toOther(LarkBaseFDC.FormItemConvert component) {
 
-        SelectOption option = (SelectOption) component.getFormItem().getOption();
+        SelectOption option = (SelectOption) component.getFormDetailItem().getOption();
 
         Map<String, String> optionMap = option.optionsToMap();
 

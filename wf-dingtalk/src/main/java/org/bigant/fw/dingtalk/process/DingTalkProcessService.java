@@ -1,14 +1,17 @@
 package org.bigant.fw.dingtalk.process;
 
-import com.aliyun.dingtalkworkflow_1_0.Client;
 import com.aliyun.dingtalkworkflow_1_0.models.GetManageProcessByStaffIdResponse;
+import com.aliyun.dingtalkworkflow_1_0.models.QuerySchemaByProcessCodeResponseBody;
 import com.aliyun.tea.TeaException;
 import com.aliyun.teautil.models.RuntimeOptions;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.bigant.fw.dingtalk.DingTalkConfig;
 import org.bigant.fw.dingtalk.DingTalkConstant;
+import org.bigant.wf.exception.WfException;
 import org.bigant.wf.process.ProcessService;
+import org.bigant.wf.process.form.FormDetailItem;
 import org.bigant.wf.process.bean.ProcessDetail;
 import org.bigant.wf.process.bean.ProcessPage;
 import org.bigant.wf.process.bean.ProcessPageQuery;
@@ -25,6 +28,7 @@ import java.util.stream.Collectors;
  * @author galen
  * @date 2024/1/30 15:33
  */
+@Slf4j
 @AllArgsConstructor
 public class DingTalkProcessService implements ProcessService {
 
@@ -32,6 +36,7 @@ public class DingTalkProcessService implements ProcessService {
     private UserService userService;
     @Getter
     private com.aliyun.dingtalkworkflow_1_0.Client client;
+
     @Override
     public List<ProcessPage> page(ProcessPageQuery processPageQuery, String userId) {
 
@@ -98,18 +103,59 @@ public class DingTalkProcessService implements ProcessService {
         }
     }
 
+
+    /**
+     * 钉钉查询详情
+     * 接口文档地址：<a href="https://open.dingtalk.com/document/orgapp/obtain-the-form-schema">...</a>
+     *
+     * @param processCode 流程定义code
+     * @return 详情
+     */
     @Override
-    public ProcessDetail detail(String code) {
+    public ProcessDetail detail(String processCode) {
 
-        
+        log.debug("钉钉-查询详情：processCode:{}", processCode);
+        com.aliyun.dingtalkworkflow_1_0.models.QuerySchemaByProcessCodeHeaders querySchemaByProcessCodeHeaders = new com.aliyun.dingtalkworkflow_1_0.models.QuerySchemaByProcessCodeHeaders();
+        querySchemaByProcessCodeHeaders.xAcsDingtalkAccessToken = dingTalkConfig.accessToken();
 
-        return null;
+        com.aliyun.dingtalkworkflow_1_0.models.QuerySchemaByProcessCodeRequest querySchemaByProcessCodeRequest = new com.aliyun.dingtalkworkflow_1_0.models.QuerySchemaByProcessCodeRequest()
+                .setProcessCode(processCode)
+                .setAppUuid(null);
+
+        try {
+            QuerySchemaByProcessCodeResponseBody.QuerySchemaByProcessCodeResponseBodyResult result =
+                    client.querySchemaByProcessCodeWithOptions(querySchemaByProcessCodeRequest,
+                                    querySchemaByProcessCodeHeaders,
+                                    new RuntimeOptions())
+                            .getBody()
+                            .getResult();
+
+            List<QuerySchemaByProcessCodeResponseBody.QuerySchemaByProcessCodeResponseBodyResultSchemaContentItems> items =
+                    result.getSchemaContent().getItems();
+
+            return ProcessDetail.builder()
+                    .processCode(processCode)
+                    .name(result.getName())
+                    .iconUrl(result.getIcon())
+                    /*.form(body.getProcess().getForm().stream().map(x -> FormDetailItem.builder()
+                                    .name(x.getName())
+                                    .type(x.getType())
+                                    .build())
+                            .collect(Collectors.toList()))*/
+                    .build();
+
+        } catch (Exception _err) {
+            String errMsg = String.format("钉钉-查询详情失败，processCode:%s", processCode);
+            log.error(errMsg, _err);
+            throw new WfException(errMsg);
+
+        }
+
     }
 
 
     /**
      * 获取钉钉用户id
-     *
      */
     private String getDingTalkUserId(String userId) {
         return userService.getOtherUserIdByUserId(userId, getType());

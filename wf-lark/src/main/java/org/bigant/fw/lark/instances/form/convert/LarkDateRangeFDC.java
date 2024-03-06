@@ -8,7 +8,7 @@ import org.bigant.wf.form.option.DateOption;
 import org.bigant.wf.instances.form.FormDataItem;
 import org.bigant.wf.instances.form.FormDataParseAll;
 import org.bigant.wf.instances.form.databean.FormDataDateRange;
-import org.bigant.wf.process.bean.ProcessDetail;
+import org.bigant.wf.process.form.FormDetailItem;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -63,7 +63,7 @@ public class LarkDateRangeFDC extends LarkBaseFDC {
 
         JSONObject dataObj = data.getFormObj();
         JSONObject value = dataObj.getJSONObject("value");
-        ProcessDetail.FormItem detailItem = data.getFormDetailItemMap()
+        FormDetailItem detailItem = data.getFormDetailItemMap()
                 .get(dataObj.getString("id"));
 
 
