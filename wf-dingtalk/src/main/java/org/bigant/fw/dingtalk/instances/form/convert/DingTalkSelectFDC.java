@@ -1,11 +1,11 @@
 package org.bigant.fw.dingtalk.instances.form.convert;
 
 import com.aliyun.dingtalkworkflow_1_0.models.GetProcessInstanceResponseBody;
-import org.bigant.wf.instances.form.FormDataItem;
+import org.bigant.fw.dingtalk.DingTalkFormType;
 import org.bigant.wf.ComponentType;
+import org.bigant.wf.instances.form.FormDataItem;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -34,6 +34,6 @@ public class DingTalkSelectFDC extends DingTalkBaseFDC {
 
     @Override
     public Collection<String> getOtherType() {
-        return Collections.singletonList("DDSelectField");
+        return DingTalkFormType.SELECT.getDingTalkType();
     }
 }

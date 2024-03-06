@@ -2,6 +2,7 @@ package org.bigant.fw.dingtalk.instances.form.convert;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.aliyun.dingtalkworkflow_1_0.models.GetProcessInstanceResponseBody;
+import org.bigant.fw.dingtalk.DingTalkFormType;
 import org.bigant.wf.instances.form.FormDataItem;
 import org.bigant.wf.instances.form.FormDataParseAll;
 import org.bigant.wf.ComponentType;
@@ -56,6 +57,6 @@ public class DingTalkImageFDC extends DingTalkBaseFDC {
 
     @Override
     public Collection<String> getOtherType() {
-        return Collections.singletonList("DDPhotoField");
+        return DingTalkFormType.IMAGE.getDingTalkType();
     }
 }

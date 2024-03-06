@@ -10,10 +10,7 @@ import com.aliyun.teautil.models.RuntimeOptions;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.bigant.fw.dingtalk.DingTalkConfig;
-import org.bigant.fw.dingtalk.DingTalkConstant;
-import org.bigant.fw.dingtalk.DingTalkFile;
-import org.bigant.fw.dingtalk.DingTalkUser;
+import org.bigant.fw.dingtalk.*;
 import org.bigant.wf.cache.ICache;
 import org.bigant.wf.exception.WfException;
 import org.bigant.wf.ComponentType;
@@ -103,7 +100,7 @@ public class DingTalkAttachmentFDC extends DingTalkBaseFDC {
 
     @Override
     public Collection<String> getOtherType() {
-        return Collections.singletonList("DDAttachment");
+        return DingTalkFormType.ATTACHMENT.getDingTalkType();
     }
 
     private Long getProcessInstancesSpaces(String dingTalkUserId) {

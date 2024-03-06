@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.aliyun.dingtalkworkflow_1_0.models.GetProcessInstanceResponseBody;
 import lombok.AllArgsConstructor;
+import org.bigant.fw.dingtalk.DingTalkFormType;
 import org.bigant.fw.dingtalk.instances.form.DingTalkFDCF;
 import org.bigant.wf.ComponentType;
 import org.bigant.wf.instances.form.FormDataItem;
@@ -11,7 +12,6 @@ import org.bigant.wf.instances.form.FormDataParseAll;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -93,6 +93,6 @@ public class DingTalkTableFDC extends DingTalkBaseFDC {
 
     @Override
     public Collection<String> getOtherType() {
-        return Collections.singletonList("TableField");
+        return DingTalkFormType.TABLE.getDingTalkType();
     }
 }
