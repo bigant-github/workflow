@@ -14,15 +14,14 @@ import org.bigant.fw.lark.instances.form.LarkFDCF;
 import org.bigant.fw.lark.instances.form.convert.LarkBaseFDC;
 import org.bigant.fw.lark.process.LarkProcessService;
 import org.bigant.wf.exception.WfException;
-import org.bigant.wf.instances.InstancesService;
 import org.bigant.wf.instances.InstanceStatus;
+import org.bigant.wf.instances.InstancesService;
 import org.bigant.wf.instances.bean.*;
 import org.bigant.wf.instances.form.FormDataItem;
 import org.bigant.wf.process.bean.ProcessDetail;
 import org.bigant.wf.task.TaskStatus;
 import org.bigant.wf.user.UserService;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -327,6 +326,9 @@ public class LarkInstancesService implements InstancesService {
                 .formData(formData)
                 .instanceStatus(instanceStatus)
                 .tasks(tasks)
+                .title(body.getApprovalName())
+                .deptId(userService.getDeptIdByOtherDeptId(body.getDepartmentId(), getType()))
+                .userId(userService.getOtherUserIdByUserId(body.getUserId(), getType()))
                 .build();
     }
 
