@@ -4,7 +4,7 @@ import com.alibaba.fastjson2.JSONObject;
 import lombok.AllArgsConstructor;
 import org.bigant.wf.exception.WfException;
 import org.bigant.wf.instances.InstancesAction;
-import org.bigant.wf.instances.InstancesStatus;
+import org.bigant.wf.instances.InstanceStatus;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -61,10 +61,7 @@ public class LarkCallback {
         Long operateTimeSecond = event.getLong("instance_operate_time");
 
         //时间戳转LocalDateTime
-        operateTimeSecond = operateTimeSecond * 1000;
-
-        Instant instant = Instant.ofEpochMilli(operateTimeSecond);
-        LocalDateTime operateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+        LocalDateTime operateTime = DateUtil.timestampToLocalDateTime(operateTimeSecond);
 
 
         InstancesAction.InstancesCallback instancesCallback = InstancesAction.InstancesCallback.builder()
@@ -75,19 +72,19 @@ public class LarkCallback {
 
         switch (event.getString("status")) {
             case "PENDING":
-                instancesCallback.setAction(InstancesStatus.RUNNING);
+                instancesCallback.setAction(InstanceStatus.RUNNING);
                 break;
             case "APPROVED":
-                instancesCallback.setAction(InstancesStatus.AGREED);
+                instancesCallback.setAction(InstanceStatus.AGREED);
                 break;
             case "REJECTED":
-                instancesCallback.setAction(InstancesStatus.REFUSED);
+                instancesCallback.setAction(InstanceStatus.REFUSED);
                 break;
             case "CANCELED":
             case "REVERTED":
-                instancesCallback.setAction(InstancesStatus.CANCELED);
+                instancesCallback.setAction(InstanceStatus.CANCELED);
             case "DELETED":
-                instancesCallback.setAction(InstancesStatus.DELETED);
+                instancesCallback.setAction(InstanceStatus.DELETED);
                 break;
             case "OVERTIME_CLOSE":
             case "OVERTIME_RECOVER":

@@ -15,7 +15,7 @@ import org.bigant.fw.dingtalk.instances.form.DingTalkFDCF;
 import org.bigant.fw.dingtalk.instances.form.convert.DingTalkBaseFDC;
 import org.bigant.wf.exception.WfException;
 import org.bigant.wf.instances.InstancesService;
-import org.bigant.wf.instances.InstancesStatus;
+import org.bigant.wf.instances.InstanceStatus;
 import org.bigant.wf.instances.bean.*;
 import org.bigant.wf.instances.form.FormDataItem;
 import org.bigant.wf.task.TaskStatus;
@@ -170,7 +170,7 @@ public class DingTalkInstancesService implements InstancesService {
             String resultStatus = result.getResult();
 
 
-            InstancesStatus instancesStatus = null;
+            InstanceStatus instanceStatus = null;
             /*
              * status 状态
              * NEW：新创建
@@ -187,18 +187,18 @@ public class DingTalkInstancesService implements InstancesService {
              */
             switch (status) {
                 case "NEW":
-                    instancesStatus = InstancesStatus.WAITING;
+                    instanceStatus = InstanceStatus.WAITING;
                     break;
                 case "RUNNING":
-                    instancesStatus = InstancesStatus.RUNNING;
+                    instanceStatus = InstanceStatus.RUNNING;
                     break;
                 case "COMPLETED":
                     switch (resultStatus) {
                         case "agree":
-                            instancesStatus = InstancesStatus.AGREED;
+                            instanceStatus = InstanceStatus.AGREED;
                             break;
                         case "refuse":
-                            instancesStatus = InstancesStatus.REFUSED;
+                            instanceStatus = InstanceStatus.REFUSED;
                             break;
                         default:
                             String errMsg = String.format("钉钉-查询审批示例详情，无法识别的实例状态 resultStatus:%s", resultStatus);
@@ -208,7 +208,7 @@ public class DingTalkInstancesService implements InstancesService {
                     break;
                 case "TERMINATED":
                 case "CANCELED":
-                    instancesStatus = InstancesStatus.CANCELED;
+                    instanceStatus = InstanceStatus.CANCELED;
                     break;
                 default:
                     String errMsg = String.format("钉钉-查询审批示例详情，无法识别的实例状态 status:%s", status);
@@ -299,10 +299,10 @@ public class DingTalkInstancesService implements InstancesService {
 
 
                 tasks.add(InstanceDetailResult.Task.builder()
-                        .taskId(task.getTaskId().toString())
+                        .taskCode(task.getTaskId().toString())
                         .userId(taskUserId)
                         .userName(taskUser.getUserName())
-                        .status(taskStatus)
+                        .taskStatus(taskStatus)
                         .build());
 
             }
@@ -313,7 +313,7 @@ public class DingTalkInstancesService implements InstancesService {
                     .instanceCode(instanceCode)
                     .userId(userId)
                     .deptId(deptId)
-                    .status(instancesStatus)
+                    .instanceStatus(instanceStatus)
                     .formData(formDataItemList)
                     .tasks(tasks)
                     .build();

@@ -5,9 +5,10 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
 import org.bigant.wf.instances.form.FormDataItem;
-import org.bigant.wf.instances.InstancesStatus;
+import org.bigant.wf.instances.InstanceStatus;
 import org.bigant.wf.task.TaskStatus;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -36,7 +37,7 @@ public class InstanceDetailResult {
     private String title;
 
     @ApiModelProperty("审批状态")
-    private InstancesStatus status;
+    private InstanceStatus instanceStatus;
 
     @ApiModelProperty("表单字段集合")
     private List<FormDataItem> formData;
@@ -49,13 +50,20 @@ public class InstanceDetailResult {
     @ApiModel("任务")
     @Builder
     public static class Task {
-        private String taskId;
+        @ApiModelProperty("任务id")
+        private String taskCode;
 
+        @ApiModelProperty("用户id")
         private String userId;
 
+        @ApiModelProperty("用户名称")
         private String userName;
 
-        private TaskStatus status;
+        @ApiModelProperty("任务状态")
+        private TaskStatus taskStatus;
+
+        @ApiModelProperty("任务结束时间")
+        private LocalDateTime endTime;
     }
 
 }

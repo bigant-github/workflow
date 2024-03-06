@@ -49,7 +49,8 @@ public class BaseTest {
                 return User.builder()
                         .userName("galen")
                         .userId("1")
-                        .deptName(Collections.singletonList("研发部"))
+                        .deptNames(Collections.singletonList("研发部"))
+                        .deptIds(Arrays.asList("1"))
                         .build();
             }
 

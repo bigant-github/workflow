@@ -3,13 +3,17 @@ package org.bigant.fw.lark.instances.form.convert;
 import com.alibaba.fastjson2.JSONObject;
 import org.bigant.fw.lark.LarkFormType;
 import org.bigant.wf.ComponentType;
+import org.bigant.wf.form.option.DateOption;
 import org.bigant.wf.instances.form.FormDataItem;
 import org.bigant.wf.instances.form.FormDataParseAll;
 import org.bigant.wf.instances.form.databean.FormDataDate;
+import org.bigant.wf.process.bean.ProcessDetail;
 
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -32,16 +36,17 @@ public class LarkDateFDC extends LarkBaseFDC {
     }
 
     @Override
-    public FormDataItem toFormData(JSONObject data) {
+    public FormDataItem toFormData(LarkBaseFDC.ToOtherParam data) {
+        JSONObject formObj = data.getFormObj();
 
-        /*String value = data.getValue();
-        DateOption.ComponentDateFormat componentDateFormat = dateType(value);
+        ProcessDetail.FormItem detailItem =
+                data.getFormDetailItemMap().get(formObj.getString("id"));
 
-        return FormData.date(data.getName(),
-                this.toLocalDateTime(value, componentDateFormat),
-                componentDateFormat);*/
+        return FormDataItem.date(data.getFormObj().getString("name"),
+                LocalDateTime.parse(data.getFormObj().getString("value"),
+                        DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+                , DateOption.ComponentDateFormat.YYYY_MM_DD_HH_MM);
 
-        return null;
     }
 
     @Override

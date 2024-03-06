@@ -1,5 +1,6 @@
 package org.bigant.fw.lark.instances.form.convert;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import org.bigant.fw.lark.LarkFormType;
 import org.bigant.wf.ComponentType;
@@ -38,9 +39,11 @@ public class LarkMultiSelectFDC extends LarkBaseFDC {
 
     @Override
     public FormDataItem toFormData(
-            JSONObject data) {
-        /*return FormData.multiSelect(data.getName(), JSONArray.parseArray(data.getValue(), String.class));*/
-        return null;
+            LarkBaseFDC.ToOtherParam data) {
+
+        return FormDataItem.multiSelect(data.getFormObj().getString("name"),
+                JSONArray.parseArray(data.getFormObj().getString("value"), String.class));
+
     }
 
     @Override

@@ -22,9 +22,9 @@ public class LarkTextareaFDC extends LarkBaseFDC {
     }
 
     @Override
-    public FormDataItem toFormData(JSONObject data) {
-        /*return FormData.textarea(data.getName(), data.getValue());*/
-        return null;
+    public FormDataItem toFormData(LarkBaseFDC.ToOtherParam data) {
+        return FormDataItem.textarea(data.getFormObj().getString("name"),
+                data.getFormObj().getString("value"));
     }
 
     @Override

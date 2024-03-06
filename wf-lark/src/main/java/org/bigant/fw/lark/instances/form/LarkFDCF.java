@@ -20,7 +20,7 @@ public class LarkFDCF
         extends FormDataConvertFactory<
         Map<String, Object>,
         LarkBaseFDC.FormItemConvert,
-        JSONObject,
+        LarkBaseFDC.ToOtherParam,
         LarkBaseFDC> {
 
 

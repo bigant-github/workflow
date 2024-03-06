@@ -3,7 +3,10 @@ package org.bigant.fw.lark.instances.form.convert;
 import com.alibaba.fastjson2.JSONObject;
 import org.bigant.fw.lark.LarkFormType;
 import org.bigant.wf.ComponentType;
+import org.bigant.wf.form.option.AmountOption;
 import org.bigant.wf.instances.form.FormDataItem;
+import org.bigant.wf.instances.form.FormDataParseAll;
+import org.bigant.wf.instances.form.databean.FormDataAmount;
 
 import java.util.Collection;
 import java.util.Map;
@@ -18,19 +21,20 @@ public class LarkAmountFDC extends LarkBaseFDC {
 
     @Override
     public Map<String, Object> toOther(FormItemConvert data) {
-        Map<String, Object> map = this.base(data, "amount", data.getFormComponents().getValue());
+        FormDataAmount formDataAmount = FormDataParseAll.COMPONENT_PARSE_AMOUNT.strToJava(data.getFormComponents().getValue());
+
+        Map<String, Object> map = this.base(data, "amount", formDataAmount.getAmount());
         map.put("currency", "CNY");
         return map;
     }
 
     @Override
     public FormDataItem toFormData(
-            JSONObject data) {
+            LarkBaseFDC.ToOtherParam data) {
 
-        /*return FormData.amount(data.getName(),
-                new BigDecimal(data.getValue()),
-                AmountOption.AmountType.CNY);*/
-        return null;
+        return FormDataItem.amount(data.getFormObj().getString("name"),
+                data.getFormObj().getBigDecimal("value"),
+                AmountOption.AmountType.CNY);
     }
 
     @Override

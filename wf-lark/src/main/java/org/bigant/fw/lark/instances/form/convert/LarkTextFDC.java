@@ -3,6 +3,7 @@ package org.bigant.fw.lark.instances.form.convert;
 import com.alibaba.fastjson2.JSONObject;
 import org.bigant.fw.lark.LarkFormType;
 import org.bigant.wf.ComponentType;
+import org.bigant.wf.form.option.AmountOption;
 import org.bigant.wf.instances.form.FormDataItem;
 
 import java.util.Collection;
@@ -23,9 +24,9 @@ public class LarkTextFDC extends LarkBaseFDC {
 
     @Override
     public FormDataItem toFormData(
-            JSONObject data) {
-        /*return FormData.text(data.getName(), data.getValue());*/
-        return null;
+            LarkBaseFDC.ToOtherParam data) {
+        return FormDataItem.text(data.getFormObj().getString("name"),
+                data.getFormObj().getString("value"));
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.bigant.fw.lark.instances.form.convert;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,7 @@ import java.util.Map;
 public class LarkAttachmentFDC extends LarkBaseFDC {
 
     private LarkFile larkFile;
+
     @Override
     public Map<String, Object> toOther(LarkBaseFDC.FormItemConvert component) {
         Collection<FormDataAttachment> formDataAttachments = FormDataParseAll
@@ -46,25 +48,24 @@ public class LarkAttachmentFDC extends LarkBaseFDC {
 
     @Override
     public FormDataItem toFormData(
-            JSONObject data) {
+            LarkBaseFDC.ToOtherParam data) {
 
-        /*String value = data.getValue();
-        JSONArray jsonVal = JSONArray.parse(value);
+        JSONArray value = data.getFormObj().getJSONArray("value");
+        String[] ext = data.getFormObj().getString("ext").split(",");
+
         ArrayList<FormDataAttachment> attachments = new ArrayList<>();
-        for (int i = 0; i < jsonVal.size(); i++) {
 
-            JSONObject jsonFile = jsonVal.getJSONObject(i);
+        for (int i = 0; i < value.size(); i++) {
 
             attachments
                     .add(FormDataAttachment.builder()
-                            .name(jsonFile.getString("fileName"))
-                            .size(jsonFile.getLong("fileSize"))
+                            .name(ext[i])
+                            .url(value.getString(i))
                             .build());
 
         }
 
-        return FormData.attachment(data.getName(), attachments);*/
-        return null;
+        return FormDataItem.attachment(data.getFormObj().getString("name"), attachments);
     }
 
     @Override

@@ -30,9 +30,9 @@ public class LarkSelectFDC extends LarkBaseFDC {
 
     @Override
     public FormDataItem toFormData(
-            JSONObject data) {
-        /*return FormData.select(data.getName(), data.getValue());*/
-        return null;
+            LarkBaseFDC.ToOtherParam data) {
+        return FormDataItem.select(data.getFormObj().getString("name"),
+                data.getFormObj().getString("value"));
     }
 
     @Override

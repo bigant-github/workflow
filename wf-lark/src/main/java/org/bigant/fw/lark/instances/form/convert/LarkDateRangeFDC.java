@@ -1,13 +1,17 @@
 package org.bigant.fw.lark.instances.form.convert;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import org.bigant.fw.lark.LarkFormType;
 import org.bigant.wf.ComponentType;
+import org.bigant.wf.form.option.DateOption;
 import org.bigant.wf.instances.form.FormDataItem;
 import org.bigant.wf.instances.form.FormDataParseAll;
 import org.bigant.wf.instances.form.databean.FormDataDateRange;
+import org.bigant.wf.process.bean.ProcessDetail;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
@@ -55,28 +59,23 @@ public class LarkDateRangeFDC extends LarkBaseFDC {
     }
 
     @Override
-    public FormDataItem toFormData(JSONObject data) {
+    public FormDataItem toFormData(LarkBaseFDC.ToOtherParam data) {
 
-        /*String value = data.getValue();
-        String name = data.getName();
-
-        List<String> jsonVal = JSONArray.parseArray(value,String.class);
-        List<String> jsonName = JSONArray.parseArray(name,String.class);
-
-        String beginDate = jsonVal.get(0);
-        String endDate = jsonVal.get(1);
-
-        String beginName = jsonName.get(0);
-        String endName = jsonName.get(1);
-
-        DateOption.ComponentDateFormat dateFormat = dateType(beginDate);
+        JSONObject dataObj = data.getFormObj();
+        JSONObject value = dataObj.getJSONObject("value");
+        ProcessDetail.FormItem detailItem = data.getFormDetailItemMap()
+                .get(dataObj.getString("id"));
 
 
-        return FormData.dateRange(
-                beginName, this.toLocalDateTime(beginDate, dateFormat),
-                endName, this.toLocalDateTime(endDate, dateFormat),
-                dateFormat);*/
-        return null;
+        String beginDate = value.getString("start");
+        String endDate = value.getString("end");
+
+        JSONArray nameArr = JSONArray.parse(detailItem.getName());
+
+        return FormDataItem.dateRange(
+                nameArr.getString(0), LocalDateTime.parse(beginDate, DateTimeFormatter.ISO_OFFSET_DATE_TIME),
+                nameArr.getString(1), LocalDateTime.parse(endDate, DateTimeFormatter.ISO_OFFSET_DATE_TIME),
+                DateOption.ComponentDateFormat.YYYY_MM_DD_HH_MM);
 
     }
 

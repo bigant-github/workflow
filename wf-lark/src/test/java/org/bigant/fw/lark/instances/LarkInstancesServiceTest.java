@@ -1,6 +1,7 @@
 package org.bigant.fw.lark.instances;
 
 
+import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.bigant.fw.lark.BaseTest;
 import org.bigant.fw.lark.instances.form.LarkFDCF;
@@ -53,7 +54,7 @@ public class LarkInstancesServiceTest extends BaseTest {
                                 FormDataItem.select("单选", "选项 1"),
                                 FormDataItem.multiSelect("多选", "选项 1", "选项 2"),
                                 FormDataItem.date("日期", LocalDateTime.now(), DateOption.ComponentDateFormat.YYYY_MM_DD),
-                                FormDataItem.dateRange("开始时间", LocalDateTime.now(), "结束时间", LocalDateTime.now(), DateOption.ComponentDateFormat.YYYY_MM_DD_HH_MM),
+                                FormDataItem.dateRange("开始时间1", LocalDateTime.now(), "结束时间1", LocalDateTime.now(), DateOption.ComponentDateFormat.YYYY_MM_DD_HH_MM),
                                 FormDataItem.image("图片", Arrays.asList(
                                         FormDataImage.builder().name("测试1.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
                                         FormDataImage.builder().name("测试2.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
@@ -85,11 +86,11 @@ public class LarkInstancesServiceTest extends BaseTest {
     }
 
 
+    @Test
     public void detail() {
         String larkTestProcessCode = System.getenv("larkTestInstanceCode");
-
         InstanceDetailResult detail = getLarkInstancesService().detail(larkTestProcessCode);
-
+        log.info(JSONObject.toJSONString(detail));
     }
 
     public LarkInstancesService getLarkInstancesService() {

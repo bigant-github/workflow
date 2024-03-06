@@ -4,7 +4,7 @@ package org.bigant.wf.instances;
  * @author galen
  * @date 2024/2/2917:27
  */
-public enum InstancesStatus {
+public enum InstanceStatus {
     WAITING("未启动"),
     RUNNING("审批中"),
     AGREED("同意"),
@@ -13,7 +13,7 @@ public enum InstancesStatus {
     DELETED("删除");
     private final String actionName;
 
-    InstancesStatus(String actionName) {
+    InstanceStatus(String actionName) {
         this.actionName = actionName;
     }
 

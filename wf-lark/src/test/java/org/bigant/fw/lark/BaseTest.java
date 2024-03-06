@@ -1,10 +1,12 @@
 package org.bigant.fw.lark;
 
+import com.lark.oapi.Client;
 import org.bigant.wf.user.UserService;
 import org.bigant.wf.user.vo.User;
 import org.junit.Before;
 
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 基础测试
@@ -29,7 +31,9 @@ public class BaseTest {
         String larkDeptId = System.getenv("larkDeptId");
 
         larkConfig = new LarkConfig(larkAppId, larkAppSecret, "");
-
+        larkConfig.setClient(Client.newBuilder(larkAppId, larkAppSecret)
+                .logReqAtDebug(true) // 在 debug 模式下会打印 http 请求和响应的 headers,body 等信息。
+                .build());
         userService = new UserService() {
 
             @Override
@@ -37,7 +41,8 @@ public class BaseTest {
                 return User.builder()
                         .userId("1")
                         .userName("galen")
-                        .deptName(Arrays.asList("研发部"))
+                        .deptNames(Arrays.asList("研发部"))
+                        .deptIds(Arrays.asList("1"))
                         .build();
 
             }
@@ -54,12 +59,12 @@ public class BaseTest {
 
             @Override
             public String getUserIdByOtherUserId(String otherUserId, String type) {
-                return null;
+                return "2";
             }
 
             @Override
             public String getDeptIdByOtherDeptId(String otherDeptId, String type) {
-                return null;
+                return "3";
             }
         };
 

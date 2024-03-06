@@ -1,5 +1,6 @@
 package org.bigant.fw.lark.instances.form.convert;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.AllArgsConstructor;
 import org.bigant.fw.lark.LarkFormType;
@@ -9,6 +10,7 @@ import org.bigant.wf.instances.form.FormDataItem;
 import org.bigant.wf.instances.form.FormDataParseAll;
 import org.bigant.wf.process.bean.ProcessDetail;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -39,38 +41,70 @@ public class LarkTableFDC extends LarkBaseFDC {
         List<List<Map<String, Object>>> value = table.stream()
                 .map(row -> row.stream()
                         .map(x -> dingTalkFDCF.getByFormType(x.getComponentType())
-                                        .toOther(new LarkBaseFDC.FormItemConvert(x, childrenMap.get(x.getName()))))
+                                .toOther(new LarkBaseFDC.FormItemConvert(x, childrenMap.get(x.getName()))))
                         .collect(Collectors.toList()))
                 .collect(Collectors.toList());
 
         return this.base(component, "fieldList", value);
     }
 
+
     @Override
     public FormDataItem toFormData(
-            JSONObject data) {
+            LarkBaseFDC.ToOtherParam data) {
 
-        /*String value = data.getValue();
-        JSONArray jsonVal = JSONArray.parse(value);
+        /*
+         * {
+         *     "id": "widget1",
+         *     "name": "Item application",
+         *     "type": "fieldList",
+         *     "value": [
+         *          [
+         *             {
+         *                 "id": "widget1",
+         *                 "type": "checkbox",
+         *                 "value": ["jxpsebqp-0"]
+         *             }
+         *          ]
+         *      ]
+         * }
+         */
+        JSONObject dataObj = data.getFormObj();
+        JSONArray rowsObj = dataObj.getJSONArray("value");
 
-        ArrayList<Collection<FormData>> rows = new ArrayList<>(jsonVal.size());
+        ArrayList<Collection<FormDataItem>> rows = new ArrayList<>(rowsObj.size());
 
-        for (int i = 0; i < jsonVal.size(); i++) {
-            JSONArray row = jsonVal.getJSONObject(i).getJSONArray("rowValue");
-            ArrayList<FormData> fieldList = new ArrayList<>(row.size());
+        ProcessDetail.FormItem detailItem =
+                data.getFormDetailItemMap()
+                        .get(dataObj.getString("id"));
+
+        Map<String, ProcessDetail.FormItem> collect = detailItem.getChildren().stream()
+                .collect(Collectors.toMap(ProcessDetail.FormItem::getId, x -> x));
+
+        for (int i = 0; i < rowsObj.size(); i++) {
+
+            JSONArray row = rowsObj.getJSONArray(i);
+
+            ArrayList<FormDataItem> fieldList = new ArrayList<>(row.size());
 
             for (int i1 = 0; i1 < row.size(); i1++) {
+                /*
+                 * {
+                 *     "id": "widget1",
+                 *     "type": "checkbox",
+                 *     "value": ["jxpsebqp-0"]
+                 * }
+                 */
                 JSONObject field = row.getJSONObject(i1);
-                GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues model
-                        = new GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues();
 
-                String type = field.getString("key").split("_")[0];
-                model.setName(field.getString("label"));
-                model.setComponentType(type);
-                model.setValue(field.getString("value"));
+                String type = field.getString("type");
 
                 LarkBaseFDC fdc = dingTalkFDCF.getByOtherType(type);
-                fieldList.add(fdc.toFormData(model));
+
+
+                fieldList.add(
+                        fdc.toFormData(
+                                new ToOtherParam(field, collect)));
             }
 
             rows.add(fieldList);
@@ -78,8 +112,7 @@ public class LarkTableFDC extends LarkBaseFDC {
         }
 
 
-        return FormData.table(data.getName(), rows);*/
-        return null;
+        return FormDataItem.table(data.getFormObj().getString("name"), rows);
     }
 
     @Override

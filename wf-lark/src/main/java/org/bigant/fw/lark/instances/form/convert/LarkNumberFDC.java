@@ -21,10 +21,12 @@ public class LarkNumberFDC extends LarkBaseFDC {
         return this.base(component, "number", component.getFormComponents().getValue());
     }
 
+    @Override
     public FormDataItem toFormData(
-            JSONObject data) {
-        /*return FormData.number(data.getName(), new BigDecimal(data.getValue()));*/
-        return null;
+            LarkBaseFDC.ToOtherParam data) {
+
+        return FormDataItem.number(data.getFormObj().getString("name"),
+                data.getFormObj().getBigDecimal("value"));
     }
 
     @Override

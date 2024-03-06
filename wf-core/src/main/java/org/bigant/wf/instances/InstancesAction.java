@@ -60,7 +60,7 @@ public interface InstancesAction {
 
         private LocalDateTime operateTime;
 
-        private InstancesStatus action;
+        private InstanceStatus action;
     }
 
 

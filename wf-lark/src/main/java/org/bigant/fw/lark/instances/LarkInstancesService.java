@@ -1,10 +1,13 @@
 package org.bigant.fw.lark.instances;
 
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.Client;
 import com.lark.oapi.core.utils.Jsons;
 import com.lark.oapi.service.approval.v4.model.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bigant.fw.lark.DateUtil;
 import org.bigant.fw.lark.LarkConfig;
 import org.bigant.fw.lark.LarkConstant;
 import org.bigant.fw.lark.instances.form.LarkFDCF;
@@ -12,11 +15,14 @@ import org.bigant.fw.lark.instances.form.convert.LarkBaseFDC;
 import org.bigant.fw.lark.process.LarkProcessService;
 import org.bigant.wf.exception.WfException;
 import org.bigant.wf.instances.InstancesService;
+import org.bigant.wf.instances.InstanceStatus;
 import org.bigant.wf.instances.bean.*;
 import org.bigant.wf.instances.form.FormDataItem;
 import org.bigant.wf.process.bean.ProcessDetail;
+import org.bigant.wf.task.TaskStatus;
 import org.bigant.wf.user.UserService;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -143,6 +149,7 @@ public class LarkInstancesService implements InstancesService {
 
             CreateInstanceRespBody data = resp.getData();
 
+            log.debug("飞书-发起审批实例成功。instanceCode:{}", data.getInstanceCode());
             return InstanceStartResult.builder().instanceCode(data.getInstanceCode())
                     .processCode(instanceStart.getProcessCode())
                     .build();
@@ -213,8 +220,114 @@ public class LarkInstancesService implements InstancesService {
         GetInstanceRespBody body = resp.getData();
         log.debug("飞书-创建查询审批实例成功。instanceCode:{},data:{}", instanceCode, Jsons.DEFAULT.toJson(body));
         String form = body.getForm();
+        String approvalCode = body.getApprovalCode();
 
-        return null;
+        JSONArray formArray = JSONArray.parse(form);
+        ArrayList<FormDataItem> formData = new ArrayList<>();
+
+        ProcessDetail detail = larkProcessService.detail(approvalCode);
+        Map<String, ProcessDetail.FormItem> detailItemMap =
+                detail.getForm().stream().collect(Collectors.toMap(ProcessDetail.FormItem::getId, x -> x));
+
+        for (int i = 0; i < formArray.size(); i++) {
+            JSONObject jsonObj = formArray.getJSONObject(i);
+            LarkBaseFDC fdc = larkFDCF.getByOtherType(jsonObj.getString("type"));
+            formData.add(fdc.toFormData(new LarkBaseFDC.ToOtherParam(jsonObj, detailItemMap)));
+        }
+
+        /*
+         * status 可选值
+         * PENDING：审批中
+         * APPROVED：通过
+         * REJECTED：拒绝
+         * CANCELED：撤回
+         * DELETED：删除
+         */
+        InstanceStatus instanceStatus = null;
+        String status = body.getStatus();
+        switch (status) {
+            case "PENDING":
+                instanceStatus = InstanceStatus.RUNNING;
+                break;
+            case "APPROVED":
+                instanceStatus = InstanceStatus.AGREED;
+                break;
+            case "REJECTED":
+                instanceStatus = InstanceStatus.REFUSED;
+                break;
+            case "CANCELED":
+                instanceStatus = InstanceStatus.CANCELED;
+                break;
+            case "DELETED":
+                instanceStatus = InstanceStatus.DELETED;
+                break;
+            default:
+                String errMsg = String.format("飞书-创建查询审批实例失败,无法翻译的实例状态。instanceCode:%s,status:%s",
+                        instanceCode,
+                        status);
+                log.error(errMsg);
+                throw new WfException(errMsg);
+        }
+
+        ArrayList<InstanceDetailResult.Task> tasks = new ArrayList<>();
+        for (InstanceTask instanceTask : body.getTaskList()) {
+
+            String userId = instanceTask.getUserId();
+            String userName = instanceTask.getUserId();
+            if (!(userId == null || userId.isEmpty())) {
+                userId = userService.getUserIdByOtherUserId(userId, getType());
+                userName = userService.getUser(userId).getUserName();
+            }
+
+            String resultTaskStatus = instanceTask.getStatus();
+            TaskStatus taskStatus;
+            /**
+             * resultTaskStatus 可选值
+             * PENDING：审批中
+             * APPROVED：通过
+             * REJECTED：拒绝
+             * TRANSFERRED：已转交
+             * DONE：完成
+             */
+            switch (resultTaskStatus) {
+                case "PENDING":
+                    taskStatus = TaskStatus.RUNNING;
+                    break;
+                case "APPROVED":
+                    taskStatus = TaskStatus.AGREED;
+                    break;
+                case "REJECTED":
+                    taskStatus = TaskStatus.REFUSED;
+                    break;
+                case "TRANSFERRED":
+                    taskStatus = TaskStatus.REDIRECTED;
+                    break;
+                case "DONE":
+                    taskStatus = TaskStatus.PAUSED;
+                    break;
+                default:
+                    String errMsg = String.format("飞书-创建查询审批实例失败,无法翻译的任务状态。instanceCode:%s,status:%s", instanceCode, resultTaskStatus);
+                    log.error(errMsg);
+                    throw new WfException(errMsg);
+            }
+
+
+            tasks.add(InstanceDetailResult.Task.builder()
+                    .taskCode(instanceTask.getId())
+                    .userId(instanceTask.getUserId())
+                    .userName(userName)
+                    .taskStatus(taskStatus)
+                    .endTime(DateUtil.timestampToLocalDateTime(instanceTask.getEndTime()))
+                    .build());
+        }
+
+        return InstanceDetailResult.builder()
+                .instanceCode(body.getInstanceCode())
+                .processCode(approvalCode)
+                .formData(formData)
+                .instanceStatus(instanceStatus)
+                .tasks(tasks)
+                .build();
     }
 
 
