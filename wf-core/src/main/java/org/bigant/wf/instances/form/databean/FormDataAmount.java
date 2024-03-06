@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bigant.wf.form.option.AmountOption;
+import org.bigant.wf.process.form.option.AmountOption;
 
 import java.math.BigDecimal;
 

@@ -2,7 +2,7 @@ package org.bigant.fw.lark.instances.form.convert;
 
 import org.bigant.fw.lark.LarkFormType;
 import org.bigant.wf.ComponentType;
-import org.bigant.wf.form.option.SelectOption;
+import org.bigant.wf.process.form.option.SelectOption;
 import org.bigant.wf.instances.form.FormDataItem;
 
 import java.util.Collection;

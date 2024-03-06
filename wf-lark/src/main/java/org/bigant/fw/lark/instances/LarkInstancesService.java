@@ -18,7 +18,6 @@ import org.bigant.wf.instances.InstanceStatus;
 import org.bigant.wf.instances.InstancesService;
 import org.bigant.wf.instances.bean.*;
 import org.bigant.wf.instances.form.FormDataItem;
-import org.bigant.wf.process.form.FormDetailItem;
 import org.bigant.wf.process.bean.ProcessDetail;
 import org.bigant.wf.task.TaskStatus;
 import org.bigant.wf.user.UserService;
@@ -65,8 +64,8 @@ public class LarkInstancesService implements InstancesService {
 
         ProcessDetail processDetail = larkProcessService.detail(instanceStart.getProcessCode());
 
-        Map<String, FormDetailItem> formItemMap =
-                processDetail.getForm().stream().collect(Collectors.toMap(FormDetailItem::getName, x -> x));
+        Map<String, org.bigant.wf.process.form.FormDetailItem> formItemMap =
+                processDetail.getForm().stream().collect(Collectors.toMap(org.bigant.wf.process.form.FormDetailItem::getName, x -> x));
 
         List<FormDataItem> formData = instanceStart.getFormData();
 
@@ -174,8 +173,8 @@ public class LarkInstancesService implements InstancesService {
 
         ProcessDetail processDetail = larkProcessService.detail(instancePreview.getInstanceCode());
 
-        Map<String, FormDetailItem> formItemMap =
-                processDetail.getForm().stream().collect(Collectors.toMap(FormDetailItem::getName, x -> x));
+        Map<String, org.bigant.wf.process.form.FormDetailItem> formItemMap =
+                processDetail.getForm().stream().collect(Collectors.toMap(org.bigant.wf.process.form.FormDetailItem::getName, x -> x));
 
         List<FormDataItem> formData = instancePreview.getFormData();
 
@@ -226,8 +225,8 @@ public class LarkInstancesService implements InstancesService {
         ArrayList<FormDataItem> formData = new ArrayList<>();
 
         ProcessDetail detail = larkProcessService.detail(approvalCode);
-        Map<String, FormDetailItem> detailItemMap =
-                detail.getForm().stream().collect(Collectors.toMap(FormDetailItem::getId, x -> x));
+        Map<String, org.bigant.wf.process.form.FormDetailItem> detailItemMap =
+                detail.getForm().stream().collect(Collectors.toMap(org.bigant.wf.process.form.FormDetailItem::getId, x -> x));
 
         for (int i = 0; i < formArray.size(); i++) {
             JSONObject jsonObj = formArray.getJSONObject(i);
@@ -382,7 +381,7 @@ public class LarkInstancesService implements InstancesService {
     }
 
 
-    public String parseFormValues(List<FormDataItem> formDataItemList, Map<String, FormDetailItem> formItemMap) {
+    public String parseFormValues(List<FormDataItem> formDataItemList, Map<String, org.bigant.wf.process.form.FormDetailItem> formItemMap) {
 
         ArrayList<Map<String, Object>> maps = new ArrayList<>();
         for (FormDataItem formDataItem : formDataItemList) {
@@ -393,7 +392,7 @@ public class LarkInstancesService implements InstancesService {
     }
 
 
-    public Map<String, Object> parseFormValues(FormDataItem formComponents, FormDetailItem formDetailItem) {
+    public Map<String, Object> parseFormValues(FormDataItem formComponents, org.bigant.wf.process.form.FormDetailItem formDetailItem) {
         if (!formComponents.getComponentType().equals(formDetailItem.getType())) {
             String errMsg = String.format("飞书-转换表单内容失败，传入表单类型与飞书平台配置类型不匹配或飞书平台设置类型系统不支持。name:%s,系统类型:%s,飞书类型:%s",
                     formDetailItem.getName(),

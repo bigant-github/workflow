@@ -2,10 +2,7 @@ package org.bigant.fw.dingtalk.process.form;
 
 import com.aliyun.dingtalkworkflow_1_0.models.QuerySchemaByProcessCodeResponseBody;
 import lombok.extern.slf4j.Slf4j;
-import org.bigant.fw.dingtalk.DingTalkConfig;
-import org.bigant.fw.dingtalk.DingTalkUser;
 import org.bigant.fw.dingtalk.process.form.convert.*;
-import org.bigant.wf.cache.ICache;
 import org.bigant.wf.process.form.FormDetailConvertFactory;
 import org.bigant.wf.process.form.FormDetailItem;
 
@@ -23,23 +20,6 @@ public class DingTalkFDTCF
                 QuerySchemaByProcessCodeResponseBody.QuerySchemaByProcessCodeResponseBodyResultSchemaContentItems,
         DingTalkBaseFDTC> {
 
-
-    private final ICache cache;
-    private final DingTalkConfig dingTalkConfig;
-    private final DingTalkUser dingTalkUser;
-    private final com.aliyun.dingtalkworkflow_1_0.Client workflowClient;
-
-    public DingTalkFDTCF(
-            DingTalkConfig dingTalkConfig,
-            DingTalkUser dingTalkUser,
-            ICache cache,
-            com.aliyun.dingtalkworkflow_1_0.Client workflowClient) {
-        this.cache = cache;
-        this.dingTalkConfig = dingTalkConfig;
-        this.dingTalkUser = dingTalkUser;
-        this.workflowClient = workflowClient;
-
-    }
 
     @Override
     public DingTalkBaseFDTC text() {

@@ -8,7 +8,6 @@ import org.bigant.fw.lark.instances.form.LarkFDCF;
 import org.bigant.wf.ComponentType;
 import org.bigant.wf.instances.form.FormDataItem;
 import org.bigant.wf.instances.form.FormDataParseAll;
-import org.bigant.wf.process.form.FormDetailItem;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,9 +33,9 @@ public class LarkTableFDC extends LarkBaseFDC {
                 .COMPONENT_PARSE_TABLE
                 .strToJava(component.getFormComponents().getValue());
 
-        List<FormDetailItem> children = component.getFormDetailItem().getChildren();
-        Map<String, FormDetailItem> childrenMap = children.stream()
-                .collect(Collectors.toMap(FormDetailItem::getName, x -> x));
+        List<org.bigant.wf.process.form.FormDetailItem> children = component.getFormDetailItem().getChildren();
+        Map<String, org.bigant.wf.process.form.FormDetailItem> childrenMap = children.stream()
+                .collect(Collectors.toMap(org.bigant.wf.process.form.FormDetailItem::getName, x -> x));
 
         List<List<Map<String, Object>>> value = table.stream()
                 .map(row -> row.stream()
@@ -74,12 +73,12 @@ public class LarkTableFDC extends LarkBaseFDC {
 
         ArrayList<Collection<FormDataItem>> rows = new ArrayList<>(rowsObj.size());
 
-        FormDetailItem detailItem =
+        org.bigant.wf.process.form.FormDetailItem detailItem =
                 data.getFormDetailItemMap()
                         .get(dataObj.getString("id"));
 
-        Map<String, FormDetailItem> collect = detailItem.getChildren().stream()
-                .collect(Collectors.toMap(FormDetailItem::getId, x -> x));
+        Map<String, org.bigant.wf.process.form.FormDetailItem> collect = detailItem.getChildren().stream()
+                .collect(Collectors.toMap(org.bigant.wf.process.form.FormDetailItem::getId, x -> x));
 
         for (int i = 0; i < rowsObj.size(); i++) {
 

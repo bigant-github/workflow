@@ -1,14 +1,12 @@
 package org.bigant.fw.lark.instances.form.convert;
 
 import com.alibaba.fastjson2.JSONArray;
-import com.alibaba.fastjson2.JSONObject;
 import lombok.AllArgsConstructor;
 import org.bigant.fw.lark.LarkFile;
 import org.bigant.fw.lark.LarkFormType;
 import org.bigant.wf.ComponentType;
 import org.bigant.wf.instances.form.FormDataItem;
 import org.bigant.wf.instances.form.FormDataParseAll;
-import org.bigant.wf.instances.form.databean.FormDataAttachment;
 import org.bigant.wf.instances.form.databean.FormDataImage;
 
 import java.util.*;

@@ -1,4 +1,4 @@
-package org.bigant.wf.form.option;
+package org.bigant.wf.process.form.option;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

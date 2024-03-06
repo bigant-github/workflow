@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bigant.wf.instances.form.FormDataItem;
 import org.bigant.wf.instances.form.FormDataConvert;
-import org.bigant.wf.process.form.FormDetailItem;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +35,7 @@ public abstract class LarkBaseFDC implements FormDataConvert<Map<String, Object>
     @AllArgsConstructor
     public static class FormItemConvert {
         private FormDataItem formComponents;
-        private FormDetailItem formDetailItem;
+        private org.bigant.wf.process.form.FormDetailItem formDetailItem;
     }
 
     @AllArgsConstructor
@@ -45,6 +44,6 @@ public abstract class LarkBaseFDC implements FormDataConvert<Map<String, Object>
     @Builder
     public static class ToOtherParam {
         private JSONObject formObj;
-        private Map<String, FormDetailItem> formDetailItemMap;
+        private Map<String, org.bigant.wf.process.form.FormDetailItem> formDetailItemMap;
     }
 }

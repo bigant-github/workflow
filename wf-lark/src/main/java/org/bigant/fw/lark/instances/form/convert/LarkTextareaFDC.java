@@ -1,6 +1,5 @@
 package org.bigant.fw.lark.instances.form.convert;
 
-import com.alibaba.fastjson2.JSONObject;
 import org.bigant.fw.lark.LarkFormType;
 import org.bigant.wf.ComponentType;
 import org.bigant.wf.instances.form.FormDataItem;

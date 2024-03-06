@@ -1,4 +1,5 @@
-package org.bigant.wf.form.option;
+package org.bigant.wf.process.form.option;
+
 
 public class AmountOption {
 

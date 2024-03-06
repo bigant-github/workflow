@@ -4,11 +4,10 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import org.bigant.fw.lark.LarkFormType;
 import org.bigant.wf.ComponentType;
-import org.bigant.wf.form.option.DateOption;
+import org.bigant.wf.process.form.option.DateOption;
 import org.bigant.wf.instances.form.FormDataItem;
 import org.bigant.wf.instances.form.FormDataParseAll;
 import org.bigant.wf.instances.form.databean.FormDataDateRange;
-import org.bigant.wf.process.form.FormDetailItem;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -63,7 +62,7 @@ public class LarkDateRangeFDC extends LarkBaseFDC {
 
         JSONObject dataObj = data.getFormObj();
         JSONObject value = dataObj.getJSONObject("value");
-        FormDetailItem detailItem = data.getFormDetailItemMap()
+        org.bigant.wf.process.form.FormDetailItem detailItem = data.getFormDetailItemMap()
                 .get(dataObj.getString("id"));
 
 

@@ -9,12 +9,13 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.bigant.fw.dingtalk.DingTalkConfig;
 import org.bigant.fw.dingtalk.DingTalkConstant;
+import org.bigant.fw.dingtalk.process.form.DingTalkFDTCF;
 import org.bigant.wf.exception.WfException;
 import org.bigant.wf.process.ProcessService;
-import org.bigant.wf.process.form.FormDetailItem;
 import org.bigant.wf.process.bean.ProcessDetail;
 import org.bigant.wf.process.bean.ProcessPage;
 import org.bigant.wf.process.bean.ProcessPageQuery;
+import org.bigant.wf.process.form.FormDetailItem;
 import org.bigant.wf.user.UserService;
 
 import java.time.LocalDateTime;
@@ -36,6 +37,7 @@ public class DingTalkProcessService implements ProcessService {
     private UserService userService;
     @Getter
     private com.aliyun.dingtalkworkflow_1_0.Client client;
+    private DingTalkFDTCF dingTalkFDTCF;
 
     @Override
     public List<ProcessPage> page(ProcessPageQuery processPageQuery, String userId) {
@@ -133,15 +135,16 @@ public class DingTalkProcessService implements ProcessService {
             List<QuerySchemaByProcessCodeResponseBody.QuerySchemaByProcessCodeResponseBodyResultSchemaContentItems> items =
                     result.getSchemaContent().getItems();
 
+            List<FormDetailItem> form = items.stream()
+                    .map(x -> dingTalkFDTCF.getByOtherType(x.getComponentName()).toFormDetail(x))
+                    .collect(Collectors.toList());
+
+
             return ProcessDetail.builder()
                     .processCode(processCode)
                     .name(result.getName())
                     .iconUrl(result.getIcon())
-                    /*.form(body.getProcess().getForm().stream().map(x -> FormDetailItem.builder()
-                                    .name(x.getName())
-                                    .type(x.getType())
-                                    .build())
-                            .collect(Collectors.toList()))*/
+                    .form(form)
                     .build();
 
         } catch (Exception _err) {

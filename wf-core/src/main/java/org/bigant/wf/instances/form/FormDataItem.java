@@ -5,8 +5,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.bigant.wf.ComponentType;
-import org.bigant.wf.form.option.AmountOption;
-import org.bigant.wf.form.option.DateOption;
+import org.bigant.wf.process.form.option.AmountOption;
+import org.bigant.wf.process.form.option.DateOption;
 import org.bigant.wf.instances.form.databean.*;
 
 import java.math.BigDecimal;
