@@ -86,6 +86,14 @@ public class DingTalkInstancesService implements InstancesService {
             selectActioners = this.parseTargetSelectUsersAuthMatch(instanceStart, formComponents);
         }
 
+        List<String> ccList = new ArrayList<>();
+
+        /*List<String> ccUsers = instanceStart.getCcUsers();
+        if (ccList != null && !ccList.isEmpty()) {
+            ccList = ccUsers.stream()
+                    .map(x -> userService.getOtherUserIdByUserId(x, getType()))
+                    .collect(Collectors.toList());
+        }*/
 
         StartProcessInstanceRequest startProcessInstanceRequest = new StartProcessInstanceRequest()
                 .setOriginatorUserId(dingTalkUserId)
@@ -95,7 +103,7 @@ public class DingTalkInstancesService implements InstancesService {
                         : null)
                 /*.setMicroappAgentId(41605932L)*/
                 /*.setApprovers(java.util.Arrays.asList(approvers0))*/
-                /*.setCcList(java.util.Arrays.asList("26652461xxxx5992"))*/
+                .setCcList(ccList)
                 /*.setCcPosition("START")*/
                 .setTargetSelectActioners(selectActioners)
                 .setFormComponentValues(valuesDetailsDetails);

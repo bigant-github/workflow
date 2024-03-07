@@ -40,6 +40,9 @@ public class InstanceStart {
     @ApiModelProperty("表单字段集合")
     private List<FormDataItem> formData;
 
+    /*@ApiModelProperty("抄送人")
+    private List<String> ccUsers;*/
+
 
     @ApiModel("自选节点用户")
     @Data
