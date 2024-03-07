@@ -30,6 +30,7 @@ public class LarkInstancesServiceTest extends BaseTest {
     @Test
     public void start() {
         log.info("开始测试");
+        String larkTestInstanceCode = System.getenv("larkTestInstanceCode");
 
         String larkTestProcessCode = System.getenv("larkTestProcessCode");
 
@@ -77,7 +78,9 @@ public class LarkInstancesServiceTest extends BaseTest {
                                                         FormDataItem.attachment("附件", Arrays.asList(
                                                                 FormDataAttachment.builder().name("测试1.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
                                                                 FormDataAttachment.builder().name("测试2.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build()))
-                                                )))))
+                                                ))),
+                                FormDataItem.joinInstance("关联审批",
+                                        larkTestInstanceCode)))
                 .build();
 
         LarkInstancesService larkInstancesService = this.getLarkInstancesService();

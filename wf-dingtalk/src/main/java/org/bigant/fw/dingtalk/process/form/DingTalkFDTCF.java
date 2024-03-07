@@ -77,6 +77,11 @@ public class DingTalkFDTCF
     }
 
     @Override
+    public DingTalkBaseFDTC joinInstance() {
+        return null;
+    }
+
+    @Override
     public DingTalkBaseFDTC unknown() {
         return new DingTalkUnknownFDTC();
     }

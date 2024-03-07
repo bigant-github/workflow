@@ -123,6 +123,17 @@ public class FormDataItem {
                 ComponentType.TABLE);
     }
 
+    public static FormDataItem joinInstance(String name, String... value) {
+        return joinInstance(name, Arrays.asList(value));
+    }
+
+    public static FormDataItem joinInstance(String name, Collection<String> value) {
+        FormDataItem formDataItem = new FormDataItem();
+        return formDataItem.setValue(name,
+                FormDataParseAll.COMPONENT_PARSE_JOIN_INSTANCE.toStr(value),
+                ComponentType.JOIN_INSTANCE);
+    }
+
 
     private FormDataItem setValue(String name, String value, ComponentType componentType) {
         this.name = name;

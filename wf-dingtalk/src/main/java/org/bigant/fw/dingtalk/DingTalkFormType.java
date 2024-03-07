@@ -20,7 +20,8 @@ public enum DingTalkFormType {
     DATE_RANGE(Collections.singletonList("DDDateRangeField")),
     ATTACHMENT(Collections.singletonList("DDAttachment")),
     IMAGE(Collections.singletonList("DDPhotoField")),
-    TABLE(Collections.singletonList("TableField"));
+    TABLE(Collections.singletonList("TableField")),
+    JOIN_INSTANCE(Collections.singletonList("RelateField"));
 
     private final
     Collection<String> dingTalkType;

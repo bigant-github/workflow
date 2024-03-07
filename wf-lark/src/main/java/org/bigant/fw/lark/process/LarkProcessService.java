@@ -220,6 +220,12 @@ public class LarkProcessService implements ProcessService {
                         .type(ComponentType.TABLE)
                         .children(childrenItems)
                         .build();
+            case "connect":
+                return FormDetailItem.builder()
+                        .name(item.get("name").toString())
+                        .id(item.get("id").toString())
+                        .type(ComponentType.JOIN_INSTANCE)
+                        .build();
             default:
                 return FormDetailItem.builder()
                         .name(item.get("name").toString())

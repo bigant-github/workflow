@@ -24,6 +24,7 @@ public enum ComponentType {
     ATTACHMENT("附件"),
     IMAGE("图片"),
     TABLE("表格"),
+    JOIN_INSTANCE("关联审批单"),
     UNKNOWN("未知");
 
     final String desc;

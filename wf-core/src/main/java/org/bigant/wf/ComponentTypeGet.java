@@ -30,6 +30,8 @@ public interface ComponentTypeGet<T> {
 
     T table();
 
+    T joinInstance();
+
     T unknown();
 
 }

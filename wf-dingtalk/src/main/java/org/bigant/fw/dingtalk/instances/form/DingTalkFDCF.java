@@ -99,6 +99,11 @@ public class DingTalkFDCF
     }
 
     @Override
+    public DingTalkBaseFDC joinInstance() {
+        return new DingTalkJoinInstanceFDC();
+    }
+
+    @Override
     public DingTalkBaseFDC unknown() {
         return new DingTalkUnknownFDC();
     }

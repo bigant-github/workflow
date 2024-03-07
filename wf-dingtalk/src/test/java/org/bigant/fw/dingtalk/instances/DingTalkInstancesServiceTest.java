@@ -25,6 +25,7 @@ import java.util.Arrays;
 public class DingTalkInstancesServiceTest extends BaseTest {
 
     private static final String dingTalkTestProcessCode = System.getenv("dingTalkTestProcessCode");
+    private static final String dingTalkTestInstanceCode = System.getenv("dingTalkTestInstanceCode");
 
     @Test
     public void start() {
@@ -75,7 +76,9 @@ public class DingTalkInstancesServiceTest extends BaseTest {
                                                         FormDataItem.attachment("附件", Arrays.asList(
                                                                 FormDataAttachment.builder().name("测试1.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
                                                                 FormDataAttachment.builder().name("测试2.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build()))
-                                                )))))
+                                                ))),
+                                FormDataItem.joinInstance("关联审批",
+                                        Arrays.asList(dingTalkTestInstanceCode))))
                 .build();
 
         DingTalkInstancesService dingTalkInstancesService = this.getDingTalkInstancesService();
@@ -87,7 +90,6 @@ public class DingTalkInstancesServiceTest extends BaseTest {
     @Test
     public void detail() {
         String instanceCode = System.getenv("dingTalkTestInstanceCode");
-
         log.info("查询审批实例开始测试。instanceCode:{}", instanceCode);
         InstanceDetailResult detail = getDingTalkInstancesService().detail(instanceCode);
         log.info("查询审批实例开始测试通过。instanceCode:{},data:{}", instanceCode, JSONObject.toJSONString(detail));

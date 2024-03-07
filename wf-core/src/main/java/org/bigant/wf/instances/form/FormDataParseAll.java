@@ -21,5 +21,7 @@ public interface FormDataParseAll {
     FormDataParseAttachment COMPONENT_PARSE_ATTACHMENT = new FormDataParseAttachment();
     FormDataParseImage COMPONENT_PARSE_IMAGE = new FormDataParseImage();
     FormDataParseTable COMPONENT_PARSE_TABLE = new FormDataParseTable();
+
+    FormDataParseJoinInstance COMPONENT_PARSE_JOIN_INSTANCE = new FormDataParseJoinInstance();
     FormDataParseUnknown COMPONENT_PARSE_UNKNOWN = new FormDataParseUnknown();
 }

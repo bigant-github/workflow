@@ -27,7 +27,6 @@ public class LarkFDCF
     private final LarkFile larkFile;
 
 
-
     public LarkFDCF(
             LarkFile larkFile) {
         this.larkFile = larkFile;
@@ -87,6 +86,11 @@ public class LarkFDCF
     @Override
     public LarkBaseFDC table() {
         return new LarkTableFDC(this);
+    }
+
+    @Override
+    public LarkBaseFDC joinInstance() {
+        return new LarkJoinInstanceFDC();
     }
 
     @Override

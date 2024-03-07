@@ -61,6 +61,7 @@ public abstract class ComponentTypeConvertFactory<T extends ComponentTypeAndOthe
         formTypeMap.put(ComponentType.IMAGE, image());
         formTypeMap.put(ComponentType.ATTACHMENT, attachment());
         formTypeMap.put(ComponentType.TABLE, table());
+        formTypeMap.put(ComponentType.JOIN_INSTANCE, joinInstance());
         formTypeMap.put(ComponentType.UNKNOWN, unknown());
 
         for (T cc : formTypeMap.values()) {
