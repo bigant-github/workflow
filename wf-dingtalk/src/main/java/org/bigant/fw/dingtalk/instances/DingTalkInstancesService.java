@@ -98,7 +98,7 @@ public class DingTalkInstancesService implements InstancesService {
         StartProcessInstanceRequest startProcessInstanceRequest = new StartProcessInstanceRequest()
                 .setOriginatorUserId(dingTalkUserId)
                 .setProcessCode(instanceStart.getProcessCode())
-                .setDeptId(instanceStart.getDeptId() != null && instanceStart.getDeptId().length() > 0 ?
+                .setDeptId(instanceStart.getDeptId() != null && !instanceStart.getDeptId().isEmpty() ?
                         Long.parseLong(userService.getOtherDeptIdByDeptId(instanceStart.getDeptId(), this.getType()))
                         : null)
                 /*.setMicroappAgentId(41605932L)*/
