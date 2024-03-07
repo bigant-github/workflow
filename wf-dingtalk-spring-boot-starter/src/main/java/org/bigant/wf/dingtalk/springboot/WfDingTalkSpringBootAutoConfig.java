@@ -9,6 +9,7 @@ import org.bigant.fw.dingtalk.DingTalkUser;
 import org.bigant.fw.dingtalk.instances.form.DingTalkFDCF;
 import org.bigant.fw.dingtalk.instances.DingTalkInstancesService;
 import org.bigant.fw.dingtalk.process.DingTalkProcessService;
+import org.bigant.fw.dingtalk.process.form.DingTalkFDTCF;
 import org.bigant.wf.Factory;
 import org.bigant.wf.cache.ICache;
 import org.bigant.wf.cache.LocalCache;
@@ -90,9 +91,11 @@ public class WfDingTalkSpringBootAutoConfig {
     @Bean
     @ConditionalOnMissingBean
     public DingTalkProcessService dingTalkProcessService(DingTalkConfig dingTalkConfig, UserService userService) throws Exception {
+
         DingTalkProcessService dingTalkProcessService = new DingTalkProcessService(dingTalkConfig,
                 userService,
-                new com.aliyun.dingtalkworkflow_1_0.Client(getConfig()));
+                new com.aliyun.dingtalkworkflow_1_0.Client(getConfig()),
+                new DingTalkFDTCF());
 
         //注册到工厂供后续使用
         Factory.registerProcessService(dingTalkProcessService.getType(), dingTalkProcessService);
