@@ -35,11 +35,11 @@ public class DingTalkInstancesServiceTest extends BaseTest {
                 .processCode(dingTalkTestProcessCode)
                 .userId("123456789")
                 .deptId("123456789")
-                .targetSelectUsersAuthMatch(
-                        Arrays.asList(InstanceStart.TargetSelectUserAuthMatch.builder()
+                .authMatchSelectApproverUsers(
+                        Arrays.asList(InstanceStart.AuthMatchNodeUser.builder()
                                         .userIds(Arrays.asList("1"))
                                         .build()
-                                , InstanceStart.TargetSelectUserAuthMatch.builder()
+                                , InstanceStart.AuthMatchNodeUser.builder()
                                         .userIds(Arrays.asList("1"))
                                         .build()
                         ))

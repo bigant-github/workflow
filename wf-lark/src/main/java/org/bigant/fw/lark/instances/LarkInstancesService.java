@@ -73,18 +73,18 @@ public class LarkInstancesService implements InstancesService {
 
         ArrayList<NodeApprover> nodeApprovers = new ArrayList<>();
 
-        List<InstanceStart.TargetSelectUser> targetSelectUsers = instanceStart.getTargetSelectUsers();
-        List<InstanceStart.TargetSelectUserAuthMatch> targetSelectUsersAuthMatch = instanceStart.getTargetSelectUsersAuthMatch();
-        if (targetSelectUsers != null && !targetSelectUsers.isEmpty()) {
-            targetSelectUsers.forEach(targetSelectUser -> {
+        List<InstanceStart.NodeUser> nodeUsers = instanceStart.getSelectApproverUsers();
+        List<InstanceStart.AuthMatchNodeUser> targetSelectUsersAuthMatch = instanceStart.getAuthMatchSelectApproverUsers();
+        if (nodeUsers != null && !nodeUsers.isEmpty()) {
+            nodeUsers.forEach(nodeUser -> {
 
-                String[] userIds = targetSelectUser.getUserIds().stream()
+                String[] userIds = nodeUser.getUserIds().stream()
                         .map(x -> userService.getOtherUserIdByUserId(x, LarkConstant.NAME))
                         .collect(Collectors.toList())
                         .toArray(new String[]{});
 
                 nodeApprovers.add(NodeApprover.newBuilder()
-                        .key(targetSelectUser.getKey())
+                        .key(nodeUser.getKey())
                         .value(userIds)
                         .build());
             });
@@ -107,7 +107,7 @@ public class LarkInstancesService implements InstancesService {
                 throw new WfException(errorMsg);
             }
             for (int i = 0; i < needApproverNodes.size(); i++) {
-                InstanceStart.TargetSelectUserAuthMatch targetSelectUser = targetSelectUsersAuthMatch.get(i);
+                InstanceStart.AuthMatchNodeUser targetSelectUser = targetSelectUsersAuthMatch.get(i);
                 PreviewNode previewNode = needApproverNodes.get(i);
                 String[] userIds = targetSelectUser.getUserIds().stream()
                         .map(x -> userService.getOtherUserIdByUserId(x, LarkConstant.NAME))

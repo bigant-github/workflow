@@ -14,8 +14,8 @@ import org.bigant.fw.dingtalk.DingTalkConstant;
 import org.bigant.fw.dingtalk.instances.form.DingTalkFDCF;
 import org.bigant.fw.dingtalk.instances.form.convert.DingTalkBaseFDC;
 import org.bigant.wf.exception.WfException;
-import org.bigant.wf.instances.InstancesService;
 import org.bigant.wf.instances.InstanceStatus;
+import org.bigant.wf.instances.InstancesService;
 import org.bigant.wf.instances.bean.*;
 import org.bigant.wf.instances.form.FormDataItem;
 import org.bigant.wf.task.TaskStatus;
@@ -78,10 +78,16 @@ public class DingTalkInstancesService implements InstancesService {
 
 
         //匹配自选审批节点
-        List<StartProcessInstanceRequest.StartProcessInstanceRequestTargetSelectActioners> selectActioners = null;
-        if (instanceStart.getTargetSelectUsers() != null && instanceStart.getTargetSelectUsers().size() > 0) {
+        List<StartProcessInstanceRequest.StartProcessInstanceRequestTargetSelectActioners> selectActioners = new ArrayList<>();
+
+        if (instanceStart.getSelectApproverUsers() != null
+                && !instanceStart.getSelectApproverUsers().isEmpty()) {
+
             selectActioners = this.parseTargetSelectUsers(instanceStart);
-        } else if (instanceStart.getTargetSelectUsersAuthMatch() != null && instanceStart.getTargetSelectUsersAuthMatch().size() > 0) {
+
+        } else if (instanceStart.getAuthMatchSelectApproverUsers() != null
+                && !instanceStart.getAuthMatchSelectApproverUsers().isEmpty()) {
+
             //自选节点自动匹配
             selectActioners = this.parseTargetSelectUsersAuthMatch(instanceStart, formComponents);
         }
@@ -346,19 +352,18 @@ public class DingTalkInstancesService implements InstancesService {
 
     /**
      * 解析自选节点用户自动匹配
-     *
-     * @param instanceStart
-     * @param formComponents
-     * @return
      */
-    private List<StartProcessInstanceRequest.StartProcessInstanceRequestTargetSelectActioners> parseTargetSelectUsersAuthMatch(InstanceStart instanceStart, HashMap<String, String> formComponents) {
-        List<InstanceStart.TargetSelectUserAuthMatch> targetSelectUsersAuthMatch = instanceStart.getTargetSelectUsersAuthMatch();
+    private List<StartProcessInstanceRequest.StartProcessInstanceRequestTargetSelectActioners> parseTargetSelectUsersAuthMatch(
+            InstanceStart instanceStart,
+            HashMap<String, String> formComponents) {
+
+        List<InstanceStart.AuthMatchNodeUser> targetSelectUsersAuthMatch = instanceStart.getAuthMatchSelectApproverUsers();
         log.debug(" 发起审批实例：code:{}，共{}个节点，使用自选节点自动匹配。", instanceStart.getProcessCode(), targetSelectUsersAuthMatch.size());
 
         List<StartProcessInstanceRequest.StartProcessInstanceRequestTargetSelectActioners> users
                 = new ArrayList<>(targetSelectUsersAuthMatch.size());
 
-        ProcessForecastResponseBody.ProcessForecastResponseBodyResult forecast = this.forecast(instanceStart.getProcessCode(),
+        ProcessForecastResponseBody.ProcessForecastResponseBodyResult forecast = this.preview(instanceStart.getProcessCode(),
                 instanceStart.getUserId(),
                 instanceStart.getDeptId(),
                 formComponents);
@@ -413,29 +418,29 @@ public class DingTalkInstancesService implements InstancesService {
      */
     private List<StartProcessInstanceRequest.StartProcessInstanceRequestTargetSelectActioners> parseTargetSelectUsers(InstanceStart instanceStart) {
 
-        List<InstanceStart.TargetSelectUser> targetSelectUsers = instanceStart.getTargetSelectUsers();
+        List<InstanceStart.NodeUser> nodeUsers = instanceStart.getSelectApproverUsers();
 
-        log.debug(" 发起审批实例：{}，共{}个节点，使用自选节点。", instanceStart.getProcessCode(), targetSelectUsers.size());
+        log.debug(" 发起审批实例：{}，共{}个节点，使用自选节点。", instanceStart.getProcessCode(), nodeUsers.size());
 
 
         List<StartProcessInstanceRequest.StartProcessInstanceRequestTargetSelectActioners> users
-                = new ArrayList<>(targetSelectUsers.size());
+                = new ArrayList<>(nodeUsers.size());
 
-        for (InstanceStart.TargetSelectUser targetSelectUser : targetSelectUsers) {
+        for (InstanceStart.NodeUser nodeUser : nodeUsers) {
 
-            List<String> userIds = targetSelectUser.getUserIds()
+            List<String> userIds = nodeUser.getUserIds()
                     .stream()
                     .map(x -> userService.getOtherUserIdByUserId(x, this.getType()))
                     .collect(Collectors.toList());
 
             log.debug(" 发起审批实例：{}，节点Key：{}，共{}个用户：{}。"
                     , instanceStart.getProcessCode()
-                    , targetSelectUser.getKey()
+                    , nodeUser.getKey()
                     , userIds.size(), userIds);
 
             StartProcessInstanceRequest.StartProcessInstanceRequestTargetSelectActioners user
                     = new StartProcessInstanceRequest.StartProcessInstanceRequestTargetSelectActioners()
-                    .setActionerKey(targetSelectUser.getKey())
+                    .setActionerKey(nodeUser.getKey())
                     .setActionerUserIds(userIds);
 
             users.add(user);
@@ -453,14 +458,14 @@ public class DingTalkInstancesService implements InstancesService {
 
     /**
      * 预测是否有自定义审批节点
-     *
-     * @param formComponents
-     * @return
-     * @throws Exception
      */
-    private ProcessForecastResponseBody.ProcessForecastResponseBodyResult forecast(String code, String userId, String deptId, Map<String, String> formComponents) {
-        log.debug(" 预测是否有自定义审批节点：code:{}，userId:{}，deptId:{}，formComponents:{}。",
-                code,
+    private ProcessForecastResponseBody.ProcessForecastResponseBodyResult preview(String processCode,
+                                                                                  String userId,
+                                                                                  String deptId,
+                                                                                  Map<String, String> formComponents) {
+
+        log.debug("钉钉-预览审批流：processCode:{}，userId:{}，deptId:{}，formComponents:{}。",
+                processCode,
                 userId,
                 deptId,
                 formComponents);
@@ -481,23 +486,26 @@ public class DingTalkInstancesService implements InstancesService {
 
 
         ProcessForecastRequest processForecastRequest = new ProcessForecastRequest()
-                .setProcessCode(code)
+                .setProcessCode(processCode)
                 .setDeptId(Integer.valueOf(userService.getOtherDeptIdByDeptId(deptId, getType())))
                 .setUserId(userService.getOtherUserIdByUserId(userId, getType()))
                 .setFormComponentValues(values);
 
+        com.aliyun.dingtalkworkflow_1_0.Client client = getClient();
+        processForecastHeaders.xAcsDingtalkAccessToken = dingTalkConfig.accessToken();
+
         try {
-            com.aliyun.dingtalkworkflow_1_0.Client client = getClient();
-            processForecastHeaders.xAcsDingtalkAccessToken = dingTalkConfig.accessToken();
 
             ProcessForecastResponseBody.ProcessForecastResponseBodyResult result =
                     client.processForecastWithOptions(processForecastRequest, processForecastHeaders, new RuntimeOptions())
                             .getBody().getResult();
 
-            if (log.isDebugEnabled()) {
+            log.debug("钉钉-预览审批流成功。processCode:{}", processCode);
+
+            /*if (log.isDebugEnabled()) {
 
                 log.debug(" 预测是否有自定义审批节点结果：code:{}，userId:{}，deptId:{}，formComponents:{}，result:{}",
-                        code,
+                        processCode,
                         userId,
                         deptId,
                         formComponents,
@@ -505,54 +513,27 @@ public class DingTalkInstancesService implements InstancesService {
 
                 this.getApproverListByForecast(result)
                         .forEach(x -> log.debug(" 预测是否有自定义审批节点结果需要自选的节点：code:{}，key:{}",
-                                code,
+                                processCode,
                                 x.getActorKey()));
 
-            }
+            }*/
 
             return result;
-        } catch (TeaException err) {
-            log.error(" 预测是否有自定义审批节点：code:{}，userId:{}，deptId:{}，formComponents:{}，errCode:{},errorMsg:{}",
-                    code,
+        } catch (Exception err) {
+            String errMsg = String.format("钉钉-预览审批流失败：code:%s,userId:%s,deptId:%s,formComponents:%s,errorMsg:%s",
+                    processCode,
                     userId,
                     deptId,
                     formComponents,
-                    err.getCode(),
-                    err.getMessage(),
-                    err);
-            throw err;
-        } catch (Exception _err) {
-            log.error(" 预测是否有自定义审批节点：{}，userId:{}，deptId:{}，formComponents:{}，err:{}", code, userId, deptId, formComponents, _err);
-            throw new TeaException(_err.getMessage(), _err);
+                    err.getMessage());
+            log.error(errMsg, err);
+            throw new WfException(errMsg, err);
         }
     }
 
 
     /**
-     * 预测是否有自定义审批节点
-     *
-     * @param formData
-     * @return
-     * @throws Exception
-     */
-    private ProcessForecastResponseBody.ProcessForecastResponseBodyResult forecast(String code, String userId, String deptId, List<FormDataItem> formData) {
-
-        log.debug(" 预测是否有自定义审批节点：code:{}，userId:{}，deptId:{}，formComponents:{}。",
-                code,
-                userId,
-                deptId,
-                formData);
-
-        return this.forecast(code, userId, deptId, this.parseFormValue(formData, userId));
-
-    }
-
-
-    /**
-     * 根据预测结果获取需要的审批人
-     *
-     * @param result
-     * @return
+     * 获取需要自选的节点
      */
     private List<ProcessForecastResponseBody.ProcessForecastResponseBodyResultWorkflowActivityRulesWorkflowActor> getApproverListByForecast(
             ProcessForecastResponseBody.ProcessForecastResponseBodyResult result) {
