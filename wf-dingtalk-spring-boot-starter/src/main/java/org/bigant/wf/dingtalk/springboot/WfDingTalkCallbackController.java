@@ -29,12 +29,6 @@ public class WfDingTalkCallbackController {
 
     /**
      * 回调接口
-     *
-     * @param signature
-     * @param timestamp
-     * @param nonce
-     * @param body
-     * @return
      */
     @PostMapping("${wf.dingtalk.callback.path:dingtalk/callback}")
     public Map<String, String> callback(@RequestParam(value = "signature", required = false) String signature,

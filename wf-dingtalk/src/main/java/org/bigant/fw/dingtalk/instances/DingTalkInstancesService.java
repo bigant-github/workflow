@@ -47,10 +47,8 @@ public class DingTalkInstancesService implements InstancesService {
 
     /**
      * 发起审批实例
-     * 对应接口文档地址：https://open.dingtalk.com/document/orgapp/create-an-approval-instance
+     * 对应接口文档地址：<a href="https://open.dingtalk.com/document/orgapp/create-an-approval-instance">...</a>
      *
-     * @param instanceStart
-     * @return
      */
     @Override
     public InstanceStartResult start(InstanceStart instanceStart) {
