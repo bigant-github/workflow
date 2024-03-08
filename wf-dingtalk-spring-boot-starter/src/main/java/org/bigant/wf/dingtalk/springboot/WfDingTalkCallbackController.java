@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.PostConstruct;
 import java.util.Map;
 
 /**
@@ -27,6 +28,10 @@ public class WfDingTalkCallbackController {
     private final DingTalkCallback dingTalkCallback;
     private final DingTalkConfig dingTalkConfig;
 
+    @PostConstruct
+    public void init() {
+        log.info("钉钉-回调controller启动");
+    }
     /**
      * 回调接口
      */

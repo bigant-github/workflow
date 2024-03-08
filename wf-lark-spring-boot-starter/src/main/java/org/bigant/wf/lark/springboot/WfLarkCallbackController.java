@@ -30,7 +30,10 @@ public class WfLarkCallbackController {
 
     private final LarkCallback larkCallback;
     private final LarkConfig larkConfig;
-
+    @PostConstruct
+    public void init() {
+        log.info("飞书-回调controller启动");
+    }
     /**
      * 回调接口
      *

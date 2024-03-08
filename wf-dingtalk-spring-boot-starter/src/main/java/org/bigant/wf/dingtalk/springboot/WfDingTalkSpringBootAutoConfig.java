@@ -56,7 +56,7 @@ public class WfDingTalkSpringBootAutoConfig {
     @Bean
     @ConditionalOnMissingBean
     @ConditionalOnBean(InstancesAction.class)
-    public DingTalkCallback larkCallback(InstancesAction instancesAction) {
+    public DingTalkCallback dingTalkCallback(InstancesAction instancesAction) {
         return new DingTalkCallback(instancesAction);
     }
 
