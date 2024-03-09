@@ -31,9 +31,8 @@ public class DingTalkUser {
 
     /**
      * 获取钉钉用户详情
+     * 接口地址：
      *
-     * @param dingTalkUserId
-     * @return
      */
     public OapiV2UserGetResponse.UserGetResponse getUserInfo(String dingTalkUserId) {
 
@@ -49,7 +48,7 @@ public class DingTalkUser {
 
             if (!rsp.isSuccess()) {
                 log.error("钉钉-获取用户详情失败,userid:{}，errcode:{} errmsg:{}", dingTalkUserId, rsp.getErrcode(), rsp.getErrmsg());
-                throw new WfException("获取钉钉用户详情失败,errcode:" + rsp.getErrcode() + ",errmsg:" + rsp.getErrmsg());
+                throw new WfException("钉钉-获取钉钉用户详情失败,errcode:" + rsp.getErrcode() + ",errmsg:" + rsp.getErrmsg());
             }
 
             log.debug("钉钉-获取用户详情成功,userid:{},data:{}", dingTalkUserId, JSONObject.toJSONString(rsp.getResult()));

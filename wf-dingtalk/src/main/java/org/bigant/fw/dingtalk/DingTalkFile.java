@@ -10,7 +10,9 @@ import com.aliyun.teautil.models.RuntimeOptions;
 import lombok.extern.slf4j.Slf4j;
 import org.bigant.wf.exception.WfException;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
@@ -210,14 +212,12 @@ public class DingTalkFile {
         try {
             com.aliyun.dingtalkstorage_1_0.Client client = createClient();
             GetFileUploadInfoResponse fileUploadInfoWithOptions = client.getFileUploadInfoWithOptions(spaceId, getFileUploadInfoRequest, getFileUploadInfoHeaders, new RuntimeOptions());
-            log.debug("获取文件上传信息成功，unionId:{}，fileName:{}，size:{}，spaceId:{}，body:{}", unionId, fileName, size, size, JSONObject.toJSONString(fileUploadInfoWithOptions.getBody()));
+            log.debug("钉钉-获取文件上传信息成功，unionId:{}，fileName:{}，size:{}，spaceId:{}，body:{}", unionId, fileName, size, size, JSONObject.toJSONString(fileUploadInfoWithOptions.getBody()));
             return fileUploadInfoWithOptions.getBody();
-        } catch (TeaException err) {
-            log.error("获取文件上传信息失败，unionId:{}，fileName:{}，size:{}，spaceId:{}，err:{}", unionId, fileName, size, size, err);
-            throw err;
-        } catch (Exception _err) {
-            log.error("获取文件上传信息失败，unionId:{}，fileName:{}，size:{}，spaceId:{}，err:{}", unionId, fileName, size, size, _err);
-            throw new TeaException(_err.getMessage(), _err);
+        } catch (Exception err) {
+            String errMsg = String.format("钉钉-获取文件上传信息失败，unionId:%s，fileName:%s，size:%s，spaceId:%s", unionId, fileName, size, size);
+            log.error(errMsg);
+            throw new WfException(errMsg, err);
         }
 
     }

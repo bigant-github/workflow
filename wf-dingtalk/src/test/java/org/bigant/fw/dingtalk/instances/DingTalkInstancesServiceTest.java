@@ -4,13 +4,13 @@ import com.alibaba.fastjson2.JSONObject;
 import com.aliyun.dingtalkworkflow_1_0.Client;
 import lombok.extern.slf4j.Slf4j;
 import org.bigant.fw.dingtalk.BaseTest;
-import org.bigant.wf.process.form.option.AmountOption;
-import org.bigant.wf.process.form.option.DateOption;
 import org.bigant.wf.instances.bean.InstanceDetailResult;
 import org.bigant.wf.instances.bean.InstanceStart;
 import org.bigant.wf.instances.form.FormDataItem;
 import org.bigant.wf.instances.form.databean.FormDataAttachment;
 import org.bigant.wf.instances.form.databean.FormDataImage;
+import org.bigant.wf.process.form.option.AmountOption;
+import org.bigant.wf.process.form.option.DateOption;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -43,6 +43,12 @@ public class DingTalkInstancesServiceTest extends BaseTest {
                                         .userIds(Arrays.asList("1"))
                                         .build()
                         ))
+                .autoMathSelectCcUsers(
+                        Arrays.asList(InstanceStart.AuthMatchNodeUser.builder()
+                                .userIds(Arrays.asList("1"))
+                                .build()
+                        )
+                )
                 .formData(
                         Arrays.asList(
                                 FormDataItem.text("单行输入框", "测试"),
