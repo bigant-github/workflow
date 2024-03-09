@@ -19,6 +19,7 @@ import org.bigant.wf.instances.InstancesService;
 import org.bigant.wf.instances.bean.*;
 import org.bigant.wf.instances.form.FormDataItem;
 import org.bigant.wf.process.bean.ProcessDetail;
+import org.bigant.wf.process.form.FormDetailItem;
 import org.bigant.wf.task.TaskStatus;
 import org.bigant.wf.user.UserService;
 
@@ -50,10 +51,7 @@ public class LarkInstancesService implements InstancesService {
 
     /**
      * 发起审批实例
-     * 接口地址 https://open.feishu.cn/document/server-docs/approval-v4/instance/create?appId=cli_a52dc3cf4f3b500e
-     *
-     * @param instanceStart
-     * @return
+     * 接口地址 <a href="https://open.feishu.cn/document/server-docs/approval-v4/instance/create?appId=cli_a52dc3cf4f3b500e">...</a>
      */
     @Override
     public InstanceStartResult start(InstanceStart instanceStart) {
@@ -64,62 +62,13 @@ public class LarkInstancesService implements InstancesService {
 
         ProcessDetail processDetail = larkProcessService.detail(instanceStart.getProcessCode());
 
-        Map<String, org.bigant.wf.process.form.FormDetailItem> formItemMap =
-                processDetail.getForm().stream().collect(Collectors.toMap(org.bigant.wf.process.form.FormDetailItem::getName, x -> x));
 
-        List<FormDataItem> formData = instanceStart.getFormData();
-
-        String form = this.parseFormValues(formData, formItemMap);
+        String form = parseFormData(processDetail, instanceStart.getFormData());
 
         ArrayList<NodeApprover> nodeApprovers = new ArrayList<>();
+        ArrayList<NodeCc> nodeCcs = new ArrayList<>();
 
-        List<InstanceStart.NodeUser> nodeUsers = instanceStart.getSelectApproverUsers();
-        List<InstanceStart.AuthMatchNodeUser> targetSelectUsersAuthMatch = instanceStart.getAuthMatchSelectApproverUsers();
-        if (nodeUsers != null && !nodeUsers.isEmpty()) {
-            nodeUsers.forEach(nodeUser -> {
-
-                String[] userIds = nodeUser.getUserIds().stream()
-                        .map(x -> userService.getOtherUserIdByUserId(x, LarkConstant.NAME))
-                        .collect(Collectors.toList())
-                        .toArray(new String[]{});
-
-                nodeApprovers.add(NodeApprover.newBuilder()
-                        .key(nodeUser.getKey())
-                        .value(userIds)
-                        .build());
-            });
-        } else if (targetSelectUsersAuthMatch != null && !targetSelectUsersAuthMatch.isEmpty()) {
-            // 自选节点自动匹配
-            log.debug("飞书-发起审批实例：code:{}，共{}个节点，使用自选节点自动匹配。", instanceStart.getProcessCode(), targetSelectUsersAuthMatch.size());
-
-            PreviewInstanceRespBody preview = this.preview(instanceStart.getProcessCode(), userId, null, form);
-
-            List<PreviewNode> needApproverNodes =
-                    Arrays.stream(preview.getPreviewNodes())
-                            .filter(PreviewNode::getIsApproverTypeFree)
-                            .collect(Collectors.toList());
-
-            if (needApproverNodes.size() != targetSelectUsersAuthMatch.size()) {
-                String errorMsg = String.format("自选节点自动匹配的流程节点与预测结果需要的数量不匹配，输入数量:%s，需要数量:%s"
-                        , targetSelectUsersAuthMatch.size()
-                        , needApproverNodes.size());
-                log.error(errorMsg);
-                throw new WfException(errorMsg);
-            }
-            for (int i = 0; i < needApproverNodes.size(); i++) {
-                InstanceStart.AuthMatchNodeUser targetSelectUser = targetSelectUsersAuthMatch.get(i);
-                PreviewNode previewNode = needApproverNodes.get(i);
-                String[] userIds = targetSelectUser.getUserIds().stream()
-                        .map(x -> userService.getOtherUserIdByUserId(x, LarkConstant.NAME))
-                        .collect(Collectors.toList())
-                        .toArray(new String[]{});
-
-                nodeApprovers.add(NodeApprover.newBuilder()
-                        .key(previewNode.getNodeId())
-                        .value(userIds)
-                        .build());
-            }
-        }
+        this.selectNode(instanceStart, nodeApprovers, userId, form, nodeCcs);
 
         // 创建请求对象
         CreateInstanceReq req = CreateInstanceReq.newBuilder()
@@ -128,6 +77,7 @@ public class LarkInstancesService implements InstancesService {
                         .userId(userId)
                         .form(form)
                         .nodeApproverUserIdList(nodeApprovers.toArray(new NodeApprover[]{}))
+                        .nodeCcUserIdList(nodeCcs.toArray(new NodeCc[]{}))
                         .build())
                 .build();
 
@@ -165,6 +115,115 @@ public class LarkInstancesService implements InstancesService {
 
     }
 
+    private void selectNode(InstanceStart instanceStart, ArrayList<NodeApprover> nodeApprovers, String userId, String form, ArrayList<NodeCc> nodeCcs) {
+        PreviewInstanceRespBody preview = null;
+
+        //自选节点
+        if (instanceStart.getSelectApproverUsers() != null
+                && !instanceStart.getSelectApproverUsers().isEmpty()) {
+            instanceStart.getSelectApproverUsers().forEach(nodeUser -> {
+
+                String[] userIds = nodeUser.getUserIds().stream()
+                        .map(x -> userService.getOtherUserIdByUserId(x, LarkConstant.NAME))
+                        .collect(Collectors.toList())
+                        .toArray(new String[]{});
+
+                nodeApprovers.add(NodeApprover.newBuilder()
+                        .key(nodeUser.getKey())
+                        .value(userIds)
+                        .build());
+            });
+        }
+
+        //自选审批节点自动匹配
+        List<InstanceStart.AuthMatchNodeUser> matchSelectApproverUsers = instanceStart.getAuthMatchSelectApproverUsers();
+        if (matchSelectApproverUsers != null
+                && !matchSelectApproverUsers.isEmpty()) {
+            // 自选节点自动匹配
+            log.debug("飞书-发起审批实例：code:{}，共{}个节点，使用自选节点自动匹配。",
+                    instanceStart.getProcessCode(),
+                    instanceStart.getAuthMatchSelectApproverUsers().size());
+
+            preview = this.preview(instanceStart.getProcessCode(), userId, null, form);
+
+            List<PreviewNode> needApproverNodes =
+                    Arrays.stream(preview.getPreviewNodes())
+                            .filter(PreviewNode::getIsApproverTypeFree)
+                            .collect(Collectors.toList());
+
+            for (int i = 0; i < Math.max(needApproverNodes.size(), matchSelectApproverUsers.size()); i++) {
+                InstanceStart.AuthMatchNodeUser targetSelectUser = matchSelectApproverUsers.get(i);
+                PreviewNode previewNode = needApproverNodes.get(i);
+                String[] userIds = targetSelectUser.getUserIds().stream()
+                        .map(x -> userService.getOtherUserIdByUserId(x, LarkConstant.NAME))
+                        .collect(Collectors.toList())
+                        .toArray(new String[]{});
+
+                nodeApprovers.add(NodeApprover.newBuilder()
+                        .key(previewNode.getNodeId())
+                        .value(userIds)
+                        .build());
+            }
+        }
+
+
+        //自选抄送节点
+        if (instanceStart.getSelectCcUsers() != null
+                && !instanceStart.getSelectCcUsers().isEmpty()) {
+            instanceStart.getSelectCcUsers().forEach(nodeUser -> {
+
+                String[] userIds = nodeUser.getUserIds().stream()
+                        .map(x -> userService.getOtherUserIdByUserId(x, LarkConstant.NAME))
+                        .collect(Collectors.toList())
+                        .toArray(new String[]{});
+
+                nodeCcs.add(NodeCc.newBuilder()
+                        .key(nodeUser.getKey())
+                        .value(userIds)
+                        .build());
+            });
+        }
+
+        //自选抄送节点自动匹配
+        List<InstanceStart.AuthMatchNodeUser> matchSelectCcUsers = instanceStart.getAutoMathSelectCcUsers();
+        if (matchSelectCcUsers != null
+                && !matchSelectCcUsers.isEmpty()) {
+            // 自选节点自动匹配
+            log.debug("飞书-发起审批实例：code:{}，共{}个节点，使用自选抄送节点自动匹配。",
+                    instanceStart.getProcessCode(),
+                    matchSelectCcUsers.size());
+            if (preview == null) {
+                preview = this.preview(instanceStart.getProcessCode(), userId, null, form);
+            }
+
+            List<PreviewNode> needCcNodes =
+                    Arrays.stream(preview.getPreviewNodes())
+                            .filter(PreviewNode::getHasCcTypeFree)
+                            .collect(Collectors.toList());
+
+            for (int i = 0; i < Math.max(needCcNodes.size(), matchSelectCcUsers.size()); i++) {
+                InstanceStart.AuthMatchNodeUser targetSelectUser = matchSelectCcUsers.get(i);
+                PreviewNode previewNode = needCcNodes.get(i);
+                String[] userIds = targetSelectUser.getUserIds().stream()
+                        .map(x -> userService.getOtherUserIdByUserId(x, LarkConstant.NAME))
+                        .collect(Collectors.toList())
+                        .toArray(new String[]{});
+
+                nodeCcs.add(NodeCc.newBuilder()
+                        .key(previewNode.getNodeId())
+                        .value(userIds)
+                        .build());
+            }
+        }
+    }
+
+    private String parseFormData(ProcessDetail processDetail, List<FormDataItem> formData) {
+        Map<String, FormDetailItem> formItemMap =
+                processDetail.getForm().stream().collect(Collectors.toMap(FormDetailItem::getName, x -> x));
+
+        return this.parseFormValues(formData, formItemMap);
+    }
+
     @Override
     public InstancePreviewResult preview(InstancePreview instancePreview) {
 
@@ -173,17 +232,10 @@ public class LarkInstancesService implements InstancesService {
 
         ProcessDetail processDetail = larkProcessService.detail(instancePreview.getInstanceCode());
 
-        Map<String, org.bigant.wf.process.form.FormDetailItem> formItemMap =
-                processDetail.getForm().stream().collect(Collectors.toMap(org.bigant.wf.process.form.FormDetailItem::getName, x -> x));
-
-        List<FormDataItem> formData = instancePreview.getFormData();
-
-        String form = this.parseFormValues(formData, formItemMap);
-
         this.preview(instancePreview.getInstanceCode(),
                 userService.getOtherUserIdByUserId(instancePreview.getUserId(), LarkConstant.NAME),
                 userService.getOtherDeptIdByDeptId(instancePreview.getDeptId(), LarkConstant.NAME),
-                form);
+                parseFormData(processDetail, instancePreview.getFormData()));
 
         return null;
     }

@@ -58,7 +58,7 @@ public class LarkProcessService implements ProcessService {
     @Override
     public ProcessDetail detail(String code) {
 
-        log.debug("lark-query process detail, code:{}", code);
+        log.debug("飞书-查询审批流程详情, code:{}", code);
 
         // 构建client
         Client client = config.getClient();
@@ -73,12 +73,12 @@ public class LarkProcessService implements ProcessService {
 
             // 处理服务端错误
             if (!resp.success()) {
-                String errMsg = String.format("lark-query process detail error,code:%s,msg:%s,reqId:%s", resp.getCode(), resp.getMsg(), resp.getRequestId());
+                String errMsg = String.format("飞书-查询审批流程详情失败,code:%s,msg:%s,reqId:%s", resp.getCode(), resp.getMsg(), resp.getRequestId());
                 log.error(errMsg);
                 throw new WfException(errMsg);
             }
 
-            log.debug("lark-query process detail success,code:{},rsp:{}", code, Jsons.DEFAULT.toJson(resp.getData()));
+            log.debug("飞书-查询审批流程详情成功,code:{},rsp:{}", code, Jsons.DEFAULT.toJson(resp.getData()));
 
             GetApprovalRespBody data = resp.getData();
             List<Map<String, Object>> formItems = Jsons.DEFAULT.fromJson(data.getForm(), LIST_MAP);
@@ -95,7 +95,7 @@ public class LarkProcessService implements ProcessService {
                     .build();
 
         } catch (Exception e) {
-            String errMsg = String.format("lark-query process detail error,code:%s", code);
+            String errMsg = String.format("飞书-查询审批流程详情失败,code:%s", code);
             log.error(errMsg, e);
             throw new WfException(errMsg, e);
         }

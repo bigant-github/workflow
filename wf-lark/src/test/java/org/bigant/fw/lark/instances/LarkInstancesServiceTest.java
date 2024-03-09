@@ -6,13 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.bigant.fw.lark.BaseTest;
 import org.bigant.fw.lark.instances.form.LarkFDCF;
 import org.bigant.fw.lark.process.LarkProcessService;
-import org.bigant.wf.process.form.option.AmountOption;
-import org.bigant.wf.process.form.option.DateOption;
 import org.bigant.wf.instances.bean.InstanceDetailResult;
 import org.bigant.wf.instances.bean.InstanceStart;
 import org.bigant.wf.instances.form.FormDataItem;
 import org.bigant.wf.instances.form.databean.FormDataAttachment;
 import org.bigant.wf.instances.form.databean.FormDataImage;
+import org.bigant.wf.process.form.option.AmountOption;
+import org.bigant.wf.process.form.option.DateOption;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -44,6 +44,11 @@ public class LarkInstancesServiceTest extends BaseTest {
                                 , InstanceStart.AuthMatchNodeUser.builder()
                                         .userIds(Arrays.asList("1"))
                                         .build()
+                        ))
+                .autoMathSelectCcUsers(
+                        Arrays.asList(InstanceStart.AuthMatchNodeUser.builder()
+                                .userIds(Arrays.asList("1"))
+                                .build()
                         ))
                 .formData(
                         Arrays.asList(
