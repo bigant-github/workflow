@@ -75,13 +75,18 @@ public class DingTalkCallback {
         finish：审批正常结束（同意或拒绝）
         terminate：审批终止（发起人撤销审批单） */
 
+        LocalDateTime operateTime;
+
         Long operateTimeSecond = event.getLong("EventTime");
+        if (operateTimeSecond != null) {
+            //时间戳转LocalDateTime
+            operateTimeSecond = operateTimeSecond * 1000;
 
-        //时间戳转LocalDateTime
-        operateTimeSecond = operateTimeSecond * 1000;
-
-        Instant instant = Instant.ofEpochMilli(operateTimeSecond);
-        LocalDateTime operateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+            Instant instant = Instant.ofEpochMilli(operateTimeSecond);
+            operateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+        } else {
+            operateTime = LocalDateTime.now();
+        }
 
 
         InstancesAction.InstancesCallback instancesCallback = InstancesAction.InstancesCallback.builder()
