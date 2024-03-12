@@ -30,25 +30,16 @@ public class WfLarkCallbackController {
 
     private final LarkCallback larkCallback;
     private final LarkConfig larkConfig;
-    @PostConstruct
-    public void init() {
-        log.info("飞书-回调controller启动");
-    }
+
     /**
      * 回调接口
-     *
-     * @param timestamp
-     * @param nonce
-     * @param sign
-     * @param body
-     * @return
      */
     @PostMapping("${wf.lark.callback.path:lark/callback}")
     public String callback(@RequestHeader("X-Lark-Request-Timestamp") String timestamp,
                            @RequestHeader("X-Lark-Request-Nonce") String nonce,
                            @RequestHeader("X-Lark-Signature") String sign,
-                           @RequestBody String body) throws NoSuchAlgorithmException {
-        larkCallback.callback(timestamp, nonce, larkConfig.getEncryptKey(), sign, body);
+                           @RequestBody String body) throws Exception {
+        larkCallback.callback(timestamp, nonce, sign, body);
         return "";
     }
 

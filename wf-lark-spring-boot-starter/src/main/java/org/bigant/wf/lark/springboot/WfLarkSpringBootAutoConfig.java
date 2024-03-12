@@ -42,7 +42,7 @@ public class WfLarkSpringBootAutoConfig {
 
         LarkConfig larkConfig = new LarkConfig(larkProperties.getAppId()
                 , larkProperties.getAppSecret()
-                , larkProperties.getEncryptKey());
+                , larkProperties.getVerificationToken());
 
         larkConfig.setClient(Client.newBuilder(larkProperties.getAppId(), larkProperties.getAppSecret())
                 .openBaseUrl(larkProperties.getOpenBaseUrl()) // 设置域名，默认为飞书
@@ -56,8 +56,8 @@ public class WfLarkSpringBootAutoConfig {
     @Bean
     @ConditionalOnMissingBean
     @ConditionalOnBean(InstancesAction.class)
-    public LarkCallback larkCallback(InstancesAction instancesAction) {
-        return new LarkCallback(instancesAction);
+    public LarkCallback larkCallback(InstancesAction instancesAction, LarkProperties larkProperties) {
+        return new LarkCallback(instancesAction, larkProperties.getVerificationToken(), larkProperties.getEncryptKey());
     }
 
     @Bean

@@ -16,7 +16,7 @@
         <maven.compiler.target>8</maven.compiler.target>
         <java.version>8</java.version>
         <jdk.version>8</jdk.version>
-        <lark.version>2.1.5</lark.version>
+        <lark.version>2.2.1</lark.version>
     </properties>
 
 

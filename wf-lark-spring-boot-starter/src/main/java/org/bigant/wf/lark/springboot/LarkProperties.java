@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 public class LarkProperties {
     private String appId;
     private String appSecret;
+    private String verificationToken;
     private String encryptKey;
     private boolean logDebug = false;
     private BaseUrlEnum openBaseUrl = BaseUrlEnum.FeiShu;
