@@ -1,6 +1,9 @@
 package org.bigant.fw.lark;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.lark.oapi.core.utils.Strings;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.binary.Hex;
 import org.bigant.wf.exception.WfException;
 import org.bigant.wf.instances.InstancesAction;
 import org.bigant.wf.instances.InstanceStatus;
@@ -20,7 +23,7 @@ import java.util.Base64;
  * @author galen
  * @date 2024/2/2813:50
  */
-
+@Slf4j
 public class LarkCallback {
 
     public static final char[] DIGITS_UPPER = {'0', '1', '2', '3', '4', '5',
@@ -30,10 +33,8 @@ public class LarkCallback {
 
     private byte[] keyBs;
 
-    private boolean hasEncryptKey;
     private String encryptKey;
 
-    private boolean hasVerificationToken;
     private String verificationToken;
 
 
@@ -42,8 +43,6 @@ public class LarkCallback {
         this.verificationToken = verificationToken;
         this.encryptKey = encryptKey;
 
-        hasEncryptKey = encryptKey != null && !encryptKey.isEmpty();
-        hasVerificationToken = verificationToken != null && !verificationToken.isEmpty();
         MessageDigest digest = null;
         try {
             digest = MessageDigest.getInstance("SHA-256");
@@ -57,24 +56,26 @@ public class LarkCallback {
 
     }
 
-    public void callback(String timestamp, String nonce, String sign, String bodyString) throws Exception {
+    public String callback(String timestamp, String nonce, String sign, String bodyString) throws Exception {
+        JSONObject body = JSONObject.parseObject(bodyString);
 
-        if (hasEncryptKey) {
-            String signature = this.calculateSignature(timestamp, nonce, encryptKey, bodyString);
-            if (!signature.equals(sign)) {
-                throw new WfException("飞书-接收回调签名校验失败");
-            }
+        String decrypt = this.decrypt(body.getString("encrypt"));
+
+        JSONObject data = JSONObject.parseObject(decrypt);
+        if (data.getString("type").equals("url_verification")) {
+            return data.getString("challenge");
         }
 
-        this.callback(this.decrypt(bodyString));
-    }
+        if (verifySign(timestamp, nonce, sign, bodyString)) {
+            throw new WfException("飞书-回调签名验证失败。");
+        }
 
-    public void callback(String body) {
-        this.callback(JSONObject.parseObject(body));
+        this.callback(data);
+        return "success";
     }
 
     public void callback(JSONObject body) {
-        if (hasVerificationToken) {
+        if (Strings.isNotEmpty(verificationToken)) {
             if (!verificationToken.equals(body.getString("token"))) {
                 throw new WfException("飞书-接收回调签名校验失败");
             }
@@ -138,23 +139,23 @@ public class LarkCallback {
 
     }
 
-
-    public String calculateSignature(String timestamp, String nonce, String encryptKey, String bodyString)
-            throws NoSuchAlgorithmException {
-        String content = timestamp + nonce + encryptKey + bodyString;
-        MessageDigest alg = MessageDigest.getInstance("SHA-256");
-        return this.encodeHexString(alg.digest(content.getBytes()));
+    private boolean verifySign(String timestamp, String nonce, String sourceSign, String bodyString) throws NoSuchAlgorithmException {
+        if (Strings.isEmpty(encryptKey)) {
+            return true;
+        }
+        String targetSign;
+        targetSign = calculateSignature(timestamp, nonce, encryptKey, bodyString);
+        return targetSign.equals(sourceSign);
     }
 
-    private String encodeHexString(byte[] data) {
-        final int l = data.length;
-        final char[] out = new char[l << 1];
-        // two characters form the hex value.
-        for (int i = 0, j = 0; i < l; i++) {
-            out[j++] = DIGITS_UPPER[(0xF0 & data[i]) >>> 4];
-            out[j++] = DIGITS_UPPER[0x0F & data[i]];
-        }
-        return new String(out);
+    protected String calculateSignature(String timestamp, String nonce, String encryptKey, String bodyString) throws NoSuchAlgorithmException {
+        String content = timestamp + nonce + encryptKey + bodyString;
+        MessageDigest alg = MessageDigest.getInstance("SHA-256");
+        return Hex.encodeHexString(alg.digest(content.getBytes()));
+    }
+
+    public void callback(String body) {
+        this.callback(JSONObject.parseObject(body));
     }
 
 

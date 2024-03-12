@@ -35,12 +35,12 @@ public class WfLarkCallbackController {
      * 回调接口
      */
     @PostMapping("${wf.lark.callback.path:lark/callback}")
-    public String callback(@RequestHeader("X-Lark-Request-Timestamp") String timestamp,
-                           @RequestHeader("X-Lark-Request-Nonce") String nonce,
-                           @RequestHeader("X-Lark-Signature") String sign,
+    public String callback(@RequestHeader(value = "X-Lark-Request-Timestamp", required = false) String timestamp,
+                           @RequestHeader(value = "X-Lark-Request-Nonce", required = false) String nonce,
+                           @RequestHeader(value = "X-Lark-Signature", required = false) String sign,
                            @RequestBody String body) throws Exception {
-        larkCallback.callback(timestamp, nonce, sign, body);
-        return "";
+
+        return larkCallback.callback(timestamp, nonce, sign, body);
     }
 
 }
