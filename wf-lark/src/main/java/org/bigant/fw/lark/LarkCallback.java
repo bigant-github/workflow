@@ -63,10 +63,12 @@ public class LarkCallback {
 
         JSONObject data = JSONObject.parseObject(decrypt);
         if (data.getString("type").equals("url_verification")) {
-            return data.getString("challenge");
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("challenge", data.getString("challenge"));
+            return jsonObject.toString();
         }
 
-        if (verifySign(timestamp, nonce, sign, bodyString)) {
+        if (!verifySign(timestamp, nonce, sign, bodyString)) {
             throw new WfException("飞书-回调签名验证失败。");
         }
 

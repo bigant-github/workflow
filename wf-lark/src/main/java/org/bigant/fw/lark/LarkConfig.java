@@ -25,9 +25,6 @@ public class LarkConfig {
     @ApiModelProperty("应用密钥")
     private String appSecret;
 
-    @ApiModelProperty("应用密钥")
-    private String encryptKey;
-
     private boolean logDebug = false;
 
     private BaseUrlEnum openBaseUrl = BaseUrlEnum.FeiShu;
@@ -36,10 +33,9 @@ public class LarkConfig {
 
     private Client client;
 
-    public LarkConfig(String appId, String appSecret, String encryptKey) {
+    public LarkConfig(String appId, String appSecret) {
         this.appId = appId;
         this.appSecret = appSecret;
-        this.encryptKey = encryptKey;
     }
 
 }

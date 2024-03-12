@@ -41,8 +41,7 @@ public class WfLarkSpringBootAutoConfig {
     public LarkConfig larkConfig(LarkProperties larkProperties) {
 
         LarkConfig larkConfig = new LarkConfig(larkProperties.getAppId()
-                , larkProperties.getAppSecret()
-                , larkProperties.getVerificationToken());
+                , larkProperties.getAppSecret());
 
         larkConfig.setClient(Client.newBuilder(larkProperties.getAppId(), larkProperties.getAppSecret())
                 .openBaseUrl(larkProperties.getOpenBaseUrl()) // 设置域名，默认为飞书

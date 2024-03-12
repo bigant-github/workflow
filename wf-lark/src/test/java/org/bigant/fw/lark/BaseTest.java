@@ -19,6 +19,8 @@ public class BaseTest {
     protected LarkConfig larkConfig;
     protected UserService userService;
     protected LarkFile larkFile;
+    protected String verificationToken = System.getenv("larkEncryptKey");
+    protected String encryptKey = System.getenv("larkVerificationToken");
 
 
     @Before
@@ -30,7 +32,7 @@ public class BaseTest {
         String larkUserId = System.getenv("larkUserId");
         String larkDeptId = System.getenv("larkDeptId");
 
-        larkConfig = new LarkConfig(larkAppId, larkAppSecret, "");
+        larkConfig = new LarkConfig(larkAppId, larkAppSecret);
         larkConfig.setClient(Client.newBuilder(larkAppId, larkAppSecret)
                 .logReqAtDebug(true) // 在 debug 模式下会打印 http 请求和响应的 headers,body 等信息。
                 .build());
