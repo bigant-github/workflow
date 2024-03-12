@@ -104,7 +104,7 @@ public class DingTalkCallback {
                     case "agree":
                         instancesCallback.setAction(InstanceStatus.AGREED);
                         break;
-                    case "reject":
+                    case "refuse":
                         instancesCallback.setAction(InstanceStatus.REFUSED);
                         break;
                     default:
