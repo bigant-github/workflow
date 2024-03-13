@@ -6,6 +6,7 @@ import org.bigant.fw.lark.LarkCallback;
 import org.bigant.fw.lark.LarkConfig;
 import org.bigant.wf.instances.InstancesAction;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,7 +22,8 @@ import java.security.NoSuchAlgorithmException;
  * @author galen
  * @date 2024/2/2816:41
  */
-@ConditionalOnProperty(value = "wf.lark.callback.enable", havingValue = "true")
+/*@ConditionalOnProperty(value = "wf.lark.callback.enable", havingValue = "true")*/
+@ConditionalOnExpression(value = "${wf.lark.callback.enable:true} and 'http'.equals('${wf.lark.callback.type}')")
 @ConditionalOnBean(value = InstancesAction.class)
 @RestController
 @Slf4j
@@ -29,7 +31,6 @@ import java.security.NoSuchAlgorithmException;
 public class WfLarkCallbackController {
 
     private final LarkCallback larkCallback;
-    private final LarkConfig larkConfig;
 
     /**
      * 回调接口

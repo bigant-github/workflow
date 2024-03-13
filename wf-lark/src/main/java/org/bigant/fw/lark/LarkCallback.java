@@ -43,14 +43,16 @@ public class LarkCallback {
         this.verificationToken = verificationToken;
         this.encryptKey = encryptKey;
 
-        MessageDigest digest = null;
-        try {
-            digest = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            // won't happen
-        }
-        if (digest != null) {
-            keyBs = digest.digest(encryptKey.getBytes(StandardCharsets.UTF_8));
+        if (Strings.isNotEmpty(encryptKey)) {
+            MessageDigest digest = null;
+            try {
+                digest = MessageDigest.getInstance("SHA-256");
+            } catch (NoSuchAlgorithmException e) {
+                // won't happen
+            }
+            if (digest != null) {
+                keyBs = digest.digest(encryptKey.getBytes(StandardCharsets.UTF_8));
+            }
         }
 
 

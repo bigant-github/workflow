@@ -6,7 +6,7 @@ import org.bigant.fw.dingtalk.DingTalkCallback;
 import org.bigant.fw.dingtalk.DingTalkConfig;
 import org.bigant.wf.instances.InstancesAction;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
@@ -18,7 +18,8 @@ import java.util.Map;
  * @author galen
  * @date 2024/2/2816:41
  */
-@ConditionalOnProperty(value = "wf.dingtalk.callback.enable", havingValue = "true")
+/*@ConditionalOnProperty(value = "wf.dingtalk.callback.enable", havingValue = "true")*/
+@ConditionalOnExpression(value = "${wf.dingtalk.callback.enable:true} and 'http'.equals('${wf.dingtalk.callback.type}')")
 @ConditionalOnBean(value = InstancesAction.class)
 @RestController
 @Slf4j
@@ -28,10 +29,6 @@ public class WfDingTalkCallbackController {
     private final DingTalkCallback dingTalkCallback;
     private final DingTalkConfig dingTalkConfig;
 
-    @PostConstruct
-    public void init() {
-        log.info("钉钉-回调controller启动");
-    }
     /**
      * 回调接口
      */
@@ -45,8 +42,6 @@ public class WfDingTalkCallbackController {
         return dingTalkCallback.callback(signature,
                 timestamp,
                 nonce,
-                dingTalkConfig.getToken(),
-                dingTalkConfig.getAesKey(),
                 dingTalkConfig.getAppKey(),
                 body);
     }

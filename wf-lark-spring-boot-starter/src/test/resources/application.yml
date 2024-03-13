@@ -2,4 +2,5 @@ wf:
   lark:
     callback:
       enable: true
+      type: http
       #path: callback

@@ -24,7 +24,15 @@ public class DingTalkProperties {
     private String appSecret;
     private String managerUserId;
     private Long agentId;
-    public String token;
-    public String aesKey;
+    private CallbackProperties callback;
+
+    @Data
+    public static class CallbackProperties {
+        private Boolean enabled = false;
+        private String type = "http";
+        private String httpPath = "dingtalk/callback";
+        private String verificationToken;
+        private String encryptKey;
+    }
 
 }

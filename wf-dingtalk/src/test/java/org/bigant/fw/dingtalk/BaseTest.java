@@ -40,7 +40,8 @@ public class BaseTest {
                 dingTalkAppSecret,
                 dingTalkManagerUserId,
                 Long.parseLong(dingTalkAgentId),
-                null, null, cache, new Client(getConfig()));
+                cache,
+                new Client(getConfig()));
 
         userService = new UserService() {
 

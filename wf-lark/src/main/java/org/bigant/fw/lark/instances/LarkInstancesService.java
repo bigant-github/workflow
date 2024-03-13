@@ -13,6 +13,7 @@ import org.bigant.fw.lark.LarkConstant;
 import org.bigant.fw.lark.instances.form.LarkFDCF;
 import org.bigant.fw.lark.instances.form.convert.LarkBaseFDC;
 import org.bigant.fw.lark.process.LarkProcessService;
+import org.bigant.wf.cache.ICache;
 import org.bigant.wf.exception.WfException;
 import org.bigant.wf.instances.InstanceStatus;
 import org.bigant.wf.instances.InstancesService;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 
@@ -40,6 +42,8 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class LarkInstancesService implements InstancesService {
 
+
+    private static final String SUBSCRIBE_KEY = LarkConstant.CACHE_KEY + "process:subscribe:";
     private LarkConfig larkConfig;
 
     private LarkProcessService larkProcessService;
@@ -48,6 +52,9 @@ public class LarkInstancesService implements InstancesService {
 
     private LarkFDCF larkFDCF;
 
+    private ICache cache;
+
+    private boolean needSubscribe;
 
     /**
      * 发起审批实例
@@ -81,9 +88,10 @@ public class LarkInstancesService implements InstancesService {
                         .build())
                 .build();
 
+        CreateInstanceResp resp;
         // 发起请求
         try {
-            CreateInstanceResp resp = client.approval().instance().create(req);
+            resp = client.approval().instance().create(req);
             // 处理服务端错误
             if (!resp.success()) {
                 String errMsg = String.format("飞书-发起审批实例失败。code:%s,msg:%s,reqId:%s,data:%s,form:%s",
@@ -96,13 +104,6 @@ public class LarkInstancesService implements InstancesService {
                 throw new WfException(errMsg);
             }
 
-            CreateInstanceRespBody data = resp.getData();
-
-            log.debug("飞书-发起审批实例成功。instanceCode:{}", data.getInstanceCode());
-            return InstanceStartResult.builder().instanceCode(data.getInstanceCode())
-                    .processCode(instanceStart.getProcessCode())
-                    .build();
-
         } catch (WfException e) {
             throw e;
         } catch (Exception e) {
@@ -112,6 +113,21 @@ public class LarkInstancesService implements InstancesService {
             log.error(errMsg);
             throw new WfException(errMsg, e);
         }
+        CreateInstanceRespBody data = resp.getData();
+
+        log.debug("飞书-发起审批实例成功。instanceCode:{}", data.getInstanceCode());
+
+
+        try {
+            this.subscribe(instanceStart.getProcessCode());
+        } catch (Exception e) {
+            log.warn("飞书-订阅审批实例失败。processCode:{}", data.getInstanceCode());
+        }
+
+        return InstanceStartResult.builder().instanceCode(data.getInstanceCode())
+                .processCode(instanceStart.getProcessCode())
+                .build();
+
 
     }
 
@@ -382,6 +398,33 @@ public class LarkInstancesService implements InstancesService {
                 .deptId(userService.getDeptIdByOtherDeptId(body.getDepartmentId(), getType()))
                 .userId(userService.getOtherUserIdByUserId(body.getUserId(), getType()))
                 .build();
+    }
+
+    public void subscribe(String processCode) throws Exception {
+
+        String cacheKey = SUBSCRIBE_KEY + processCode;
+        if (needSubscribe && !cache.exists(cacheKey)) {
+            // 构建client
+            Client client = larkConfig.getClient();
+
+            // 创建请求对象
+            SubscribeApprovalReq req = SubscribeApprovalReq.newBuilder()
+                    .approvalCode(processCode)
+                    .build();
+
+            // 发起请求
+            SubscribeApprovalResp resp = client.approval().approval().subscribe(req);
+
+            // 处理服务端错误
+            if (!resp.success()) {
+                String errMsg = String.format("飞书-订阅审批失败。processCode:%s,errMsg:%s", processCode, resp.getMsg());
+                log.error(errMsg);
+                throw new WfException(errMsg);
+            }
+
+            cache.set(SUBSCRIBE_KEY + processCode, "true", 9999, TimeUnit.DAYS);
+        }
+
     }
 
 

@@ -1,6 +1,8 @@
 package org.bigant.fw.lark;
 
 import com.lark.oapi.Client;
+import org.bigant.wf.cache.ICache;
+import org.bigant.wf.cache.LocalCache;
 import org.bigant.wf.user.UserService;
 import org.bigant.wf.user.vo.User;
 import org.junit.Before;
@@ -19,6 +21,8 @@ public class BaseTest {
     protected LarkConfig larkConfig;
     protected UserService userService;
     protected LarkFile larkFile;
+
+    protected ICache cache;
     protected String verificationToken = System.getenv("larkEncryptKey");
     protected String encryptKey = System.getenv("larkVerificationToken");
 
@@ -71,6 +75,7 @@ public class BaseTest {
         };
 
         this.larkFile = new LarkFile(larkConfig);
+        cache = LocalCache.getInstance();
     }
 
 

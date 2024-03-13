@@ -14,6 +14,7 @@ import org.bigant.wf.instances.InstancesAction;
 import org.bigant.wf.user.UserService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -55,8 +56,11 @@ public class WfLarkSpringBootAutoConfig {
     @Bean
     @ConditionalOnMissingBean
     @ConditionalOnBean(InstancesAction.class)
+    @ConditionalOnProperty(value = "wf.lark.callback.enable", havingValue = "true")
     public LarkCallback larkCallback(InstancesAction instancesAction, LarkProperties larkProperties) {
-        return new LarkCallback(instancesAction, larkProperties.getVerificationToken(), larkProperties.getEncryptKey());
+        return new LarkCallback(instancesAction,
+                larkProperties.getCallback().getVerificationToken(),
+                larkProperties.getCallback().getEncryptKey());
     }
 
     @Bean
@@ -82,11 +86,20 @@ public class WfLarkSpringBootAutoConfig {
 
     @Bean
     @ConditionalOnMissingBean
-    public LarkInstancesService larkInstancesService(LarkConfig larkConfig,
-                                                     LarkProcessService larkProcessService,
-                                                     UserService userService,
-                                                     LarkFDCF larkFDCF) {
-        LarkInstancesService larkInstancesService = new LarkInstancesService(larkConfig, larkProcessService, userService, larkFDCF);
+    public LarkInstancesService larkInstancesService(
+            LarkProperties larkProperties,
+            LarkConfig larkConfig,
+            LarkProcessService larkProcessService,
+            UserService userService,
+            LarkFDCF larkFDCF,
+            ICache cache) {
+
+        LarkInstancesService larkInstancesService = new LarkInstancesService(larkConfig,
+                larkProcessService,
+                userService,
+                larkFDCF,
+                cache,
+                larkProperties.getCallback().getEnabled());
         Factory.registerInstancesService(larkInstancesService.getType(), larkInstancesService);
         return larkInstancesService;
     }

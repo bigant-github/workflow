@@ -107,7 +107,7 @@ public class LarkInstancesServiceTest extends BaseTest {
         return new LarkInstancesService(larkConfig,
                 processService,
                 userService,
-                new LarkFDCF(larkFile));
+                new LarkFDCF(larkFile), cache, true);
 
     }
 

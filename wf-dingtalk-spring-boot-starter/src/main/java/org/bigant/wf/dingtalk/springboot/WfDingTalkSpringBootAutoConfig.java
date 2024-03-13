@@ -17,6 +17,7 @@ import org.bigant.wf.instances.InstancesAction;
 import org.bigant.wf.user.UserService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -46,8 +47,6 @@ public class WfDingTalkSpringBootAutoConfig {
                 dingTalkProperties.getAppSecret(),
                 dingTalkProperties.getManagerUserId(),
                 dingTalkProperties.getAgentId(),
-                dingTalkProperties.getToken(),
-                dingTalkProperties.getAesKey(),
                 cache,
                 new Client(this.getConfig()));
     }
@@ -55,9 +54,12 @@ public class WfDingTalkSpringBootAutoConfig {
 
     @Bean
     @ConditionalOnMissingBean
+    @ConditionalOnProperty(value = "wf.dingtalk.callback.enable", havingValue = "true")
     @ConditionalOnBean(InstancesAction.class)
-    public DingTalkCallback dingTalkCallback(InstancesAction instancesAction) {
-        return new DingTalkCallback(instancesAction);
+    public DingTalkCallback dingTalkCallback(InstancesAction instancesAction, DingTalkProperties dingTalkProperties) {
+        return new DingTalkCallback(instancesAction,
+                dingTalkProperties.getCallback().getVerificationToken(),
+                dingTalkProperties.getCallback().getEncryptKey());
     }
 
     @Bean

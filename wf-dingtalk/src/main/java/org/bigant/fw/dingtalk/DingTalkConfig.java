@@ -32,8 +32,6 @@ public class DingTalkConfig {
     private String managerUserId;
     @ApiModelProperty("应用id")
     private Long agentId;
-    public String token;
-    public String aesKey;
     private ICache cache;
 
     private Client client;

@@ -30,12 +30,12 @@ public class DingTalkCallback {
             '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
     private InstancesAction action;
+    private String token;
+    private String aesKey;
 
     public Map<String, String> callback(String signature,
                                         String timestamp,
                                         String nonce,
-                                        String token,
-                                        String aesKey,
                                         String appKey,
                                         String body) {
         String params = " signature:" + signature + " timestamp:" + timestamp + " nonce:" + nonce + " json:" + body;
