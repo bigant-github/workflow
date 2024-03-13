@@ -236,7 +236,7 @@ public class LarkProcessService implements ProcessService {
     }
 
     @Override
-    public String getType() {
+    public String getChannelName() {
         return LarkConstant.NAME;
     }
 }

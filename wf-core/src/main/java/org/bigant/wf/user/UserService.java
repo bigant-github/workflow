@@ -20,25 +20,18 @@ public interface UserService {
 
     /**
      * 获取实现方用户id
-     *
-     * @param userId
-     * @param type
-     * @return
+
      */
-    String getOtherUserIdByUserId(String userId, String type);
+    String getOtherUserIdByUserId(String userId, String channelName);
 
 
     /**
      * 获取实现方部门id
-     *
-     * @param deptId
-     * @param type
-     * @return
      */
-    String getOtherDeptIdByDeptId(String deptId, String type);
+    String getOtherDeptIdByDeptId(String deptId, String channelName);
 
-    String getUserIdByOtherUserId(String otherUserId, String type);
+    String getUserIdByOtherUserId(String otherUserId, String channelName);
 
-    String getDeptIdByOtherDeptId(String otherDeptId, String type);
+    String getDeptIdByOtherDeptId(String otherDeptId, String channelName);
 
 }

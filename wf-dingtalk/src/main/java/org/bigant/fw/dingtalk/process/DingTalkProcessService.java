@@ -47,7 +47,7 @@ public class DingTalkProcessService implements ProcessService {
             com.aliyun.dingtalkworkflow_1_0.models.ListUserVisibleBpmsProcessesHeaders listUserVisibleBpmsProcessesHeaders = new com.aliyun.dingtalkworkflow_1_0.models.ListUserVisibleBpmsProcessesHeaders();
             listUserVisibleBpmsProcessesHeaders.xAcsDingtalkAccessToken = dingTalkConfig.accessToken();
             com.aliyun.dingtalkworkflow_1_0.models.ListUserVisibleBpmsProcessesRequest listUserVisibleBpmsProcessesRequest = new com.aliyun.dingtalkworkflow_1_0.models.ListUserVisibleBpmsProcessesRequest()
-                    .setUserId(userService.getOtherUserIdByUserId(userId, this.getType()))
+                    .setUserId(userService.getOtherUserIdByUserId(userId, this.getChannelName()))
                     .setMaxResults(100L)
                     .setNextToken(0L);
             return client.listUserVisibleBpmsProcessesWithOptions(listUserVisibleBpmsProcessesRequest,
@@ -161,11 +161,11 @@ public class DingTalkProcessService implements ProcessService {
      * 获取钉钉用户id
      */
     private String getDingTalkUserId(String userId) {
-        return userService.getOtherUserIdByUserId(userId, getType());
+        return userService.getOtherUserIdByUserId(userId, getChannelName());
     }
 
     @Override
-    public String getType() {
+    public String getChannelName() {
         return DingTalkConstant.NAME;
     }
 

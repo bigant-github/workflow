@@ -342,7 +342,7 @@ public class LarkInstancesService implements InstancesService {
             String userId = instanceTask.getUserId();
             String userName = instanceTask.getUserId();
             if (!(userId == null || userId.isEmpty())) {
-                userId = userService.getUserIdByOtherUserId(userId, getType());
+                userId = userService.getUserIdByOtherUserId(userId, getChannelName());
                 userName = userService.getUser(userId).getUserName();
             }
 
@@ -395,8 +395,8 @@ public class LarkInstancesService implements InstancesService {
                 .instanceStatus(instanceStatus)
                 .tasks(tasks)
                 .title(body.getApprovalName())
-                .deptId(userService.getDeptIdByOtherDeptId(body.getDepartmentId(), getType()))
-                .userId(userService.getOtherUserIdByUserId(body.getUserId(), getType()))
+                .deptId(userService.getDeptIdByOtherDeptId(body.getDepartmentId(), getChannelName()))
+                .userId(userService.getOtherUserIdByUserId(body.getUserId(), getChannelName()))
                 .build();
     }
 
@@ -502,7 +502,7 @@ public class LarkInstancesService implements InstancesService {
 
 
     @Override
-    public String getType() {
+    public String getChannelName() {
         return LarkConstant.NAME;
     }
 

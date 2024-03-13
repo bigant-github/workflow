@@ -38,7 +38,7 @@ public interface InstancesService {
 
 
 
-    String getType();
+    String getChannelName();
 
 
 }

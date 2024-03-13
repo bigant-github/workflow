@@ -85,7 +85,7 @@ public class WfDingTalkSpringBootAutoConfig {
                 userService,
                 new com.aliyun.dingtalkworkflow_1_0.Client(getConfig()));
         //注册到工厂供后续使用
-        Factory.registerInstancesService(dingTalkInstancesService.getType(), dingTalkInstancesService);
+        Factory.registerInstancesService(dingTalkInstancesService.getChannelName(), dingTalkInstancesService);
 
         return dingTalkInstancesService;
     }
@@ -100,7 +100,7 @@ public class WfDingTalkSpringBootAutoConfig {
                 new DingTalkFDTCF());
 
         //注册到工厂供后续使用
-        Factory.registerProcessService(dingTalkProcessService.getType(), dingTalkProcessService);
+        Factory.registerProcessService(dingTalkProcessService.getChannelName(), dingTalkProcessService);
         return dingTalkProcessService;
     }
 

@@ -74,7 +74,7 @@ public class WfLarkSpringBootAutoConfig {
     @ConditionalOnMissingBean
     public LarkProcessService larkProcessService(LarkConfig larkConfig) {
         LarkProcessService larkProcessService = new LarkProcessService(larkConfig);
-        Factory.registerProcessService(larkProcessService.getType(), larkProcessService);
+        Factory.registerProcessService(larkProcessService.getChannelName(), larkProcessService);
         return larkProcessService;
     }
 
@@ -100,7 +100,7 @@ public class WfLarkSpringBootAutoConfig {
                 larkFDCF,
                 cache,
                 larkProperties.getCallback().getEnabled());
-        Factory.registerInstancesService(larkInstancesService.getType(), larkInstancesService);
+        Factory.registerInstancesService(larkInstancesService.getChannelName(), larkInstancesService);
         return larkInstancesService;
     }
 

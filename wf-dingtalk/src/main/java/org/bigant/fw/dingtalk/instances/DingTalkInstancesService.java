@@ -51,7 +51,7 @@ public class DingTalkInstancesService implements InstancesService {
 
         log.debug("发起审批实例：{}", JSONObject.toJSONString(instanceStart));
 
-        String dingTalkUserId = userService.getOtherUserIdByUserId(instanceStart.getUserId(), this.getType());
+        String dingTalkUserId = userService.getOtherUserIdByUserId(instanceStart.getUserId(), this.getChannelName());
 
         StartProcessInstanceHeaders startProcessInstanceHeaders = new
                 StartProcessInstanceHeaders();
@@ -80,7 +80,7 @@ public class DingTalkInstancesService implements InstancesService {
                 .setOriginatorUserId(dingTalkUserId)
                 .setProcessCode(instanceStart.getProcessCode())
                 .setDeptId(instanceStart.getDeptId() != null && !instanceStart.getDeptId().isEmpty() ?
-                        Long.parseLong(userService.getOtherDeptIdByDeptId(instanceStart.getDeptId(), this.getType()))
+                        Long.parseLong(userService.getOtherDeptIdByDeptId(instanceStart.getDeptId(), this.getChannelName()))
                         : null)
                 .setTargetSelectActioners(selectUser)
                 .setFormComponentValues(valuesDetailsDetails);
@@ -210,9 +210,9 @@ public class DingTalkInstancesService implements InstancesService {
             //将钉钉返回数据转换为InstanceDetailResult
 
             //钉钉userId获取系统userId
-            String userId = userService.getUserIdByOtherUserId(result.getOriginatorUserId(), getType());
+            String userId = userService.getUserIdByOtherUserId(result.getOriginatorUserId(), getChannelName());
             //钉钉部门Id获取系统部门Id
-            String deptId = userService.getOtherDeptIdByDeptId(result.getOriginatorDeptId(), getType());
+            String deptId = userService.getOtherDeptIdByDeptId(result.getOriginatorDeptId(), getChannelName());
 
 
             String status = result.getStatus();
@@ -281,7 +281,7 @@ public class DingTalkInstancesService implements InstancesService {
             //将task转换为系统task实体
             for (GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultTasks task : result.getTasks()) {
 
-                String taskUserId = userService.getUserIdByOtherUserId(task.getUserId(), getType());
+                String taskUserId = userService.getUserIdByOtherUserId(task.getUserId(), getChannelName());
                 User taskUser = userService.getUser(taskUserId);
 
                 TaskStatus taskStatus;
@@ -411,7 +411,7 @@ public class DingTalkInstancesService implements InstancesService {
 
             List<String> userIds = targetSelectUsersAuthMatch.get(i).getUserIds()
                     .stream()
-                    .map(x -> userService.getOtherUserIdByUserId(x, this.getType()))
+                    .map(x -> userService.getOtherUserIdByUserId(x, this.getChannelName()))
                     .collect(Collectors.toList());
 
             ProcessForecastResponseBody.ProcessForecastResponseBodyResultWorkflowActivityRulesWorkflowActor actor
@@ -452,7 +452,7 @@ public class DingTalkInstancesService implements InstancesService {
 
             List<String> userIds = nodeUser.getUserIds()
                     .stream()
-                    .map(x -> userService.getOtherUserIdByUserId(x, this.getType()))
+                    .map(x -> userService.getOtherUserIdByUserId(x, this.getChannelName()))
                     .collect(Collectors.toList());
 
             log.debug("钉钉-发起审批实例：节点Key：{}，共{}个用户：{}。",
@@ -474,7 +474,7 @@ public class DingTalkInstancesService implements InstancesService {
 
 
     @Override
-    public String getType() {
+    public String getChannelName() {
         return DingTalkConstant.NAME;
     }
 
@@ -509,8 +509,8 @@ public class DingTalkInstancesService implements InstancesService {
 
         ProcessForecastRequest processForecastRequest = new ProcessForecastRequest()
                 .setProcessCode(processCode)
-                .setDeptId(Integer.valueOf(userService.getOtherDeptIdByDeptId(deptId, getType())))
-                .setUserId(userService.getOtherUserIdByUserId(userId, getType()))
+                .setDeptId(Integer.valueOf(userService.getOtherDeptIdByDeptId(deptId, getChannelName())))
+                .setUserId(userService.getOtherUserIdByUserId(userId, getChannelName()))
                 .setFormComponentValues(values);
 
         com.aliyun.dingtalkworkflow_1_0.Client client = getClient();
@@ -673,7 +673,7 @@ public class DingTalkInstancesService implements InstancesService {
         com.aliyun.dingtalkworkflow_1_0.models.GetAttachmentSpaceHeaders getAttachmentSpaceHeaders = new com.aliyun.dingtalkworkflow_1_0.models.GetAttachmentSpaceHeaders();
 
         com.aliyun.dingtalkworkflow_1_0.models.GetAttachmentSpaceRequest getAttachmentSpaceRequest = new com.aliyun.dingtalkworkflow_1_0.models.GetAttachmentSpaceRequest()
-                .setUserId(userService.getOtherUserIdByUserId(userId, getType()))
+                .setUserId(userService.getOtherUserIdByUserId(userId, getChannelName()))
                 .setAgentId(dingTalkConfig.getAgentId());
 
         try {

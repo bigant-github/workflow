@@ -16,21 +16,21 @@ public class Factory {
     private static final ConcurrentHashMap<String, InstancesService> instancesServiceMap = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, ProcessService> processServiceMap = new ConcurrentHashMap<>();
 
-    public static InstancesService getInstancesService(String type) {
-        return instancesServiceMap.get(type);
+    public static InstancesService getInstancesService(String channelName) {
+        return instancesServiceMap.get(channelName);
 
     }
 
-    public static ProcessService getProcessService(String type) {
-        return processServiceMap.get(type);
+    public static ProcessService getProcessService(String channelName) {
+        return processServiceMap.get(channelName);
     }
 
-    public static void registerInstancesService(String type, InstancesService instancesService) {
-        instancesServiceMap.put(type, instancesService);
+    public static void registerInstancesService(String channelName, InstancesService instancesService) {
+        instancesServiceMap.put(channelName, instancesService);
     }
 
-    public static void registerProcessService(String type, ProcessService processService) {
-        processServiceMap.put(type, processService);
+    public static void registerProcessService(String channelName, ProcessService processService) {
+        processServiceMap.put(channelName, processService);
     }
 
 }

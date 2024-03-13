@@ -58,6 +58,8 @@ public interface InstancesAction {
 
         private String instanceCode;
 
+        private String channelName;
+
         private LocalDateTime operateTime;
 
         private InstanceStatus action;

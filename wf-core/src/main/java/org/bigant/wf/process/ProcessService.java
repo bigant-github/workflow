@@ -31,5 +31,5 @@ public interface ProcessService {
 
     ProcessDetail detail(String code);
 
-    String getType();
+    String getChannelName();
 }
