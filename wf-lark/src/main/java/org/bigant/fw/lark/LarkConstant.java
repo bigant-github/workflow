@@ -9,6 +9,6 @@ package org.bigant.fw.lark;
 public interface LarkConstant {
 
     String NAME = "lark";
-
+    String CACHE_KEY = "wf:lark:";
 
 }

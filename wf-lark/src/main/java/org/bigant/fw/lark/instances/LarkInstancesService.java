@@ -416,7 +416,7 @@ public class LarkInstancesService implements InstancesService {
             SubscribeApprovalResp resp = client.approval().approval().subscribe(req);
 
             // 处理服务端错误
-            if (!resp.success()) {
+            if (!resp.success() && resp.getCode() != 1390007) {
                 String errMsg = String.format("飞书-订阅审批失败。processCode:%s,errMsg:%s", processCode, resp.getMsg());
                 log.error(errMsg);
                 throw new WfException(errMsg);

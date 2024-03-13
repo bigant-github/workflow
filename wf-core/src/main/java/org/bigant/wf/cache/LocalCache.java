@@ -53,6 +53,18 @@ public class LocalCache implements ICache {
         CACHE.put(key, v);
     }
 
+
+    @Override
+    public boolean exists(String key) {
+        Value v = CACHE.get(key);
+        if (v == null || new Date().after(v.end)) {
+            return false;
+        }
+
+        log.debug("exists key:{},time left:{}s", key, (v.end.getTime() - new Date().getTime()) / 1000);
+        return true;
+    }
+
     private static class Value {
 
         String value;
