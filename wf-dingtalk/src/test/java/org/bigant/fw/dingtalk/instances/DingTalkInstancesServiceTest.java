@@ -43,12 +43,12 @@ public class DingTalkInstancesServiceTest extends BaseTest {
                                         .userIds(Arrays.asList("1"))
                                         .build()
                         ))
-                .autoMathSelectCcUsers(
+/*                .autoMathSelectCcUsers(
                         Arrays.asList(InstanceStart.AuthMatchNodeUser.builder()
                                 .userIds(Arrays.asList("1"))
                                 .build()
                         )
-                )
+                )*/
                 .formData(
                         Arrays.asList(
                                 FormDataItem.text("单行输入框", "测试"),

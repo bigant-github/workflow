@@ -22,6 +22,8 @@ import org.bigant.wf.task.TaskStatus;
 import org.bigant.wf.user.UserService;
 import org.bigant.wf.user.vo.User;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -41,6 +43,7 @@ public class DingTalkInstancesService implements InstancesService {
     private UserService userService;
     private com.aliyun.dingtalkworkflow_1_0.Client client;
 
+    private static final DateTimeFormatter TASK_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mmX");
 
     /**
      * 发起审批实例
@@ -337,6 +340,7 @@ public class DingTalkInstancesService implements InstancesService {
                                 log.error(errMsg);
                                 throw new WfException(errMsg);
                         }
+                        break;
                     case "TERMINATED":
                         taskStatus = TaskStatus.CANCELED;
                         break;
@@ -348,6 +352,7 @@ public class DingTalkInstancesService implements InstancesService {
 
 
                 tasks.add(InstanceDetailResult.Task.builder()
+                        .endTime(LocalDateTime.parse(task.getFinishTime(), TASK_TIME_FORMAT))
                         .taskCode(task.getTaskId().toString())
                         .userId(taskUserId)
                         .userName(taskUser.getUserName())
