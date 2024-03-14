@@ -113,6 +113,7 @@ public class LarkCallback {
                 .instanceCode(event.getString("instance_code"))
                 .processCode(event.getString("approval_code"))
                 .operateTime(operateTime)
+                .channelName(LarkConstant.NAME)
                 .build();
 
         switch (event.getString("status")) {

@@ -92,6 +92,7 @@ public class DingTalkCallback {
         InstancesAction.InstancesCallback instancesCallback = InstancesAction.InstancesCallback.builder()
                 .instanceCode(event.getString("processInstanceId"))
                 .processCode(event.getString("processCode"))
+                .channelName(DingTalkConstant.NAME)
                 .operateTime(operateTime)
                 .build();
 

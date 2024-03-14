@@ -1,11 +1,7 @@
 package org.bigant.wf.dingtalk.springboot;
 
-import com.aliyun.dingtalkoauth2_1_0.Client;
-import com.aliyun.teaopenapi.models.Config;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.bigant.wf.exception.WfException;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 
@@ -24,6 +20,7 @@ public class DingTalkProperties {
     private String appSecret;
     private String managerUserId;
     private Long agentId;
+    private String corpId;
     private CallbackProperties callback;
 
     @Data
