@@ -14,7 +14,7 @@ import java.util.List;
  * 发起审批实例实体
  *
  * @author galen
- * @date 2024/1/3114:54
+ * date 2024/1/3114:54
  */
 @Data
 @ApiModel("发起审批实例")

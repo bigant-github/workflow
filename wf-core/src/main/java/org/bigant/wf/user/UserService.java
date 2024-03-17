@@ -6,15 +6,13 @@ import org.bigant.wf.user.vo.User;
  * 用户详情
  *
  * @author galen
- * @date 2024/1/3111:34
+ * date 2024/1/3111:34
  */
 public interface UserService {
 
     /**
      * 获取用户详情
      *
-     * @param id
-     * @return
      */
     User getUser(String id);
 

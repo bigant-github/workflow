@@ -9,7 +9,7 @@ import org.bigant.wf.instances.form.databean.FormDataAmount;
  * 组建工具
  *
  * @author galen
- * @date 2024/1/3116:30
+ * date 2024/1/3116:30
  */
 public class FormDataParseAmount implements FormDataParse<FormDataAmount> {
 

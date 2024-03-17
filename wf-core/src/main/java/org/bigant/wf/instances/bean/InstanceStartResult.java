@@ -10,7 +10,7 @@ import lombok.ToString;
  * 发起审批实例结果
  *
  * @author galen
- * @date 2024/1/3114:54
+ * date 2024/1/3114:54
  */
 @ApiModel("发起审批实例结果")
 @Data

@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  * 单选框附属信息
  *
  * @author galen
- * @date 2024/2/2311:21
+ * date 2024/2/2311:21
  */
 @ApiModel("单选框附属信息")
 @Data

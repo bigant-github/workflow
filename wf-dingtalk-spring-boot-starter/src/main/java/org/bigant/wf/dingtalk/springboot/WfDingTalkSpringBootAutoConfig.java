@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Configuration;
  * spring boot 自动配置
  *
  * @author galen
- * @date 2024/2/2316:42
+ * date 2024/2/2316:42
  */
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(DingTalkProperties.class)

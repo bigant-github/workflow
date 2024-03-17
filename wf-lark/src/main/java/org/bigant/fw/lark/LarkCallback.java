@@ -21,7 +21,7 @@ import java.util.Base64;
  * 飞书回调
  *
  * @author galen
- * @date 2024/2/2813:50
+ * date 2024/2/2813:50
  */
 @Slf4j
 public class LarkCallback {

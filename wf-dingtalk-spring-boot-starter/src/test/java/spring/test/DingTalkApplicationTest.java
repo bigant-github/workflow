@@ -16,7 +16,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * @author galen
- * @date 2024/2/2609:49
+ * date 2024/2/2609:49
  */
 @SpringBootApplication
 @Configuration

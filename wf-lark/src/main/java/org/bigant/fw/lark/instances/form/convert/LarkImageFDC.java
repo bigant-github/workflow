@@ -15,7 +15,7 @@ import java.util.*;
  * 钉钉图片类型转换器
  *
  * @author galen
- * @date 2024/3/115:29
+ * date 2024/3/115:29
  */
 @AllArgsConstructor
 public class LarkImageFDC extends LarkBaseFDC {

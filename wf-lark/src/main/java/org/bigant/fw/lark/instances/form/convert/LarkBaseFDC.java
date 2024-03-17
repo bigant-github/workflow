@@ -16,7 +16,7 @@ import java.util.Map;
  * 钉钉组件转换器基础功能
  *
  * @author galen
- * @date 2024/3/115:38
+ * date 2024/3/115:38
  */
 @Slf4j
 public abstract class LarkBaseFDC implements FormDataConvert<Map<String, Object>, LarkBaseFDC.FormItemConvert

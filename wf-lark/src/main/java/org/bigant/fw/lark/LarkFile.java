@@ -22,7 +22,7 @@ import java.util.UUID;
  * 飞书文件相关
  *
  * @author galen
- * @date 2024/2/2116:54
+ * date 2024/2/2116:54
  */
 @Slf4j
 @AllArgsConstructor

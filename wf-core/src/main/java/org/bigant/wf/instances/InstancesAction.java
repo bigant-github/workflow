@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
  * 实例事件
  *
  * @author galen
- * @date 2024/2/2811:29
+ * date 2024/2/2811:29
  */
 public interface InstancesAction {
 

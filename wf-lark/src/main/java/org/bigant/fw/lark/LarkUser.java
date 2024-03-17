@@ -8,7 +8,7 @@ import org.bigant.wf.user.vo.User;
  * 飞书用户service
  *
  * @author galen
- * @date 2024/2/1815:46
+ * date 2024/2/1815:46
  */
 @AllArgsConstructor
 public class LarkUser {

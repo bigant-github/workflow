@@ -8,7 +8,7 @@ import java.net.URL;
 
 /**
  * @author galen
- * @date 2024/2/2211:32
+ * date 2024/2/2211:32
  */
 public class IOUtils {
     public static void copyFile(URL url, File file) throws IOException {

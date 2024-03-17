@@ -6,7 +6,7 @@ import org.bigant.wf.ComponentType;
  * 组建工具
  *
  * @author galen
- * @date 2024/1/3116:30
+ * date 2024/1/3116:30
  */
 public interface FormDataParse<T> {
 

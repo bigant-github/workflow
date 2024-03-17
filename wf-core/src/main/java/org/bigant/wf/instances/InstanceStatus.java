@@ -2,7 +2,7 @@ package org.bigant.wf.instances;
 
 /**
  * @author galen
- * @date 2024/2/2917:27
+ * date 2024/2/2917:27
  */
 public enum InstanceStatus {
     WAITING("未启动"),

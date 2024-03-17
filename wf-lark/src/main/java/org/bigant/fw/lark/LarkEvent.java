@@ -15,7 +15,7 @@ import java.nio.charset.StandardCharsets;
  * 飞书长链接回调
  *
  * @author galen
- * @date 2024/3/1213:42
+ * date 2024/3/1213:42
  */
 public class LarkEvent {
 

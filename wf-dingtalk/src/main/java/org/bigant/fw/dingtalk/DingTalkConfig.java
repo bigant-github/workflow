@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
  * 钉钉配置
  *
  * @author galen
- * @date 2024/1/30 15:30
+ * date 2024/1/30 15:30
  */
 @Data
 @AllArgsConstructor

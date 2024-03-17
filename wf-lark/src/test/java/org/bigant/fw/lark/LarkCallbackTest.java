@@ -5,7 +5,7 @@ import org.junit.Test;
 
 /**
  * @author galen
- * @date 2024/3/1216:31
+ * date 2024/3/1216:31
  */
 public class LarkCallbackTest extends BaseTest {
 

@@ -16,7 +16,7 @@ import java.util.Map;
  * 钉钉组件转换器基础功能
  *
  * @author galen
- * @date 2024/3/115:38
+ * date 2024/3/115:38
  */
 @Slf4j
 public abstract class DingTalkBaseFDC implements FormDataConvert<Map<String, String>, FormDataItem
@@ -59,8 +59,6 @@ public abstract class DingTalkBaseFDC implements FormDataConvert<Map<String, Str
     /**
      * 日期格式
      *
-     * @param dateStr
-     * @return
      */
     public DateOption.ComponentDateFormat dateType(String dateStr) {
         int length = dateStr.length();
@@ -81,8 +79,6 @@ public abstract class DingTalkBaseFDC implements FormDataConvert<Map<String, Str
     /**
      * 日期格式
      *
-     * @param dateStr
-     * @return
      */
     public LocalDateTime toLocalDateTime(String dateStr, DateOption.ComponentDateFormat format) {
         switch (format) {

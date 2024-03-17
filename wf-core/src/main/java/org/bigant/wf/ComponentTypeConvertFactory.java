@@ -30,8 +30,6 @@ public abstract class ComponentTypeConvertFactory<T extends ComponentTypeAndOthe
     /**
      * 根据其他系统类型获取转换器
      *
-     * @param type
-     * @return
      */
     public T getByOtherType(String type) {
         if (!init) {

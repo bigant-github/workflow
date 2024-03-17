@@ -21,7 +21,7 @@ import java.util.Map;
  * 钉钉云盘文件上传
  *
  * @author galen
- * @date 2024/2/515:15
+ * date 2024/2/515:15
  */
 @Slf4j
 public class DingTalkFile {
@@ -30,12 +30,6 @@ public class DingTalkFile {
     /**
      * 上传文件
      *
-     * @param unionId
-     * @param fileName
-     * @param size
-     * @param spaceId
-     * @param dingTalkConfig
-     * @return
      */
     public static CommitFileResponseBody uploadFile(String unionId,
                                                     String spaceId,
@@ -60,12 +54,6 @@ public class DingTalkFile {
     /**
      * 上传文件
      *
-     * @param unionId
-     * @param fileName
-     * @param size
-     * @param spaceId
-     * @param dingTalkConfig
-     * @return
      */
     public static CommitFileResponseBody uploadFile(String unionId, String spaceId, String fileName, Long size, InputStream is, DingTalkConfig dingTalkConfig) {
         log.debug("根据流上传文件，unionId:{}，fileName:{}，size:{}，spaceId:{}", unionId, fileName, size, size);
@@ -134,14 +122,6 @@ public class DingTalkFile {
     /**
      * 提交文件
      *
-     * @param unionId
-     * @param fileName
-     * @param size
-     * @param spaceId
-     * @param dingTalkConfig
-     * @param uploadInfo
-     * @return
-     * @throws Exception
      */
     private static CommitFileResponseBody commitFile(String unionId, String spaceId, String fileName, Long size, DingTalkConfig dingTalkConfig, GetFileUploadInfoResponseBody uploadInfo) throws Exception {
         log.debug("提交文件，unionId:{}，spaceId:{}，fileName:{}，size:{}", unionId, fileName, size, spaceId);
@@ -179,12 +159,6 @@ public class DingTalkFile {
     /**
      * 获取文件上传信息
      *
-     * @param unionId
-     * @param fileName
-     * @param size
-     * @param spaceId
-     * @param dingTalkConfig
-     * @return
      */
     public static GetFileUploadInfoResponseBody getUploadInfo(String unionId, String spaceId, String fileName, Long size, DingTalkConfig dingTalkConfig) {
 

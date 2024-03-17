@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
  * 飞书配置
  *
  * @author galen
- * @date 2024/2/1816:23
+ * date 2024/2/1816:23
  */
 @Data
 @Builder

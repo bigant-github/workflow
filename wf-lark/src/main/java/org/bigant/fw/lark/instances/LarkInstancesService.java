@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
  * 飞书审批流程service
  *
  * @author galen
- * @date 2024/2/1815:49
+ * date 2024/2/1815:49
  */
 @Slf4j
 @AllArgsConstructor

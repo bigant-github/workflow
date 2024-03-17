@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  * 审批实例service
  *
  * @author galen
- * @date 2024/1/3114:53
+ * date 2024/1/3114:53
  */
 @AllArgsConstructor
 @Data
@@ -561,9 +561,6 @@ public class DingTalkInstancesService implements InstancesService {
     /**
      * 解析表单值,主要是解决个平台数据格式不一样的问题
      *
-     * @param formDataItemList
-     * @param dingTalkUserId
-     * @return
      */
     private HashMap<String, String> parseFormValue(List<FormDataItem> formDataItemList, String dingTalkUserId) {
         HashMap<String, String> formMap = new HashMap<>(formDataItemList.size());
@@ -581,9 +578,6 @@ public class DingTalkInstancesService implements InstancesService {
     /**
      * 解析将form数据转换为Map
      *
-     * @param formDataItem
-     * @param dingTalkUserId
-     * @return
      */
     private Map<String, String> parseFormValue(FormDataItem formDataItem, String dingTalkUserId) {
         return dingTalkFDCF.getByFormType(formDataItem.getComponentType()).toOther(formDataItem, dingTalkUserId);
@@ -668,8 +662,6 @@ public class DingTalkInstancesService implements InstancesService {
     /**
      * 获取流程实例的空间
      *
-     * @param userId
-     * @return
      */
     private Long getProcessInstancesSpaces(String userId) {
 

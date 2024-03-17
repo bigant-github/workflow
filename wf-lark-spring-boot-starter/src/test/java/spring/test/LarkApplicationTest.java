@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * @author galen
- * @date 2024/2/2609:49
+ * date 2024/2/2609:49
  */
 @SpringBootApplication
 @Configuration

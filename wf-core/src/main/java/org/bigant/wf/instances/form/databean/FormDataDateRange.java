@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
  * 时间区间
  *
  * @author galen
- * @date 2024/2/111:56
+ * date 2024/2/111:56
  */
 @Data
 @ApiModel(value = "时间区间")

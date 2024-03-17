@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  * 飞书审批流service
  *
  * @author galen
- * @date 2024/2/1909:24
+ * date 2024/2/1909:24
  */
 @Slf4j
 @AllArgsConstructor
@@ -128,8 +128,6 @@ public class LarkProcessService implements ProcessService {
      * 多选	checkbox/checkboxV2
      * 表格 fieldList
      *
-     * @param item
-     * @return
      */
     public FormDetailItem convertFormItem(Map<String, Object> item) {
 

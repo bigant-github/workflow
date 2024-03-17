@@ -14,7 +14,7 @@ import java.util.Map;
  * 钉钉数字类型转换器
  *
  * @author galen
- * @date 2024/3/115:29
+ * date 2024/3/115:29
  */
 public class LarkAmountFDC extends LarkBaseFDC {
 

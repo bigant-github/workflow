@@ -10,7 +10,7 @@ public class DateOption {
      * 控件类型
      *
      * @author galen
-     * @date 2024/1/3115:33
+     * date 2024/1/3115:33
      */
     @Getter
     @AllArgsConstructor

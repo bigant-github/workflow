@@ -21,7 +21,7 @@ import java.util.Arrays;
 
 /**
  * @author galen
- * @date 2024/2/2217:01
+ * date 2024/2/2217:01
  */
 @Slf4j
 public class LarkInstancesServiceTest extends BaseTest {

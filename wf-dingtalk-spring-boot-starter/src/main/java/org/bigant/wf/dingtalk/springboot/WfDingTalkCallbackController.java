@@ -16,7 +16,7 @@ import java.util.Map;
  * 回调接口
  *
  * @author galen
- * @date 2024/2/2816:41
+ * date 2024/2/2816:41
  */
 /*@ConditionalOnProperty(value = "wf.dingtalk.callback.enable", havingValue = "true")*/
 @ConditionalOnExpression(value = "${wf.dingtalk.callback.enable:true} and 'http'.equals('${wf.dingtalk.callback.type}')")

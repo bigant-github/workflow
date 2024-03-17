@@ -63,8 +63,6 @@ public class DingCallbackCrypto {
      * @param plaintext 传递的消息体明文
      * @param timeStamp 时间戳
      * @param nonce     随机字符串
-     * @return
-     * @throws DingTalkEncryptException
      */
     public Map<String, String> getEncryptedMap(String plaintext, Long timeStamp, String nonce)
             throws DingTalkEncryptException {
@@ -96,7 +94,6 @@ public class DingCallbackCrypto {
      * @param nonce        随机串
      * @param encryptMsg   密文
      * @return 解密后的原文
-     * @throws DingTalkEncryptException
      */
     public String getDecryptMsg(String msgSignature, String timeStamp, String nonce, String encryptMsg)
             throws DingTalkEncryptException {
@@ -191,8 +188,6 @@ public class DingCallbackCrypto {
      * @param timestamp 时间戳
      * @param nonce     随机串
      * @param encrypt   加密文本
-     * @return
-     * @throws DingTalkEncryptException
      */
     public String getSignature(String token, String timestamp, String nonce, String encrypt)
             throws DingTalkEncryptException {

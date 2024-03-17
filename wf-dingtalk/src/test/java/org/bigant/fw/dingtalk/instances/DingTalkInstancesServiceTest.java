@@ -19,7 +19,7 @@ import java.util.Arrays;
 
 /**
  * @author galen
- * @date 2024/2/117:07
+ * date 2024/2/117:07
  */
 @Slf4j
 public class DingTalkInstancesServiceTest extends BaseTest {

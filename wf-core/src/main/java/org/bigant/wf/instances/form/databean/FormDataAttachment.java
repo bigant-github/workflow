@@ -9,7 +9,7 @@ import lombok.Data;
  * 附件
  *
  * @author galen
- * @date 2024/2/111:56
+ * date 2024/2/111:56
  */
 @Data
 @ApiModel(value = "附件")

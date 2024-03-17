@@ -11,7 +11,7 @@ import java.util.List;
  * 审批流程详情
  *
  * @author galen
- * @date 2024/2/1909:28
+ * date 2024/2/1909:28
  */
 @ApiModel("审批流程详情")
 @Data

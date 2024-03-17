@@ -10,7 +10,7 @@ import java.util.Collection;
  * 关联审批单实体
  *
  * @author galen
- * @date 2024/1/3116:30
+ * date 2024/1/3116:30
  */
 public class FormDataParseJoinInstance implements FormDataParse<Collection<String>> {
 

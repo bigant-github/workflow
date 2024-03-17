@@ -4,7 +4,7 @@ package org.bigant.wf;
  * 所有组件方法
  *
  * @author galen
- * @date 2024/1/3115:33
+ * date 2024/1/3115:33
  */
 public interface ComponentTypeGet<T> {
 

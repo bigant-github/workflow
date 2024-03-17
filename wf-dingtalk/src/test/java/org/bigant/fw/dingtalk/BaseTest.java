@@ -18,7 +18,7 @@ import java.util.Collections;
  * 基础测试
  *
  * @author galen
- * @date 2024/1/3111:53
+ * date 2024/1/3111:53
  */
 public class BaseTest {
     protected DingTalkConfig dingTalkConfig;

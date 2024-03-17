@@ -7,7 +7,7 @@ import org.junit.Test;
 
 /**
  * @author galen
- * @date 2024/2/2011:27
+ * date 2024/2/2011:27
  */
 @Slf4j
 public class LarkProcessServiceTest extends BaseTest {

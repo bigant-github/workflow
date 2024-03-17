@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
  * 基础测试
  *
  * @author galen
- * @date 2024/2/2011:28
+ * date 2024/2/2011:28
  */
 public class BaseTest {
 

@@ -9,7 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * 飞书spring配置文件
  *
  * @author galen
- * @date 2024/2/2816:29
+ * date 2024/2/2816:29
  */
 @Data
 @ConfigurationProperties(prefix = "wf.dingtalk")

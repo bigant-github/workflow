@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  * 钉钉用户
  *
  * @author galen
- * @date 2024/2/514:52
+ * date 2024/2/514:52
  */
 @AllArgsConstructor
 @Slf4j

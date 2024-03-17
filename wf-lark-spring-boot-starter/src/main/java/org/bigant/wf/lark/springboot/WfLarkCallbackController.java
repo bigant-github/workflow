@@ -20,7 +20,7 @@ import java.security.NoSuchAlgorithmException;
  * 回调接口
  *
  * @author galen
- * @date 2024/2/2816:41
+ * date 2024/2/2816:41
  */
 /*@ConditionalOnProperty(value = "wf.lark.callback.enable", havingValue = "true")*/
 @ConditionalOnExpression(value = "${wf.lark.callback.enable:true} and 'http'.equals('${wf.lark.callback.type}')")

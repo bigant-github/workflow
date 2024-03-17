@@ -12,7 +12,7 @@ import java.util.Collections;
  * 钉钉字符串转换器
  *
  * @author galen
- * @date 2024/3/115:29
+ * date 2024/3/115:29
  */
 public class DingTalkUnknownFDTC extends DingTalkBaseFDTC {
 

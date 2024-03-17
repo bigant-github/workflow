@@ -12,7 +12,7 @@ import java.util.Map;
  * 钉钉关联审批单
  *
  * @author galen
- * @date 2024/3/115:29
+ * date 2024/3/115:29
  */
 public class DingTalkJoinInstanceFDC extends DingTalkBaseFDC {
 
