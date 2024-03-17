@@ -2,13 +2,11 @@ package org.bigant.fw.dingtalk;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-import com.dingtalk.oapi.lib.aes.DingTalkEncryptor;
-import com.dingtalk.oapi.lib.aes.Utils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bigant.wf.exception.WfException;
-import org.bigant.wf.instances.InstancesAction;
 import org.bigant.wf.instances.InstanceStatus;
+import org.bigant.wf.instances.InstancesAction;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -41,7 +39,7 @@ public class DingTalkCallback {
         String params = " signature:" + signature + " timestamp:" + timestamp + " nonce:" + nonce + " json:" + body;
         try {
 
-            DingTalkEncryptor dingTalkEncryptor = new DingTalkEncryptor(token, aesKey, appKey);
+            DingCallbackCrypto dingTalkEncryptor = new DingCallbackCrypto(token, aesKey, appKey);
 
             JSONObject bodyJson = JSONObject.parseObject(body);
             //从post请求的body中获取回调信息的加密数据进行解密处理
@@ -50,7 +48,7 @@ public class DingTalkCallback {
             JSONObject obj = JSON.parseObject(plainText);
             this.callback(obj);
             // 返回success的加密信息表示回调处理成功
-            return dingTalkEncryptor.getEncryptedMap("success", System.currentTimeMillis(), Utils.getRandomStr(8));
+            return dingTalkEncryptor.getEncryptedMap("success");
         } catch (Exception e) {
             //失败的情况，应用的开发者应该通过告警感知，并干预修复
             log.error("钉钉-回调失败：" + params, e);
