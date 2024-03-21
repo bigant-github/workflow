@@ -76,7 +76,12 @@ public class DingTalkAttachmentFDC extends DingTalkBaseFDC {
             GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues data) {
 
         String value = data.getValue();
+
+        if (value == null || value.isEmpty()) {
+            return FormDataItem.attachment(data.getName(), new ArrayList<>());
+        }
         JSONArray jsonVal = JSONArray.parse(value);
+
         ArrayList<FormDataAttachment> attachments = new ArrayList<>();
         for (int i = 0; i < jsonVal.size(); i++) {
 

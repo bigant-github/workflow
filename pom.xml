@@ -90,7 +90,7 @@
     </dependencyManagement>
 
 
-    <build>
+    <!--<build>
         <plugins>
             <plugin>
                 <groupId>org.sonatype.central</groupId>
@@ -129,6 +129,6 @@
                 </executions>
             </plugin>
         </plugins>
-    </build>
+    </build>-->
 
 </project>
