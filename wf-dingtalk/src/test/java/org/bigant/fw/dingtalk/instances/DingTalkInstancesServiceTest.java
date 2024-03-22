@@ -165,7 +165,7 @@ public class DingTalkInstancesServiceTest extends BaseTest {
                 "        \"name\": \"费用报销明细\",\n" +
                 "        \"value\": \"[[{\\\"componentType\\\":\\\"SELECT\\\",\\\"name\\\":\\\"报销项目\\\",\\\"value\\\":\\\"福利费\\\"}" +
                 ",{\\\"componentType\\\":\\\"TEXT\\\",\\\"name\\\":\\\"摘要\\\"}" +
-                ",{\\\"componentType\\\":\\\"AMOUNT\\\",\\\"name\\\":\\\"报销金额（元）\\\",\\\"value\\\":\\\"{\\\\\\\"amount\\\\\\\":3000000,\\\\\\\"amountType\\\\\\\":\\\\\\\"CNY\\\\\\\"}\\\"}]]\",\n" +
+                "]]\",\n" +
                 "        \"componentType\": \"TABLE\"\n" +
                 "    }" +
                 /*",\n" +
