@@ -246,9 +246,9 @@ public class LarkInstancesService implements InstancesService {
         log.debug("飞书-预览审批实例:{}", Jsons.DEFAULT.toJson(instancePreview));
 
 
-        ProcessDetail processDetail = larkProcessService.detail(instancePreview.getInstanceCode());
+        ProcessDetail processDetail = larkProcessService.detail(instancePreview.getProcessCode());
 
-        this.preview(instancePreview.getInstanceCode(),
+        this.preview(instancePreview.getProcessCode(),
                 userService.getOtherUserIdByUserId(instancePreview.getUserId(), LarkConstant.NAME),
                 userService.getOtherDeptIdByDeptId(instancePreview.getDeptId(), LarkConstant.NAME),
                 parseFormData(processDetail, instancePreview.getFormData()));

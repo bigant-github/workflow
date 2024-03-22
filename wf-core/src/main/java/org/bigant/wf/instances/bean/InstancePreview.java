@@ -2,7 +2,10 @@ package org.bigant.wf.instances.bean;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bigant.wf.instances.form.FormDataItem;
 
 import java.util.List;
@@ -15,9 +18,12 @@ import java.util.List;
  */
 @Data
 @ApiModel("发起审批实例")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class InstancePreview {
-    @ApiModelProperty("审批实例code")
-    private String instanceCode;
+    @ApiModelProperty("审批流程code")
+    private String processCode;
 
     @ApiModelProperty("发起人id")
     private String userId;

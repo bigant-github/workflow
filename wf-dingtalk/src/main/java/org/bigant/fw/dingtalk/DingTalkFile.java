@@ -76,7 +76,7 @@ public class DingTalkFile {
             connection.setDoOutput(true);
             connection.setRequestMethod("PUT");
             connection.setUseCaches(false);
-            connection.setReadTimeout(10000);
+            connection.setReadTimeout(1000000);
             connection.setConnectTimeout(10000);
             connection.connect();
             OutputStream out = connection.getOutputStream();

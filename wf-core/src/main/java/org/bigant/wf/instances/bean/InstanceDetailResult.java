@@ -2,8 +2,10 @@ package org.bigant.wf.instances.bean;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bigant.wf.instances.form.FormDataItem;
 import org.bigant.wf.instances.InstanceStatus;
 import org.bigant.wf.task.TaskStatus;
@@ -20,6 +22,8 @@ import java.util.List;
 @Data
 @ApiModel("发起审批实例")
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class InstanceDetailResult {
     @ApiModelProperty("审批实例code")
     private String instanceCode;
@@ -49,6 +53,8 @@ public class InstanceDetailResult {
     @Data
     @ApiModel("任务")
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Task {
         @ApiModelProperty("任务id")
         private String taskCode;

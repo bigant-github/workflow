@@ -91,9 +91,7 @@ public class DingTalkInstancesService implements InstancesService {
         try {
             Client client = getClient();
             startProcessInstanceHeaders.xAcsDingtalkAccessToken = dingTalkConfig.accessToken();
-            StartProcessInstanceResponse processInstanceResponse = client.startProcessInstanceWithOptions(startProcessInstanceRequest,
-                    startProcessInstanceHeaders,
-                    new RuntimeOptions());
+            StartProcessInstanceResponse processInstanceResponse = client.startProcessInstance(startProcessInstanceRequest);
 
             String instanceId = processInstanceResponse.getBody().getInstanceId();
             log.debug("发起审批实例成功：processCode:{}，instanceCode:{}", instanceStart.getProcessCode(), instanceId);
@@ -178,7 +176,13 @@ public class DingTalkInstancesService implements InstancesService {
 
     @Override
     public InstancePreviewResult preview(InstancePreview instancePreview) {
+        String userId = userService.getOtherUserIdByUserId(instancePreview.getUserId(), this.getChannelName());
+        String deptId = userService.getOtherDeptIdByDeptId(instancePreview.getDeptId(), this.getChannelName());
+        HashMap<String, String> formComponents = this.parseFormValue(instancePreview.getFormData(), userId);
+        ProcessForecastResponseBody.ProcessForecastResponseBodyResult preview = preview(instancePreview.getProcessCode(), userId, deptId, formComponents);
+
         return null;
+
     }
 
     /**
@@ -560,7 +564,6 @@ public class DingTalkInstancesService implements InstancesService {
 
     /**
      * 解析表单值,主要是解决个平台数据格式不一样的问题
-     *
      */
     private HashMap<String, String> parseFormValue(List<FormDataItem> formDataItemList, String dingTalkUserId) {
         HashMap<String, String> formMap = new HashMap<>(formDataItemList.size());
@@ -577,7 +580,6 @@ public class DingTalkInstancesService implements InstancesService {
 
     /**
      * 解析将form数据转换为Map
-     *
      */
     private Map<String, String> parseFormValue(FormDataItem formDataItem, String dingTalkUserId) {
         return dingTalkFDCF.getByFormType(formDataItem.getComponentType()).toOther(formDataItem, dingTalkUserId);
@@ -661,7 +663,6 @@ public class DingTalkInstancesService implements InstancesService {
 
     /**
      * 获取流程实例的空间
-     *
      */
     private Long getProcessInstancesSpaces(String userId) {
 

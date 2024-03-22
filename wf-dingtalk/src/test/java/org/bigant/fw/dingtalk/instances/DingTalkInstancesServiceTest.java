@@ -1,10 +1,13 @@
 package org.bigant.fw.dingtalk.instances;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.aliyun.dingtalkworkflow_1_0.Client;
 import lombok.extern.slf4j.Slf4j;
 import org.bigant.fw.dingtalk.BaseTest;
 import org.bigant.wf.instances.bean.InstanceDetailResult;
+import org.bigant.wf.instances.bean.InstancePreview;
+import org.bigant.wf.instances.bean.InstancePreviewResult;
 import org.bigant.wf.instances.bean.InstanceStart;
 import org.bigant.wf.instances.form.FormDataItem;
 import org.bigant.wf.instances.form.databean.FormDataAttachment;
@@ -16,6 +19,7 @@ import org.junit.Test;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author galen
@@ -100,6 +104,86 @@ public class DingTalkInstancesServiceTest extends BaseTest {
         InstanceDetailResult detail = getDingTalkInstancesService().detail(instanceCode);
         log.info("查询审批实例开始测试通过。instanceCode:{},data:{}", instanceCode, JSONObject.toJSONString(detail));
 
+    }
+
+
+    @Test
+    public void preview() {
+        log.info("预览审批开始测试。");
+        log.info("预览审批开始测试通过。");
+
+        List<FormDataItem> formData = JSONArray.parseArray("[\n" +
+                "    {\n" +
+                "        \"name\": \"类别\",\n" +
+                "        \"value\": \"费用报销\",\n" +
+                "        \"componentType\": \"SELECT\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "        \"name\": \"收款方开户名\",\n" +
+                "        \"value\": \"石家庄平衡裕华门诊部\",\n" +
+                "        \"componentType\": \"TEXT\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "        \"name\": \"收款方开户行\",\n" +
+                "        \"value\": \"中国光大银行中国光大银行股份有限公司石家庄体育大街支行\",\n" +
+                "        \"componentType\": \"TEXT\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "        \"name\": \"收款方银行账号\",\n" +
+                "        \"value\": \"79400188000000991\",\n" +
+                "        \"componentType\": \"TEXT\"\n" +
+                "    }" +
+/*                ",\n" +
+                "    {\n" +
+                "        \"name\": \"预算\",\n" +
+                "        \"value\": \"内\",\n" +
+                "        \"componentType\": \"SELECT\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "        \"name\": \"单据\",\n" +
+                "        \"value\": \"1\",\n" +
+                "        \"componentType\": \"NUMBER\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "        \"name\": \"产品线\",\n" +
+                "        \"value\": \"岗位外包\",\n" +
+                "        \"componentType\": \"TEXT\"\n" +
+                "    },\n" +*/
+                "    {\n" +
+                "        \"name\": \"付款公司全称\",\n" +
+                "        \"value\": \"河北搜才商务服务有限公司\",\n" +
+                "        \"componentType\": \"SELECT\"\n" +
+                "    }" +
+/*                ",\n" +
+                "    {\n" +
+                "        \"name\": \"领导审批\",\n" +
+                "        \"value\": \"满艺|发起|2024-03-21;\\n满艺|同意|2024-03-21;\\n\",\n" +
+                "        \"componentType\": \"TEXTAREA\"\n" +
+                "    }" +*/
+                ",\n" +
+                "    {\n" +
+                "        \"name\": \"费用报销明细\",\n" +
+                "        \"value\": \"[[{\\\"componentType\\\":\\\"SELECT\\\",\\\"name\\\":\\\"报销项目\\\",\\\"value\\\":\\\"福利费\\\"}" +
+                ",{\\\"componentType\\\":\\\"TEXT\\\",\\\"name\\\":\\\"摘要\\\"}" +
+                ",{\\\"componentType\\\":\\\"AMOUNT\\\",\\\"name\\\":\\\"报销金额（元）\\\",\\\"value\\\":\\\"{\\\\\\\"amount\\\\\\\":3000000,\\\\\\\"amountType\\\\\\\":\\\\\\\"CNY\\\\\\\"}\\\"}]]\",\n" +
+                "        \"componentType\": \"TABLE\"\n" +
+                "    }" +
+                /*",\n" +
+                "    {\n" +
+                "        \"name\": \"附件/图片\",\n" +
+                "        \"value\": \"[{\\\"name\\\":\\\"深泽体检费3636.jpg\\\",\\\"url\\\":\\\"\\\"}]\",\n" +
+                "        \"componentType\": \"ATTACHMENT\"\n" +
+                "    }\n" +*/
+                "]", FormDataItem.class);
+        InstancePreview preview = InstancePreview.builder()
+                .processCode("")
+                .formData(formData)
+                .build();
+
+
+        InstancePreviewResult result =
+                getDingTalkInstancesService()
+                        .preview(preview);
     }
 
     public DingTalkInstancesService getDingTalkInstancesService() {
