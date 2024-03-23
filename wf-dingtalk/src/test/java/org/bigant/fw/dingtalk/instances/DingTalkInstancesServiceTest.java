@@ -98,6 +98,23 @@ public class DingTalkInstancesServiceTest extends BaseTest {
 
 
     @Test
+    public void start_old() {
+        log.info("发起审批实例开始测试。");
+        InstanceStart.InstanceStartBuilder builder = InstanceStart.builder();
+        InstanceStart instanceStart = builder
+                .processCode(dingTalkTestProcessCode)
+                .userId("123456789")
+                .deptId("123456789")
+                .formData(JSONArray.parseArray("", FormDataItem.class))
+                .build();
+
+        DingTalkInstancesService dingTalkInstancesService = this.getDingTalkInstancesService();
+        dingTalkInstancesService.start(instanceStart);
+
+    }
+
+
+    @Test
     public void detail() {
         String instanceCode = System.getenv("dingTalkTestInstanceCode");
         log.info("查询审批实例开始测试。instanceCode:{}", instanceCode);
