@@ -26,13 +26,12 @@ public class DingTalkUser {
     private DingTalkConfig dingTalkConfig;
     private ICache cache;
 
-    private static final String CACHE_KEY = DingTalkConstant.CACHE_KEY + "instances:openId:";
+    private static final String CACHE_KEY = DingTalkConstant.CACHE_KEY + "unionId:";
     private static final DingTalkClient client = new DefaultDingTalkClient("https://oapi.dingtalk.com/topapi/v2/user/get");
 
     /**
      * 获取钉钉用户详情
      * 接口地址：
-     *
      */
     public OapiV2UserGetResponse.UserGetResponse getUserInfo(String dingTalkUserId) {
 
@@ -61,10 +60,11 @@ public class DingTalkUser {
     }
 
     public String getUnionId(String dingTalkUserId) {
-        String spaceId = cache.get(CACHE_KEY + dingTalkUserId);
-        if (spaceId != null) {
-            return spaceId;
-        }
+        /*TODO 暂时关掉缓存尝试
+        String unionId = cache.get(CACHE_KEY + dingTalkUserId);
+        if (unionId != null) {
+            return unionId;
+        }*/
 
         String unionId = this.getUserInfo(dingTalkUserId).getUnionid();
         cache.set(CACHE_KEY + dingTalkUserId, unionId, 1000, TimeUnit.DAYS);

@@ -29,7 +29,6 @@ public class DingTalkFile {
 
     /**
      * 上传文件
-     *
      */
     public static CommitFileResponseBody uploadFile(String unionId,
                                                     String spaceId,
@@ -37,12 +36,12 @@ public class DingTalkFile {
                                                     Long size,
                                                     String filePath,
                                                     DingTalkConfig dingTalkConfig) {
-        log.debug("根据上传文件，unionId:{}，spaceId:{}，fileName:{}，size:{}，filePath:{}", unionId, fileName, size, size, filePath);
+        log.debug("根据上传文件，unionId:{}，spaceId:{}，fileName:{}，size:{}，filePath:{}", unionId, spaceId, fileName, size, filePath);
         try {
             return uploadFile(unionId, spaceId, fileName, size, new URL(filePath).openStream(), dingTalkConfig);
         } catch (IOException e) {
 
-            String errMsg = String.format("上传文件，unionId:%s，spaceId:%s，fileName:%s，size:%s，filePath:%s", unionId, fileName, size, size, filePath);
+            String errMsg = String.format("上传文件，unionId:%s，spaceId:%s，fileName:%s，size:%s，filePath:%s", unionId, spaceId, fileName, size, filePath);
 
             log.error(errMsg, e);
 
@@ -53,10 +52,9 @@ public class DingTalkFile {
 
     /**
      * 上传文件
-     *
      */
     public static CommitFileResponseBody uploadFile(String unionId, String spaceId, String fileName, Long size, InputStream is, DingTalkConfig dingTalkConfig) {
-        log.debug("根据流上传文件，unionId:{}，fileName:{}，size:{}，spaceId:{}", unionId, fileName, size, size);
+        log.info("根据流上传文件，unionId:{}，fileName:{}，size:{}，spaceId:{}", unionId, fileName, size, spaceId);
         GetFileUploadInfoResponseBody uploadInfo = getUploadInfo(unionId, spaceId, fileName, size, dingTalkConfig);
         GetFileUploadInfoResponseBody.GetFileUploadInfoResponseBodyHeaderSignatureInfo headerSignatureInfo = uploadInfo.getHeaderSignatureInfo();
 
@@ -100,7 +98,7 @@ public class DingTalkFile {
                         unionId,
                         fileName,
                         size,
-                        size,
+                        spaceId,
                         responseCode);
                 log.error(errMsg);
                 throw new TeaException(errMsg, new RuntimeException(errMsg));
@@ -111,7 +109,7 @@ public class DingTalkFile {
                     unionId,
                     fileName,
                     size,
-                    size,
+                    spaceId,
                     e.getMessage());
 
             log.error(errMsg);
@@ -121,7 +119,6 @@ public class DingTalkFile {
 
     /**
      * 提交文件
-     *
      */
     private static CommitFileResponseBody commitFile(String unionId, String spaceId, String fileName, Long size, DingTalkConfig dingTalkConfig, GetFileUploadInfoResponseBody uploadInfo) throws Exception {
         log.debug("提交文件，unionId:{}，spaceId:{}，fileName:{}，size:{}", unionId, fileName, size, spaceId);
@@ -158,7 +155,6 @@ public class DingTalkFile {
 
     /**
      * 获取文件上传信息
-     *
      */
     public static GetFileUploadInfoResponseBody getUploadInfo(String unionId, String spaceId, String fileName, Long size, DingTalkConfig dingTalkConfig) {
 

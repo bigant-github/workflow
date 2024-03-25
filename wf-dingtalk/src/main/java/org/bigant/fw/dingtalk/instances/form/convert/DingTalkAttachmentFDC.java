@@ -11,14 +11,16 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.bigant.fw.dingtalk.*;
+import org.bigant.wf.ComponentType;
 import org.bigant.wf.cache.ICache;
 import org.bigant.wf.exception.WfException;
-import org.bigant.wf.ComponentType;
 import org.bigant.wf.instances.form.FormDataItem;
 import org.bigant.wf.instances.form.FormDataParseAll;
 import org.bigant.wf.instances.form.databean.FormDataAttachment;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -110,13 +112,13 @@ public class DingTalkAttachmentFDC extends DingTalkBaseFDC {
 
     public Long getProcessInstancesSpaces(String dingTalkUserId) {
 
+        /*TODO 暂时关掉缓存排查问题
         String spaceIdStr = cache.get(CACHE_KEY_SPACE_ID + dingTalkUserId);
         if (spaceIdStr != null) {
             return Long.valueOf(spaceIdStr);
-        }
+        }*/
 
-        log.debug("钉钉-获取流程实例的空间：userId:{}。",
-                dingTalkUserId);
+        log.info("钉钉-获取审批附件空间：userId:{}。", dingTalkUserId);
         com.aliyun.dingtalkworkflow_1_0.models.GetAttachmentSpaceHeaders getAttachmentSpaceHeaders = new com.aliyun.dingtalkworkflow_1_0.models.GetAttachmentSpaceHeaders();
 
         com.aliyun.dingtalkworkflow_1_0.models.GetAttachmentSpaceRequest getAttachmentSpaceRequest = new com.aliyun.dingtalkworkflow_1_0.models.GetAttachmentSpaceRequest()
@@ -129,7 +131,7 @@ public class DingTalkAttachmentFDC extends DingTalkBaseFDC {
             GetAttachmentSpaceResponse attachmentSpaceWithOptions = client.getAttachmentSpaceWithOptions(getAttachmentSpaceRequest, getAttachmentSpaceHeaders, new RuntimeOptions());
             Long spaceId = attachmentSpaceWithOptions.getBody().getResult().getSpaceId();
 
-            log.debug("钉钉-获取审批空间详情成功，userId:{},spaceId:{}", dingTalkUserId, spaceId);
+            log.debug("钉钉-获取审批附件空间成功，userId:{},spaceId:{}", dingTalkUserId, spaceId);
 
 
             cache.set(CACHE_KEY_SPACE_ID + dingTalkUserId, spaceId.toString(), 1000, TimeUnit.DAYS);
