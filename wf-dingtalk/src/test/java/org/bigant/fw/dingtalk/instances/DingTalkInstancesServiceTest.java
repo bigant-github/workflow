@@ -40,12 +40,12 @@ public class DingTalkInstancesServiceTest extends BaseTest {
                 .userId("123456789")
                 .deptId("123456789")
                 .authMatchSelectApproverUsers(
-                        Arrays.asList(InstanceStart.AuthMatchNodeUser.builder()
+                        Arrays.asList(/*InstanceStart.AuthMatchNodeUser.builder()
                                         .userIds(Arrays.asList("1"))
-                                        .build()
-                                , InstanceStart.AuthMatchNodeUser.builder()
+                                        .build()*/
+                                /*, InstanceStart.AuthMatchNodeUser.builder()
                                         .userIds(Arrays.asList("1"))
-                                        .build()
+                                        .build()*/
                         ))
 /*                .autoMathSelectCcUsers(
                         Arrays.asList(InstanceStart.AuthMatchNodeUser.builder()

@@ -94,20 +94,21 @@ public class DingTalkInstancesService implements InstancesService {
 
             OapiProcessinstanceCreateResponse execute = client.execute(req, dingTalkConfig.accessToken());
             if (!execute.isSuccess()) {
-                throw new WfException("发起审批失败：" + execute.getErrcode());
+                throw new WfException("钉钉-发起审批实例失败：" + execute.getErrmsg());
             }
 
             String instanceId = execute.getProcessInstanceId();
-            log.debug("发起审批实例成功：processCode:{}，instanceCode:{}", instanceStart.getProcessCode(), instanceId);
+            log.debug("钉钉-发起审批实例成功：processCode:{}，instanceCode:{}", instanceStart.getProcessCode(), instanceId);
 
             return InstanceStartResult.builder()
                     .processCode(instanceStart.getProcessCode())
                     .instanceCode(instanceId)
                     .build();
-        } catch (TeaException err) {
-            throw err;
+        } catch (WfException we) {
+            throw we;
         } catch (Exception _err) {
-            throw new TeaException(_err.getMessage(), _err);
+            log.error("钉钉-发起审批实例失败", _err);
+            throw new WfException("钉钉-发起审批实例失败:" + _err.getMessage(), _err);
         }
     }
 
