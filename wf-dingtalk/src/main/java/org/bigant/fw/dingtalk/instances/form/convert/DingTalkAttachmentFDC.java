@@ -108,7 +108,7 @@ public class DingTalkAttachmentFDC extends DingTalkBaseFDC {
         return DingTalkFormType.ATTACHMENT.getDingTalkType();
     }
 
-    private Long getProcessInstancesSpaces(String dingTalkUserId) {
+    public Long getProcessInstancesSpaces(String dingTalkUserId) {
 
         String spaceIdStr = cache.get(CACHE_KEY_SPACE_ID + dingTalkUserId);
         if (spaceIdStr != null) {

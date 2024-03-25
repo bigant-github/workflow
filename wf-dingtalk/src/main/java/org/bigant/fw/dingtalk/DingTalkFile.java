@@ -162,7 +162,7 @@ public class DingTalkFile {
      */
     public static GetFileUploadInfoResponseBody getUploadInfo(String unionId, String spaceId, String fileName, Long size, DingTalkConfig dingTalkConfig) {
 
-        log.debug("获取文件上传信息，unionId:{}，fileName:{}，size:{}，spaceId:{}", unionId, fileName, size, size);
+        log.debug("获取文件上传信息，unionId:{}，fileName:{}，size:{}，spaceId:{}", unionId, fileName, size, spaceId);
 
         com.aliyun.dingtalkstorage_1_0.models.GetFileUploadInfoHeaders getFileUploadInfoHeaders = new com.aliyun.dingtalkstorage_1_0.models.GetFileUploadInfoHeaders();
         getFileUploadInfoHeaders.xAcsDingtalkAccessToken = dingTalkConfig.accessToken();
@@ -186,10 +186,10 @@ public class DingTalkFile {
         try {
             com.aliyun.dingtalkstorage_1_0.Client client = createClient();
             GetFileUploadInfoResponse fileUploadInfoWithOptions = client.getFileUploadInfoWithOptions(spaceId, getFileUploadInfoRequest, getFileUploadInfoHeaders, new RuntimeOptions());
-            log.debug("钉钉-获取文件上传信息成功，unionId:{}，fileName:{}，size:{}，spaceId:{}，body:{}", unionId, fileName, size, size, JSONObject.toJSONString(fileUploadInfoWithOptions.getBody()));
+            log.debug("钉钉-获取文件上传信息成功，unionId:{}，fileName:{}，size:{}，spaceId:{}，body:{}", unionId, fileName, size, spaceId, JSONObject.toJSONString(fileUploadInfoWithOptions.getBody()));
             return fileUploadInfoWithOptions.getBody();
         } catch (Exception err) {
-            String errMsg = String.format("钉钉-获取文件上传信息失败，unionId:%s，fileName:%s，size:%s，spaceId:%s", unionId, fileName, size, size);
+            String errMsg = String.format("钉钉-获取文件上传信息失败，unionId:%s，fileName:%s，size:%s，spaceId:%s", unionId, fileName, size, spaceId);
             log.error(errMsg);
             throw new WfException(errMsg, err);
         }

@@ -102,10 +102,22 @@ public class DingTalkInstancesServiceTest extends BaseTest {
         log.info("发起审批实例开始测试。");
         InstanceStart.InstanceStartBuilder builder = InstanceStart.builder();
         InstanceStart instanceStart = builder
-                .processCode(dingTalkTestProcessCode)
+                .processCode("PROC-E117ADE6-8082-446E-AE8B-00886A0C30B9")
                 .userId("123456789")
                 .deptId("123456789")
-                .formData(JSONArray.parseArray("", FormDataItem.class))
+                .formData(JSONArray.parseArray("[{\"name\": \"付款公司\", \"value\": \"保定搜才人力资源有限公司\", \"componentType\": \"SELECT\"}, " +
+                        "{\"name\": \"预算\", \"value\": \"内\", \"componentType\": \"SELECT\"}, " +
+                        "{\"name\": \"款项性质\", \"value\": \"预付款\", \"componentType\": \"SELECT\"}, " +
+                        "{\"name\": \"付款项目\", \"value\": \"服务费\", \"componentType\": \"SELECT\"}, " +
+                        "{\"name\": \"付款金额（元）\", \"value\": \"{\\\"amount\\\":6.00,\\\"amountType\\\":\\\"CNY\\\"}\", \"componentType\": \"AMOUNT\"}, " +
+                        "{\"name\": \"收款方开户名\", \"value\": \"河南快沃网络科技有限公司\", \"componentType\": \"TEXT\"}, " +
+                        "{\"name\": \"收款方开户行\", \"value\": \"财付通-备付金账户null\", \"componentType\": \"TEXT\"}, " +
+                        "{\"name\": \"收款方银行账号\", \"value\": \"950171653894142\", \"componentType\": \"TEXT\"}, " +
+                        "{\"name\": \"付款备注\", \"value\": \"拼多多小时工项目_20240325142706结算单,微信方式发放3人，共计6.00元。\", \"componentType\": \"TEXTAREA\"}, " +
+                        "{\"name\": \"备注\", \"value\": null, \"componentType\": \"TEXTAREA\"}, " +
+                        "{\"name\": \"发起者附言\", \"value\": null, \"componentType\": \"TEXTAREA\"}, " +
+                        /*"{\"name\": \"结算明细文件\", \"value\": \"[{\\\"name\\\":\\\"快乐沃克人力资源股份有限公司广州分公司559.pdf\\\",\\\"url\\\":\\\"https://klwk-matrix.kuailework.com/upload/20240325/5e147a98216565286b5c89ad4eb5cbbe.pdf\\\"}]\", \"componentType\": \"ATTACHMENT\"}" +*/
+                        "]", FormDataItem.class))
                 .build();
 
         DingTalkInstancesService dingTalkInstancesService = this.getDingTalkInstancesService();
