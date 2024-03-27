@@ -428,6 +428,8 @@ public class DingTalkInstancesService implements InstancesService {
 
             }
 
+            tasks.sort(Comparator.comparing(InstanceDetailResult.Task::getEndTime));
+
 
             return InstanceDetailResult.builder()
                     .title(result.getTitle())
