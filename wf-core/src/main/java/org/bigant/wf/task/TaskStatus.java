@@ -8,6 +8,7 @@ package org.bigant.wf.task;
  */
 public enum TaskStatus {
 
+    START("发起"),
     WAITING("未启动"),
     RUNNING("处理中"),
     PAUSED("暂停"),

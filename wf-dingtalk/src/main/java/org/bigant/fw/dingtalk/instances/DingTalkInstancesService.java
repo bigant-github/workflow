@@ -340,7 +340,9 @@ public class DingTalkInstancesService implements InstancesService {
             //将form数据转换成系统form实体
             for (GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues formComponentValue
                     : result.getFormComponentValues()) {
-
+                if (formComponentValue.getValue() == null || formComponentValue.getValue().isEmpty()) {
+                    continue;
+                }
                 DingTalkBaseFDC fdc = dingTalkFDCF.getByOtherType(formComponentValue.getComponentType());
                 FormDataItem formDataItem = fdc.toFormData(formComponentValue);
                 formDataItemList.add(formDataItem);
@@ -348,6 +350,16 @@ public class DingTalkInstancesService implements InstancesService {
             }
 
             List<InstanceDetailResult.Task> tasks = new ArrayList<>();
+
+            String startUserId = userService.getUserIdByOtherUserId(result.getOriginatorUserId(), getChannelName());
+            User startUser = userService.getUser(startUserId);
+            tasks.add(InstanceDetailResult.Task.builder()
+                    .endTime(LocalDateTime.parse(result.getCreateTime(), TASK_TIME_FORMAT))
+                    .taskCode("")
+                    .userId(startUserId)
+                    .userName(startUser.getUserName())
+                    .taskStatus(TaskStatus.START)
+                    .build());
             //将task转换为系统task实体
             for (GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultTasks task : result.getTasks()) {
 

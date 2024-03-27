@@ -69,12 +69,15 @@ public class DingTalkTableFDC extends DingTalkBaseFDC {
                 GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues model
                         = new GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultFormComponentValues();
 
-                String type = field.getString("key").split("_")[0];
+                String type = field.getString("key").split("_")[0].split("-")[0];
                 model.setName(field.getString("label"));
                 model.setComponentType(type);
                 model.setValue(field.getString("value"));
 
                 DingTalkBaseFDC fdc = dingTalkFDCF.getByOtherType(type);
+                if (fdc == null || fdc.getType().equals(ComponentType.UNKNOWN)) {
+                    continue;
+                }
                 fieldList.add(fdc.toFormData(model));
             }
 
