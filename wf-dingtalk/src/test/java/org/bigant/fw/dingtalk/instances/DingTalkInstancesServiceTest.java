@@ -92,7 +92,7 @@ public class DingTalkInstancesServiceTest extends BaseTest {
                 .build();
 
         DingTalkInstancesService dingTalkInstancesService = this.getDingTalkInstancesService();
-        dingTalkInstancesService.start(instanceStart);
+        dingTalkInstancesService.start_new(instanceStart);
 
     }
 

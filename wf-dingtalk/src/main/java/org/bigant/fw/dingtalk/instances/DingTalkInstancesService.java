@@ -58,7 +58,7 @@ public class DingTalkInstancesService implements InstancesService {
 
         if ((instanceStart.getSelectApproverUsers() != null && !instanceStart.getSelectApproverUsers().isEmpty())
                 || (instanceStart.getAuthMatchSelectApproverUsers() != null && !instanceStart.getAuthMatchSelectApproverUsers().isEmpty())) {
-            this.start_new(instanceStart);
+            return this.start_new(instanceStart);
         }
 
         log.debug("发起审批实例：{}", JSONObject.toJSONString(instanceStart));
@@ -113,6 +113,10 @@ public class DingTalkInstancesService implements InstancesService {
     }
 
 
+    /**
+     * 发起审批实例
+     * 对应接口文档地址：<a href="https://open.dingtalk.com/document/orgapp/create-an-approval-instance">...</a>
+     */
     public InstanceStartResult start_new(InstanceStart instanceStart) {
 
         log.debug("发起审批实例：{}", JSONObject.toJSONString(instanceStart));
@@ -154,7 +158,9 @@ public class DingTalkInstancesService implements InstancesService {
         try {
             Client client = getClient();
             startProcessInstanceHeaders.xAcsDingtalkAccessToken = dingTalkConfig.accessToken();
-            StartProcessInstanceResponse processInstanceResponse = client.startProcessInstance(startProcessInstanceRequest);
+            StartProcessInstanceResponse processInstanceResponse = client.startProcessInstanceWithOptions(startProcessInstanceRequest
+                    , startProcessInstanceHeaders
+                    , new com.aliyun.teautil.models.RuntimeOptions());
 
             String instanceId = processInstanceResponse.getBody().getInstanceId();
             log.debug("发起审批实例成功：processCode:{}，instanceCode:{}", instanceStart.getProcessCode(), instanceId);
@@ -363,8 +369,8 @@ public class DingTalkInstancesService implements InstancesService {
             //将task转换为系统task实体
             for (GetProcessInstanceResponseBody.GetProcessInstanceResponseBodyResultTasks task : result.getTasks()) {
 
-                String taskUserId = userService.getUserIdByOtherUserId(task.getUserId(), getChannelName());
-                User taskUser = userService.getUser(taskUserId);
+                String taskUserId = null;
+                String taskUserName = null;
 
                 TaskStatus taskStatus;
 
@@ -392,27 +398,36 @@ public class DingTalkInstancesService implements InstancesService {
 
                 switch (instancesTaskStatus) {
                     case "NEW":
+                        taskUserId = userService.getUserIdByOtherUserId(task.getUserId(), getChannelName());
+                        taskUserName = userService.getUser(taskUserId).getUserName();
                         taskStatus = TaskStatus.WAITING;
                         break;
                     case "RUNNING":
+                        taskUserId = userService.getUserIdByOtherUserId(task.getUserId(), getChannelName());
+                        taskUserName = userService.getUser(taskUserId).getUserName();
                         taskStatus = TaskStatus.RUNNING;
                         break;
                     case "PAUSED":
                         taskStatus = TaskStatus.PAUSED;
                         break;
                     case "CANCELED":
-                        taskStatus = TaskStatus.CANCELED;
+                        if ("REDIRECTED".equals(instancesTaskResultStatus)) {
+                            taskUserId = userService.getUserIdByOtherUserId(task.getUserId(), getChannelName());
+                            taskUserName = userService.getUser(taskUserId).getUserName();
+                            taskStatus = TaskStatus.REDIRECTED;
+                        } else {
+                            taskStatus = TaskStatus.CANCELED;
+                        }
                         break;
                     case "COMPLETED":
+                        taskUserId = userService.getUserIdByOtherUserId(task.getUserId(), getChannelName());
+                        taskUserName = userService.getUser(taskUserId).getUserName();
                         switch (instancesTaskResultStatus) {
                             case "AGREE":
                                 taskStatus = TaskStatus.AGREED;
                                 break;
                             case "REFUSE":
                                 taskStatus = TaskStatus.REFUSED;
-                                break;
-                            case "REDIRECTED":
-                                taskStatus = TaskStatus.REDIRECTED;
                                 break;
                             default:
                                 String errMsg = String.format("钉钉-查询审批示例详情，无法识别的任务状态 resultStatus:%s", status);
@@ -431,16 +446,20 @@ public class DingTalkInstancesService implements InstancesService {
 
 
                 tasks.add(InstanceDetailResult.Task.builder()
-                        .endTime(LocalDateTime.parse(task.getFinishTime(), TASK_TIME_FORMAT))
+                        .endTime(task.getFinishTime() == null || task.getFinishTime().isEmpty()
+                                ? null : LocalDateTime.parse(task.getFinishTime(), TASK_TIME_FORMAT))
                         .taskCode(task.getTaskId().toString())
                         .userId(taskUserId)
-                        .userName(taskUser.getUserName())
+                        .userName(taskUserName)
                         .taskStatus(taskStatus)
                         .build());
 
             }
 
-            tasks.sort(Comparator.comparing(InstanceDetailResult.Task::getEndTime));
+            LocalDateTime now = LocalDateTime.now();
+            tasks.sort(Comparator.comparing(x -> x.getEndTime() == null
+                    ? now
+                    : x.getEndTime()));
 
 
             return InstanceDetailResult.builder()

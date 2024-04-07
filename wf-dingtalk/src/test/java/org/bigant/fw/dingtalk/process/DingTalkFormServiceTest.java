@@ -30,7 +30,12 @@ public class DingTalkFormServiceTest extends BaseTest {
                 getProcessService()
                         .allPage(new ProcessPageQuery());
 
-        log.info(processPageStream.toString());
+
+        log.info("钉钉-测试查询列表成功");
+        for (ProcessPage processPage : processPageStream) {
+            log.info("钉钉-测试查询列表成功。data:{}", JSONObject.toJSONString(processPage));
+        }
+
     }
 
 
@@ -38,7 +43,7 @@ public class DingTalkFormServiceTest extends BaseTest {
     public void detail() {
         log.info("钉钉-测试查询详情开始");
         ProcessDetail detail = getProcessService()
-                .detail(dingTalkTestProcessCode);
+                .detail("dingTalkTestProcessCode");
         log.info("钉钉-测试查询详情成功。data:{}", JSONObject.toJSONString(detail));
     }
 
