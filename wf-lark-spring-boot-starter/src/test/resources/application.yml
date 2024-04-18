@@ -1,6 +1,6 @@
 wf:
   lark:
     callback:
-      enable: true
+      enabled: true
       type: http
       #path: callback

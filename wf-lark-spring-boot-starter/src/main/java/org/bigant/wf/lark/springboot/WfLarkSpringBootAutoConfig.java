@@ -56,7 +56,7 @@ public class WfLarkSpringBootAutoConfig {
     @Bean
     @ConditionalOnMissingBean
     @ConditionalOnBean(InstancesAction.class)
-    @ConditionalOnProperty(value = "wf.lark.callback.enable", havingValue = "true")
+    @ConditionalOnProperty(value = "wf.lark.callback.enabled", havingValue = "true")
     public LarkCallback larkCallback(InstancesAction instancesAction, LarkProperties larkProperties) {
         return new LarkCallback(instancesAction,
                 larkProperties.getCallback().getVerificationToken(),
