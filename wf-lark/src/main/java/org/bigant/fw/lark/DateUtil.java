@@ -13,7 +13,6 @@ import java.time.ZoneId;
 public class DateUtil {
 
     public static LocalDateTime timestampToLocalDateTime(Long timestamp) {
-        timestamp = timestamp * 1000;
         Instant instant = Instant.ofEpochMilli(timestamp);
         return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
     }
