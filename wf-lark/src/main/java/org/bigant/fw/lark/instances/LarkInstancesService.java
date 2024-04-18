@@ -480,7 +480,9 @@ public class LarkInstancesService implements InstancesService {
 
         ArrayList<Map<String, Object>> maps = new ArrayList<>();
         for (FormDataItem formDataItem : formDataItemList) {
-            if (formDataItem.getValue() == null || formDataItem.getValue().isEmpty()) {
+            if (formDataItem.getValue() == null
+                    || formDataItem.getValue().isEmpty()
+                    || !formItemMap.containsKey(formDataItem.getName())) {
                 continue;
             }
             maps.add(this.parseFormValues(formDataItem, formItemMap.get(formDataItem.getName())));
