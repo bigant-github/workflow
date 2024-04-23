@@ -145,8 +145,12 @@ public class LarkProcessService implements ProcessService {
                         .type(ComponentType.TEXTAREA)
                         .build();
             case "number":
+                String name = item.get("name").toString();
+                if(name.contains("(")){
+                    name = name.substring(0,name.lastIndexOf("("));
+                }
                 return FormDetailItem.builder()
-                        .name(item.get("name").toString())
+                        .name(name)
                         .id(item.get("id").toString())
                         .type(ComponentType.NUMBER)
                         .build();
