@@ -82,6 +82,9 @@ public class LarkInstancesService implements InstancesService {
                 .instanceCreate(InstanceCreate.newBuilder()
                         .approvalCode(instanceStart.getProcessCode())
                         .userId(userId)
+                        .departmentId(instanceStart.getDeptId() != null && !instanceStart.getDeptId().isEmpty()
+                                ? userService.getOtherDeptIdByDeptId(instanceStart.getDeptId(), this.getChannelName())
+                                : null)
                         .form(form)
                         .nodeApproverUserIdList(nodeApprovers.toArray(new NodeApprover[]{}))
                         .nodeCcUserIdList(nodeCcs.toArray(new NodeCc[]{}))
@@ -396,7 +399,7 @@ public class LarkInstancesService implements InstancesService {
                 .tasks(tasks)
                 .title(body.getApprovalName())
                 .deptId(userService.getDeptIdByOtherDeptId(body.getDepartmentId(), getChannelName()))
-                .userId(userService.getOtherUserIdByUserId(body.getUserId(), getChannelName()))
+                .userId(userService.getUserIdByOtherUserId(body.getUserId(), getChannelName()))
                 .build();
     }
 

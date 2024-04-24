@@ -129,6 +129,7 @@ public class LarkCallback {
             case "CANCELED":
             case "REVERTED":
                 instancesCallback.setAction(InstanceStatus.CANCELED);
+                break;
             case "DELETED":
                 instancesCallback.setAction(InstanceStatus.DELETED);
                 break;
