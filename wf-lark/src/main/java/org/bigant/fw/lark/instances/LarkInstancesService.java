@@ -62,13 +62,18 @@ public class LarkInstancesService implements InstancesService {
      */
     @Override
     public InstanceStartResult start(InstanceStart instanceStart) {
+
+        try {
+            this.subscribe(instanceStart.getProcessCode());
+        } catch (Exception e) {
+            log.warn("飞书-订阅审批实例失败。processCode:{}", instanceStart.getProcessCode());
+        }
         // 构建client
         Client client = larkConfig.getClient();
 
         String userId = userService.getOtherUserIdByUserId(instanceStart.getUserId(), LarkConstant.NAME);
 
         ProcessDetail processDetail = larkProcessService.detail(instanceStart.getProcessCode());
-
 
         String form = parseFormData(processDetail, instanceStart.getFormData());
 
@@ -82,9 +87,9 @@ public class LarkInstancesService implements InstancesService {
                 .instanceCreate(InstanceCreate.newBuilder()
                         .approvalCode(instanceStart.getProcessCode())
                         .userId(userId)
-                        .departmentId(instanceStart.getDeptId() != null && !instanceStart.getDeptId().isEmpty()
+                        /*.departmentId(instanceStart.getDeptId() != null && !instanceStart.getDeptId().isEmpty()
                                 ? userService.getOtherDeptIdByDeptId(instanceStart.getDeptId(), this.getChannelName())
-                                : null)
+                                : null)*/
                         .form(form)
                         .nodeApproverUserIdList(nodeApprovers.toArray(new NodeApprover[]{}))
                         .nodeCcUserIdList(nodeCcs.toArray(new NodeCc[]{}))
@@ -121,11 +126,7 @@ public class LarkInstancesService implements InstancesService {
         log.debug("飞书-发起审批实例成功。instanceCode:{}", data.getInstanceCode());
 
 
-        try {
-            this.subscribe(instanceStart.getProcessCode());
-        } catch (Exception e) {
-            log.warn("飞书-订阅审批实例失败。processCode:{}", data.getInstanceCode());
-        }
+
 
         return InstanceStartResult.builder().instanceCode(data.getInstanceCode())
                 .processCode(instanceStart.getProcessCode())
@@ -339,7 +340,17 @@ public class LarkInstancesService implements InstancesService {
                 throw new WfException(errMsg);
         }
 
+        String startUserId = userService.getUserIdByOtherUserId(body.getUserId(), getChannelName());
         ArrayList<InstanceDetailResult.Task> tasks = new ArrayList<>();
+
+        tasks.add(InstanceDetailResult.Task.builder()
+                .taskCode("")
+                .userId(startUserId)
+                .userName(userService.getUser(startUserId).getUserName())
+                .taskStatus(TaskStatus.START)
+                .endTime(DateUtil.timestampToLocalDateTime(body.getStartTime()))
+                .build());
+
         for (InstanceTask instanceTask : body.getTaskList()) {
 
             String userId = instanceTask.getUserId();
