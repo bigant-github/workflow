@@ -20,7 +20,7 @@ public class LarkProperties {
     private String appSecret;
     private boolean logDebug = false;
     private BaseUrlEnum openBaseUrl = BaseUrlEnum.FeiShu;
-    private int requestTimeout = 3;
+    private int requestTimeout = 30;
 
     private CallbackProperties callback;
 

@@ -94,7 +94,7 @@ public class LarkCallback {
 
 
     public void instancesCallback(JSONObject event) {
-
+        log.info("飞书-审批回调：{}", event.toJSONString());
         /*PENDING - 审批中
         APPROVED - 已通过
         REJECTED - 已拒绝
@@ -103,10 +103,19 @@ public class LarkCallback {
         REVERTED - 已撤销
         OVERTIME_CLOSE - 超时被关闭
         OVERTIME_RECOVER - 超时实例被恢复 */
-        Long operateTimeSecond = event.getLong("instance_operate_time");
 
-        //时间戳转LocalDateTime
-        LocalDateTime operateTime = DateUtil.timestampToLocalDateTime(operateTimeSecond);
+        if (!"approval_instance".equals(event.getString("type"))) {
+            return;
+        }
+
+        LocalDateTime operateTime;
+        Long operateTimeSecond = event.getLong("instance_operate_time");
+        if (operateTimeSecond == null) {
+            operateTime = LocalDateTime.now();
+        } else {
+            //时间戳转LocalDateTime
+            operateTime = DateUtil.timestampToLocalDateTime(operateTimeSecond);
+        }
 
 
         InstancesAction.InstancesCallback instancesCallback = InstancesAction.InstancesCallback.builder()

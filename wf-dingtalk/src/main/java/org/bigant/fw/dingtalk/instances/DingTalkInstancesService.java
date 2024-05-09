@@ -10,6 +10,7 @@ import com.dingtalk.api.DefaultDingTalkClient;
 import com.dingtalk.api.DingTalkClient;
 import com.dingtalk.api.request.OapiProcessinstanceCreateRequest;
 import com.dingtalk.api.response.OapiProcessinstanceCreateResponse;
+import com.taobao.api.internal.toplink.embedded.websocket.util.StringUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -416,6 +417,8 @@ public class DingTalkInstancesService implements InstancesService {
                             taskUserName = userService.getUser(taskUserId).getUserName();
                             taskStatus = TaskStatus.REDIRECTED;
                         } else {
+                            taskUserId = startUserId;
+                            taskUserName = startUser.getUserName();
                             taskStatus = TaskStatus.CANCELED;
                         }
                         break;
@@ -447,7 +450,8 @@ public class DingTalkInstancesService implements InstancesService {
 
                 tasks.add(InstanceDetailResult.Task.builder()
                         .endTime(task.getFinishTime() == null || task.getFinishTime().isEmpty()
-                                ? null : LocalDateTime.parse(task.getFinishTime(), TASK_TIME_FORMAT))
+                                ? LocalDateTime.parse(task.getCreateTime(), TASK_TIME_FORMAT)
+                                : LocalDateTime.parse(task.getFinishTime(), TASK_TIME_FORMAT))
                         .taskCode(task.getTaskId().toString())
                         .userId(taskUserId)
                         .userName(taskUserName)
