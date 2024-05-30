@@ -12,25 +12,25 @@ public interface InstancesService {
 
     /**
      * 发起实例
-     *
      */
     InstanceStartResult start(InstanceStart instanceStart);
 
 
     /**
      * 预览实例
-     *
      */
     InstancePreviewResult preview(InstancePreview instancePreview);
 
 
     /**
      * 预览实例
-     *
      */
     InstanceDetailResult detail(String instanceCode);
 
-
+    /**
+     * 撤销实例
+     */
+    void cancel(InstanceCancel instanceCancel);
 
     String getChannelName();
 

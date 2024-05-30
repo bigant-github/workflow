@@ -18,6 +18,7 @@ import org.bigant.wf.exception.WfException;
 import org.bigant.wf.instances.InstanceStatus;
 import org.bigant.wf.instances.InstancesService;
 import org.bigant.wf.instances.bean.*;
+import org.bigant.wf.instances.bean.InstanceCancel;
 import org.bigant.wf.instances.form.FormDataItem;
 import org.bigant.wf.process.bean.ProcessDetail;
 import org.bigant.wf.process.form.FormDetailItem;
@@ -124,8 +125,6 @@ public class LarkInstancesService implements InstancesService {
         CreateInstanceRespBody data = resp.getData();
 
         log.debug("飞书-发起审批实例成功。instanceCode:{}", data.getInstanceCode());
-
-
 
 
         return InstanceStartResult.builder().instanceCode(data.getInstanceCode())
@@ -412,6 +411,37 @@ public class LarkInstancesService implements InstancesService {
                 .deptId(userService.getDeptIdByOtherDeptId(body.getDepartmentId(), getChannelName()))
                 .userId(userService.getUserIdByOtherUserId(body.getUserId(), getChannelName()))
                 .build();
+    }
+
+    @Override
+    public void cancel(InstanceCancel instanceCancel) {
+        // 构建client
+        Client client = larkConfig.getClient();
+
+        // 创建请求对象
+        CancelInstanceReq req = CancelInstanceReq.newBuilder()
+                .instanceCancel(com.lark.oapi.service.approval.v4.model.InstanceCancel.newBuilder()
+                        .approvalCode(instanceCancel.getProcessCode())
+                        .instanceCode(instanceCancel.getInstanceCode())
+                        .userId(instanceCancel.getUserId())
+                        .build())
+                .build();
+
+        // 发起请求
+        CancelInstanceResp resp = null;
+        try {
+            resp = client.approval().instance().cancel(req);
+            // 处理服务端错误
+            if (!resp.success()) {
+                String errMsg = String.format("飞书-撤销审批实例失败。instanceCode:%s", instanceCancel.getInstanceCode());
+                throw new WfException(errMsg);
+            }
+        } catch (Exception e) {
+            String errMsg = String.format("飞书-撤销审批实例失败。instanceCode:%s", instanceCancel.getInstanceCode());
+            log.error(errMsg);
+            throw new WfException(errMsg, e);
+        }
+
     }
 
     public void subscribe(String processCode) throws Exception {

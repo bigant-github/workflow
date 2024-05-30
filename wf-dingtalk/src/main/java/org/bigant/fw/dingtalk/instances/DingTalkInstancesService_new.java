@@ -394,6 +394,43 @@ public class DingTalkInstancesService_new implements InstancesService {
         }
     }
 
+    @Override
+    public void cancel(InstanceCancel instanceCancel) {
+        com.aliyun.dingtalkworkflow_1_0.models.TerminateProcessInstanceHeaders terminateProcessInstanceHeaders =
+                new com.aliyun.dingtalkworkflow_1_0.models.TerminateProcessInstanceHeaders();
+        terminateProcessInstanceHeaders.xAcsDingtalkAccessToken = dingTalkConfig.accessToken();
+
+        com.aliyun.dingtalkworkflow_1_0.models.TerminateProcessInstanceRequest terminateProcessInstanceRequest =
+                new com.aliyun.dingtalkworkflow_1_0.models.TerminateProcessInstanceRequest()
+                        .setProcessInstanceId(instanceCancel.getInstanceCode())
+                        .setIsSystem(true)
+                        .setRemark(instanceCancel.getRemark())
+                        .setOperatingUserId(instanceCancel.getUserId());
+        try {
+            TerminateProcessInstanceResponse processInstanceResponse
+                    = client.terminateProcessInstanceWithOptions(terminateProcessInstanceRequest, terminateProcessInstanceHeaders, new RuntimeOptions());
+            if (!processInstanceResponse.getBody().getResult()) {
+                throw new WfException("钉钉-撤销审批实例失败。");
+            }
+        } catch (TeaException err) {
+
+            String errMsg = String.format("钉钉-撤销审批实例失败。instanceCode:%s,errorCode:%s,message:%s",
+                    instanceCancel.getInstanceCode(),
+                    err.code,
+                    err.message);
+
+            log.error(errMsg, errMsg);
+            throw new WfException(errMsg, err);
+
+        } catch (Exception _err) {
+
+            String errMsg = String.format("钉钉-撤销审批实例失败。instanceCode:%s", instanceCancel.getInstanceCode());
+            log.error(errMsg, _err);
+            throw new WfException(errMsg, _err);
+
+        }
+    }
+
     /**
      * 解析自选节点用户自动匹配
      */
