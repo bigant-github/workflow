@@ -4,8 +4,10 @@ package org.bigant.fw.lark.instances;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.bigant.fw.lark.BaseTest;
+import org.bigant.fw.lark.LarkConstant;
 import org.bigant.fw.lark.instances.form.LarkFDCF;
 import org.bigant.fw.lark.process.LarkProcessService;
+import org.bigant.wf.instances.bean.InstanceCancel;
 import org.bigant.wf.instances.bean.InstanceDetailResult;
 import org.bigant.wf.instances.bean.InstanceStart;
 import org.bigant.wf.instances.form.FormDataItem;
@@ -27,12 +29,13 @@ import java.util.Arrays;
 public class LarkInstancesServiceTest extends BaseTest {
 
 
+    String instanceCode;
+
     @Test
     public void start() {
         log.info("开始测试");
-        String larkTestInstanceCode = System.getenv("larkTestInstanceCode");
 
-        String larkTestProcessCode = System.getenv("larkTestProcessCode");
+        String larkTestProcessCode = System.getProperty("larkTestProcessCode");
 
         InstanceStart instanceStart = InstanceStart.builder().processCode(larkTestProcessCode)
                 .userId("123456789")
@@ -43,13 +46,7 @@ public class LarkInstancesServiceTest extends BaseTest {
                                         .build()
                                 , InstanceStart.AuthMatchNodeUser.builder()
                                         .userIds(Arrays.asList("1"))
-                                        .build()
-                        ))
-/*                .autoMathSelectCcUsers(
-                        Arrays.asList(InstanceStart.AuthMatchNodeUser.builder()
-                                .userIds(Arrays.asList("1"))
-                                .build()
-                        ))*/
+                                        .build()))
                 .formData(
                         Arrays.asList(
                                 FormDataItem.text("单行文本", "测试"),
@@ -83,22 +80,33 @@ public class LarkInstancesServiceTest extends BaseTest {
                                                         FormDataItem.attachment("附件", Arrays.asList(
                                                                 FormDataAttachment.builder().name("测试1.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build(),
                                                                 FormDataAttachment.builder().name("测试2.gif").url("https://t7.baidu.com/it/u=4162611394,4275913936&fm=193&f=GIF").build()))
-                                                ))),
-                                FormDataItem.joinInstance("关联审批",
-                                        larkTestInstanceCode)))
+                                                )))))
                 .build();
 
         LarkInstancesService larkInstancesService = this.getLarkInstancesService();
-        larkInstancesService.start(instanceStart);
+        this.instanceCode = larkInstancesService.start(instanceStart).getInstanceCode();
     }
 
 
     @Test
     public void detail() {
-        String larkTestProcessCode = System.getenv("larkTestInstanceCode");
+        String larkTestProcessCode = System.getProperty("larkTestInstanceCode");
         InstanceDetailResult detail = getLarkInstancesService().detail(larkTestProcessCode);
         log.info(JSONObject.toJSONString(detail));
     }
+
+    @Test
+    public void cancel() throws InterruptedException {
+        String larkTestProcessCode = System.getProperty("larkTestProcessCode");
+        this.start();
+        Thread.sleep(20000);
+        getLarkInstancesService().cancel(InstanceCancel.builder()
+                .processCode(larkTestProcessCode)
+                .instanceCode(instanceCode)
+                .userId(userService.getOtherUserIdByUserId("1", LarkConstant.NAME))
+                .build());
+    }
+
 
     public LarkInstancesService getLarkInstancesService() {
         LarkProcessService processService = new LarkProcessService(larkConfig);

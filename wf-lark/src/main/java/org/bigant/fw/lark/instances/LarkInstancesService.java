@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.Client;
 import com.lark.oapi.core.utils.Jsons;
+import com.lark.oapi.service.approval.v4.enums.CancelInstanceUserIdTypeEnum;
 import com.lark.oapi.service.approval.v4.model.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -420,6 +421,7 @@ public class LarkInstancesService implements InstancesService {
 
         // 创建请求对象
         CancelInstanceReq req = CancelInstanceReq.newBuilder()
+                .userIdType(CancelInstanceUserIdTypeEnum.USER_ID)
                 .instanceCancel(com.lark.oapi.service.approval.v4.model.InstanceCancel.newBuilder()
                         .approvalCode(instanceCancel.getProcessCode())
                         .instanceCode(instanceCancel.getInstanceCode())
@@ -433,7 +435,7 @@ public class LarkInstancesService implements InstancesService {
             resp = client.approval().instance().cancel(req);
             // 处理服务端错误
             if (!resp.success()) {
-                String errMsg = String.format("飞书-撤销审批实例失败。instanceCode:%s", instanceCancel.getInstanceCode());
+                String errMsg = String.format("飞书-撤销审批实例失败。instanceCode:%s，message:%s", instanceCancel.getInstanceCode(), resp.getMsg());
                 throw new WfException(errMsg);
             }
         } catch (Exception e) {

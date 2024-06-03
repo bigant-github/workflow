@@ -3,6 +3,7 @@ package org.bigant.fw.dingtalk.instances.form.convert;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.aliyun.dingtalkdrive_1_0.models.AddFileResponseBody;
+import com.aliyun.dingtalkstorage_1_0.models.CommitFileResponseBody;
 import com.aliyun.dingtalkworkflow_1_0.models.GetAttachmentSpaceResponse;
 import com.aliyun.dingtalkworkflow_1_0.models.GetProcessInstanceResponseBody;
 import com.aliyun.tea.TeaException;
@@ -55,22 +56,21 @@ public class DingTalkAttachmentFDC extends DingTalkBaseFDC {
         JSONArray array = new JSONArray();
         for (FormDataAttachment formDataAttachment : formDataAttachments) {
 
-            /*CommitFileResponseBody fileBody = DingTalkFile.uploadFile(unionId,
+            CommitFileResponseBody fileBody = DingTalkFile.uploadFile(unionId,
                     spaceId,
                     formDataAttachment.getName(),
                     formDataAttachment.getSize(),
                     formDataAttachment.getUrl(),
                     dingTalkConfig);
 
-                    JSONObject jsonObject = new JSONObject();
+            JSONObject jsonObject = new JSONObject();
             jsonObject.put("spaceId", fileBody.getDentry().getSpaceId());
             jsonObject.put("fileName", fileBody.getDentry().getName());
             jsonObject.put("fileSize", fileBody.getDentry().getSize());
             jsonObject.put("fileType", fileBody.getDentry().getType());
             jsonObject.put("fileId", fileBody.getDentry().getId());
-            */
 
-            AddFileResponseBody fileBody = DingTalkFileOld.updateFile(unionId,
+            /*AddFileResponseBody fileBody = DingTalkFileOld.updateFile(unionId,
                     spaceId,
                     formDataAttachment.getName(),
                     formDataAttachment.getUrl(),
@@ -81,7 +81,7 @@ public class DingTalkAttachmentFDC extends DingTalkBaseFDC {
             jsonObject.put("fileName", fileBody.getFileName());
             jsonObject.put("fileSize", fileBody.getFileSize());
             jsonObject.put("fileType", fileBody.getFileType());
-            jsonObject.put("fileId", fileBody.getFileId());
+            jsonObject.put("fileId", fileBody.getFileId());*/
             array.add(jsonObject);
         }
         return toMap(data.getName(), array.toJSONString());
