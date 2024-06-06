@@ -395,7 +395,7 @@ public class LarkInstancesService implements InstancesService {
 
             tasks.add(InstanceDetailResult.Task.builder()
                     .taskCode(instanceTask.getId())
-                    .userId(instanceTask.getUserId())
+                    .userId(userId)
                     .userName(userName)
                     .taskStatus(taskStatus)
                     .endTime(DateUtil.timestampToLocalDateTime(instanceTask.getEndTime()))

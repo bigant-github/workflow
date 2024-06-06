@@ -91,7 +91,7 @@ public class LarkInstancesServiceTest extends BaseTest {
     @Test
     public void detail() {
         String larkTestProcessCode = System.getProperty("larkTestInstanceCode");
-        InstanceDetailResult detail = getLarkInstancesService().detail(larkTestProcessCode);
+        InstanceDetailResult detail = getLarkInstancesService().detail("4D312F4B-6052-46DB-A53E-2D011EB669FA");
         log.info(JSONObject.toJSONString(detail));
     }
 

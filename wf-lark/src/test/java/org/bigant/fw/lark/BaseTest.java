@@ -85,7 +85,7 @@ public class BaseTest {
     public void loadEnv() {
         String envPath = System.getProperty("user.dir").substring(0, System.getProperty("user.dir").lastIndexOf(File.separator));
         log.info("load env {}", envPath);
-        File envFile = new File(envPath + File.separator + ".env");
+        File envFile = new File(envPath + File.separator + ".env_klwk");
         if (envFile.exists()) {
             try {
                 Properties properties = new Properties();
