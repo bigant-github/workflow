@@ -25,8 +25,9 @@ public class LarkUnknownFDC extends LarkBaseFDC {
 
     @Override
     public FormDataItem toFormData(ToOtherParam component) {
-        String errorMsg = String.format("飞书-无法将%s转换为 form组件。", getType());
-        throw new WfException(errorMsg);
+        return null;
+        //String errorMsg = String.format("飞书-无法将%s转换为 form组件。", getType());
+        //throw new WfException(errorMsg);
     }
 
     @Override

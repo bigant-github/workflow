@@ -303,7 +303,9 @@ public class LarkInstancesService implements InstancesService {
         for (int i = 0; i < formArray.size(); i++) {
             JSONObject jsonObj = formArray.getJSONObject(i);
             LarkBaseFDC fdc = larkFDCF.getByOtherType(jsonObj.getString("type"));
-            formData.add(fdc.toFormData(new LarkBaseFDC.ToOtherParam(jsonObj, detailItemMap)));
+            if (fdc != null) {
+                formData.add(fdc.toFormData(new LarkBaseFDC.ToOtherParam(jsonObj, detailItemMap)));
+            }
         }
 
         /*
